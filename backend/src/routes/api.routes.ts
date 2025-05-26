@@ -179,15 +179,7 @@ router.get('/emails', validateOrgId, async (req, res) => {
         where,
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limitNum,
-        include: {
-          event: {
-            select: {
-              eventType: true,
-              payload: true
-            }
-          }
-        }
+        take: limitNum
       }),
       prisma.emailLog.count({ where })
     ]);

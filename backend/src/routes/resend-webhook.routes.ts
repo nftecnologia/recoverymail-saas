@@ -12,6 +12,7 @@ const resendWebhookSchema = z.object({
   type: z.enum([
     'email.sent',
     'email.delivered',
+    'email.delivery_delayed',
     'email.opened',
     'email.clicked',
     'email.bounced',
