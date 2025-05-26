@@ -8,7 +8,7 @@ const DEMO_USER = {
   id: "1",
   email: "admin@recoverymail.com",
   name: "Admin",
-  password: "$2a$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNu/1u", // senha: admin123
+  password: "$2b$10$VfmXiCRdvKxbNUURFAbfKuAnhEuTixAoVQe2JWhPGyDpPVC4EuKk2", // senha: admin123
 };
 
 export const authOptions: NextAuthOptions = {
