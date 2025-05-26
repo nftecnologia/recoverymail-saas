@@ -122,6 +122,11 @@ export async function sendEmail(emailData: EmailData): Promise<string> {
         { name: 'attempt_number', value: attemptNumber.toString() },
         { name: 'template', value: template },
       ],
+      // Habilitar tracking de cliques e abertura
+      headers: {
+        'X-Track-Clicks': 'true',
+        'X-Track-Opens': 'true',
+      },
     });
 
     if (error) {

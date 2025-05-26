@@ -33,6 +33,7 @@ const envSchema = z.object({
   RESEND_DOMAIN: z.string().default('inboxrecovery.com'),
   RESEND_FROM_EMAIL: z.string().email().default('recovery@inboxrecovery.com'),
   RESEND_FROM_NAME: z.string().default('InboxRecovery'),
+  RESEND_WEBHOOK_SECRET: z.string().optional(),
   
   // Security
   JWT_SECRET: z.string().min(32),
