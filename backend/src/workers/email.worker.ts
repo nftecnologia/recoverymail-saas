@@ -99,6 +99,81 @@ const emailWorker = new Worker<EmailJobData>(
           };
           break;
 
+        case 'SALE_REFUSED':
+          emailData.data = {
+            ...emailData.data,
+            checkoutUrl: '#',
+            productName: eventData.product?.name || 'Produto',
+            refusalReason: eventData.reason || 'Pagamento não autorizado',
+            pixDiscount: 15,
+            totalModules: 12,
+            communityMembers: 5000,
+            hoursAgo: 2,
+            supportCode: `SUP${eventId.slice(-6).toUpperCase()}`,
+            testimonial1: 'Maria Silva',
+            testimonial2: 'João Santos',
+            testimonial3: 'Ana Costa',
+            totalStudents: 10000,
+            phoneNumber: '0800-123-4567',
+            chatUrl: 'https://chat.example.com',
+          };
+          break;
+
+        case 'SALE_APPROVED':
+          emailData.data = {
+            ...emailData.data,
+            orderNumber: eventData.order_id || eventId,
+            totalAmount: eventData.amount || 'R$ 0,00',
+            paymentMethod: eventData.payment_method || 'Cartão',
+            productName: eventData.product?.name || 'Produto',
+            platformUrl: 'https://plataforma.example.com',
+            temporaryPassword: 'senha123',
+            bonuses: [],
+            communityMembers: 5000,
+            productBenefit: 'alcançar seus objetivos',
+            totalModules: 12,
+            communityUrl: '#',
+            telegramUrl: '#',
+            facebookGroupUrl: '#',
+            hasMobileApp: false,
+            organizationCNPJ: '00.000.000/0001-00',
+            termsUrl: `https://${event.organization.domain}/termos`,
+            privacyUrl: `https://${event.organization.domain}/privacidade`,
+          };
+          break;
+
+        case 'BANK_SLIP_GENERATED':
+          emailData.data = {
+            ...emailData.data,
+            productName: eventData.product?.name || 'Produto',
+            bankSlipUrl: eventData.bank_slip_url || '#',
+            barCode: eventData.bar_code || '00000.00000 00000.000000 00000.000000 0 00000000000000',
+            dueDate: eventData.due_date || new Date().toISOString(),
+            totalAmount: eventData.amount || 'R$ 0,00',
+          };
+          break;
+
+        case 'PIX_GENERATED':
+          emailData.data = {
+            ...emailData.data,
+            productName: eventData.product?.name || 'Produto',
+            qrCode: eventData.qr_code || '',
+            qrCodeUrl: eventData.qr_code_url || '#',
+            expiresAt: eventData.expires_at || new Date().toISOString(),
+            totalAmount: eventData.amount || 'R$ 0,00',
+          };
+          break;
+
+        case 'SUBSCRIPTION_EXPIRED':
+          emailData.data = {
+            ...emailData.data,
+            productName: eventData.plan?.name || 'Assinatura',
+            planName: eventData.plan?.name || 'Plano',
+            expiredAt: eventData.expired_at || new Date().toISOString(),
+            renewalUrl: `https://${event.organization.domain}/renovar`,
+          };
+          break;
+
         case 'SUBSCRIPTION_RENEWED':
           emailData.data = {
             ...emailData.data,
@@ -152,6 +227,40 @@ const emailWorker = new Worker<EmailJobData>(
           };
           break;
 
+        case 'SALE_CHARGEBACK':
+          emailData.data = {
+            ...emailData.data,
+            productName: eventData.product?.name || 'Produto',
+            purchaseDate: eventData.purchase_date || new Date().toISOString(),
+            purchaseAmount: eventData.amount || 'R$ 0,00',
+            chargebackId: eventData.chargeback_id || eventId,
+            daysRemaining: eventData.days_to_resolve || 7,
+            billingDescriptor: eventData.payment_details?.billing_descriptor || event.organization.name,
+            cardLastDigits: eventData.payment_details?.card_last_digits || '****',
+            transactionId: eventData.transaction_id || eventId,
+            cancelChargebackUrl: eventData.resolution_url || `https://${event.organization.domain}/resolver-chargeback`,
+            resolveChargebackUrl: eventData.resolution_url || `https://${event.organization.domain}/resolver-chargeback`,
+            phoneNumber: '0800-123-4567',
+            financeEmail: 'financeiro@example.com',
+          };
+          break;
+
+        case 'SALE_REFUNDED':
+          emailData.data = {
+            ...emailData.data,
+            productName: eventData.product?.name || 'Produto',
+            refundAmount: eventData.amount || 'R$ 0,00',
+            paymentMethod: eventData.refund_method || 'Cartão',
+            refundDate: eventData.refunded_at || new Date().toISOString(),
+            refundProtocol: eventData.refund_id || eventId,
+            feedbackUrl: eventData.feedback_url || `https://${event.organization.domain}/feedback`,
+            specialCode: eventId.slice(-4).toUpperCase(),
+            organizationCNPJ: '00.000.000/0001-00',
+            financeEmail: 'financeiro@example.com',
+            refundReceiptUrl: `https://${event.organization.domain}/comprovante/${eventData.refund_id || eventId}`,
+          };
+          break;
+
         default:
           // Dados genéricos para outros eventos
           emailData.data = {
@@ -181,11 +290,12 @@ const emailWorker = new Worker<EmailJobData>(
       });
 
       // Registrar falha no banco
+      const failedCustomerData = (payload as any).data?.customer || (payload as any).customer || {};
       await prisma.emailLog.create({
         data: {
           organizationId,
           eventId,
-          to: customerData.email || 'unknown',
+          to: failedCustomerData.email || 'unknown',
           subject: template?.subject || 'Failed to send',
           template: template?.templateName || 'unknown',
           status: 'FAILED',
