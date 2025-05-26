@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 {{customerName}}, seu reembolso foi processado</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h2 style="margin: 0; font-size: 28px;">💰 Reembolso Processado</h2>
+                            <p style="margin: 10px 0 0 0; font-size: 16px;">Confirmação do seu pedido de reembolso</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px;">
+                                Olá {{customerName}},
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #555; line-height: 1.8; margin-bottom: 20px;">
+                                Seu pedido de reembolso foi <strong>processado com sucesso</strong>. 
+                                Lamentamos que o <strong>{{productName}}</strong> não tenha atendido suas expectativas.
+                            </p>
+
+                            <!-- Detalhes do Reembolso -->
+                            <div style="background-color: #e8f5e9; border: 2px solid #4caf50; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h3 style="color: #2e7d32; margin: 0 0 15px 0; text-align: center;">
+                                    ✅ Detalhes do Reembolso
+                                </h3>
+                                <table style="width: 100%; color: #666; font-size: 15px;">
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Valor reembolsado:</strong></td>
+                                        <td style="text-align: right; color: #2e7d32; font-weight: bold;">{{refundAmount}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Forma de pagamento:</strong></td>
+                                        <td style="text-align: right;">{{paymentMethod}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Data do processamento:</strong></td>
+                                        <td style="text-align: right;">{{refundDate}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Protocolo:</strong></td>
+                                        <td style="text-align: right;">{{refundProtocol}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Prazo de Crédito -->
+                            <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h4 style="color: #856404; margin: 0 0 10px 0;">
+                                    ⏰ Quando vou receber o dinheiro de volta?
+                                </h4>
+                                <p style="color: #666; font-size: 15px; margin: 0; line-height: 1.8;">
+                                    O prazo varia conforme a forma de pagamento original:
+                                </p>
+                                <ul style="color: #666; font-size: 14px; margin: 10px 0 0 0; padding-left: 20px;">
+                                    <li><strong>PIX:</strong> Em até 24 horas úteis</li>
+                                    <li><strong>Cartão de Crédito:</strong> 1 a 2 faturas (30-60 dias)</li>
+                                    <li><strong>Boleto:</strong> 3 a 5 dias úteis na conta informada</li>
+                                </ul>
+                            </div>
+
+                            <!-- Feedback -->
+                            <div style="background-color: #f0f8ff; padding: 25px; border-radius: 8px; margin: 20px 0;">
+                                <h3 style="color: #1976d2; margin: 0 0 15px 0; text-align: center;">
+                                    🤔 Nos ajude a melhorar
+                                </h3>
+                                <p style="color: #666; font-size: 15px; margin: 0 0 20px 0; text-align: center;">
+                                    Sua opinião é muito importante para nós. Por que decidiu solicitar o reembolso?
+                                </p>
+                                
+                                <div style="text-align: center;">
+                                    <a href="{{feedbackUrl}}?reason=content" style="display: inline-block; background-color: white; color: #1976d2; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: 2px solid #1976d2; font-size: 14px; margin: 5px;">
+                                        📚 Conteúdo não era o esperado
+                                    </a>
+                                    <a href="{{feedbackUrl}}?reason=difficult" style="display: inline-block; background-color: white; color: #1976d2; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: 2px solid #1976d2; font-size: 14px; margin: 5px;">
+                                        😕 Muito difícil/complexo
+                                    </a>
+                                    <a href="{{feedbackUrl}}?reason=time" style="display: inline-block; background-color: white; color: #1976d2; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: 2px solid #1976d2; font-size: 14px; margin: 5px;">
+                                        ⏰ Sem tempo para estudar
+                                    </a>
+                                    <a href="{{feedbackUrl}}?reason=other" style="display: inline-block; background-color: white; color: #1976d2; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: 2px solid #1976d2; font-size: 14px; margin: 5px;">
+                                        💭 Outro motivo
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Oferta Especial de Retorno -->
+                            <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #2196f3;">
+                                <h4 style="color: #1565c0; margin: 0 0 10px 0; text-align: center;">
+                                    💙 Ainda acreditamos em você!
+                                </h4>
+                                <p style="color: #666; font-size: 15px; margin: 0 0 15px 0; text-align: center;">
+                                    Se mudar de ideia, preparamos uma condição especial:
+                                </p>
+                                <p style="color: #1565c0; font-size: 20px; font-weight: bold; margin: 0; text-align: center;">
+                                    30% de desconto + Mentoria Individual
+                                </p>
+                                <p style="color: #666; font-size: 14px; margin: 10px 0 0 0; text-align: center;">
+                                    Válido por 30 dias • Código: <strong>VOLTAPRAMIM{{specialCode}}</strong>
+                                </p>
+                            </div>
+
+                            <!-- Confirmação de Cancelamento -->
+                            <div style="background-color: #ffebee; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #c62828; margin: 0 0 10px 0;">
+                                    ⚠️ Importante:
+                                </h4>
+                                <ul style="color: #666; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li>Seu acesso ao {{productName}} foi <strong>cancelado</strong></li>
+                                    <li>Você não receberá mais cobranças</li>
+                                    <li>Seus dados pessoais serão mantidos por 90 dias (LGPD)</li>
+                                    <li>Após este prazo, tudo será permanentemente excluído</li>
+                                </ul>
+                            </div>
+
+                            <!-- Mensagem Pessoal -->
+                            <div style="border: 2px dashed #667eea; padding: 20px; border-radius: 8px; margin: 20px 0; background-color: #f8f7ff;">
+                                <p style="color: #666; font-size: 15px; line-height: 1.8; margin: 0;">
+                                    {{customerName}}, foi um prazer ter você conosco, mesmo que por pouco tempo.<br><br>
+                                    
+                                    Se houver algo que eu possa fazer para mudar sua decisão ou 
+                                    se tiver alguma sugestão de melhoria, por favor me conte.<br><br>
+                                    
+                                    Desejo muito sucesso em sua jornada!<br><br>
+                                    
+                                    Atenciosamente,<br>
+                                    <strong>{{organizationOwner}}</strong><br>
+                                    Criador do {{productName}}
+                                </p>
+                            </div>
+
+                            <!-- Contato para Dúvidas -->
+                            <div style="text-align: center; background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 10px 0;">
+                                    📞 Dúvidas sobre o reembolso?
+                                </h4>
+                                <p style="color: #666; font-size: 14px; margin: 0;">
+                                    Entre em contato conosco:<br>
+                                    <a href="mailto:{{financeEmail}}" style="color: #667eea;">{{financeEmail}}</a><br>
+                                    WhatsApp: <a href="https://wa.me/{{whatsappNumber}}" style="color: #25d366;">{{whatsappNumber}}</a>
+                                </p>
+                            </div>
+
+                            <!-- Comprovante -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{refundReceiptUrl}}" style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                                    📄 BAIXAR COMPROVANTE
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                Este é um email de confirmação de reembolso.<br>
+                                {{organizationName}} • CNPJ: {{organizationCNPJ}}<br>
+                                Guarde este email como comprovante da transação.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 

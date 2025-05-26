@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ {{customerName}}, precisamos resolver uma contestação urgente</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header Urgente -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h2 style="margin: 0; font-size: 28px;">⚠️ ATENÇÃO URGENTE!</h2>
+                            <p style="margin: 10px 0 0 0; font-size: 16px;">Recebemos uma contestação do seu pagamento</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px;">
+                                Olá {{customerName}},
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #555; line-height: 1.8; margin-bottom: 20px;">
+                                Recebemos uma <strong>contestação (chargeback)</strong> referente à sua compra do 
+                                <strong>{{productName}}</strong>, realizada em {{purchaseDate}}.
+                            </p>
+
+                            <!-- Box de Alerta -->
+                            <div style="background-color: #ffebee; border: 2px solid #f44336; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h3 style="color: #c62828; margin: 0 0 15px 0;">
+                                    🚨 O que isso significa:
+                                </h3>
+                                <ul style="color: #666; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li>Você ou seu banco <strong>contestou a cobrança</strong></li>
+                                    <li>Seu acesso ao curso foi <strong>temporariamente suspenso</strong></li>
+                                    <li>Temos <strong>7 dias</strong> para resolver isso juntos</li>
+                                    <li>Sem resolução, o acesso será <strong>permanentemente cancelado</strong></li>
+                                </ul>
+                            </div>
+
+                            <!-- Possíveis Motivos -->
+                            <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h4 style="color: #856404; margin: 0 0 15px 0;">
+                                    🤔 Motivos comuns de contestação:
+                                </h4>
+                                <ul style="color: #666; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li><strong>Não reconhecimento:</strong> Esqueceu da compra ou não identificou na fatura</li>
+                                    <li><strong>Compra não autorizada:</strong> Alguém usou seu cartão sem permissão</li>
+                                    <li><strong>Engano:</strong> Contestou sem querer ao revisar a fatura</li>
+                                    <li><strong>Nome diferente:</strong> Apareceu como {{billingDescriptor}} na fatura</li>
+                                </ul>
+                            </div>
+
+                            <!-- Opções de Resolução -->
+                            <div style="background-color: #e8f5e9; padding: 25px; border-radius: 8px; margin: 20px 0;">
+                                <h3 style="color: #2e7d32; margin: 0 0 20px 0; text-align: center;">
+                                    ✅ Como resolver rapidamente:
+                                </h3>
+                                
+                                <!-- Opção 1 -->
+                                <div style="background-color: white; padding: 20px; border-radius: 5px; margin-bottom: 15px;">
+                                    <h4 style="color: #1976d2; margin: 0 0 10px 0;">
+                                        1️⃣ Foi um engano? Cancele a contestação
+                                    </h4>
+                                    <p style="color: #666; font-size: 14px; margin: 0 0 15px 0;">
+                                        Se você reconhece a compra e quer manter o acesso:
+                                    </p>
+                                    <a href="{{cancelChargebackUrl}}" style="display: inline-block; background-color: #4caf50; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                                        CANCELAR CONTESTAÇÃO →
+                                    </a>
+                                </div>
+                                
+                                <!-- Opção 2 -->
+                                <div style="background-color: white; padding: 20px; border-radius: 5px;">
+                                    <h4 style="color: #ff9800; margin: 0 0 10px 0;">
+                                        2️⃣ Tem algum problema? Vamos conversar
+                                    </h4>
+                                    <p style="color: #666; font-size: 14px; margin: 0 0 15px 0;">
+                                        Se algo não está como esperado, podemos resolver:
+                                    </p>
+                                    <a href="https://wa.me/{{whatsappNumber}}?text=Oi,%20recebi%20email%20sobre%20chargeback" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                                        💬 FALAR NO WHATSAPP
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Informações da Compra -->
+                            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 15px 0;">
+                                    📋 Detalhes da sua compra:
+                                </h4>
+                                <table style="width: 100%; color: #666; font-size: 14px;">
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Produto:</strong></td>
+                                        <td>{{productName}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Data:</strong></td>
+                                        <td>{{purchaseDate}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Valor:</strong></td>
+                                        <td>{{purchaseAmount}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Cartão:</strong></td>
+                                        <td>{{cardLastDigits}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>ID da transação:</strong></td>
+                                        <td>{{transactionId}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Consequências -->
+                            <div style="background-color: #ffebee; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                                <h4 style="color: #c62828; margin: 0 0 10px 0;">
+                                    ⏰ Prazo para resolução:
+                                </h4>
+                                <p style="color: #d32f2f; font-size: 24px; font-weight: bold; margin: 10px 0;">
+                                    {{daysRemaining}} DIAS
+                                </p>
+                                <p style="color: #666; font-size: 14px; margin: 0;">
+                                    Após este prazo, sem resposta sua, o acesso será cancelado definitivamente
+                                </p>
+                            </div>
+
+                            <!-- CTA Principal -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{resolveChargebackUrl}}" style="display: inline-block; background-color: #ff4444; color: white; padding: 18px 50px; text-decoration: none; border-radius: 50px; font-size: 20px; font-weight: bold;">
+                                    RESOLVER AGORA →
+                                </a>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    Não perca seu acesso e todo seu progresso!
+                                </p>
+                            </div>
+
+                            <!-- Suporte Direto -->
+                            <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                                <h4 style="color: #1976d2; margin: 0 0 10px 0;">
+                                    💬 Precisa de ajuda imediata?
+                                </h4>
+                                <p style="color: #666; font-size: 14px; margin: 0 0 15px 0;">
+                                    Nossa equipe especializada está pronta para ajudar:
+                                </p>
+                                <a href="tel:{{phoneNumber}}" style="color: #ff4444; font-weight: bold; text-decoration: none; font-size: 18px;">
+                                    📞 {{phoneNumber}}
+                                </a><br>
+                                <span style="color: #999; font-size: 14px;">
+                                    Atendimento das 9h às 18h (dias úteis)
+                                </span>
+                            </div>
+
+                            <!-- Aviso Legal -->
+                            <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin: 20px 0; background-color: #fafafa;">
+                                <p style="color: #666; font-size: 13px; margin: 0; line-height: 1.6;">
+                                    <strong>Importante:</strong> Este é um procedimento padrão de segurança. 
+                                    Contestações não resolvidas podem afetar seu histórico de crédito e 
+                                    impossibilitar futuras compras online. Recomendamos resolver o quanto antes.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                Este é um email importante sobre sua conta.<br>
+                                {{organizationName}} • {{domain}}<br>
+                                Departamento Financeiro: {{financeEmail}}<br>
+                                <strong>Por favor, não ignore este email.</strong>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 

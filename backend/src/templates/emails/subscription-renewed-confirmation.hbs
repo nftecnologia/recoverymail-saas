@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ {{customerName}}, sua assinatura foi renovada com sucesso!</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h2 style="margin: 0; font-size: 28px;">🎉 Assinatura Renovada!</h2>
+                            <p style="margin: 10px 0 0 0; font-size: 16px;">Obrigado por continuar conosco</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px;">
+                                Olá {{customerName}},
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #555; line-height: 1.8; margin-bottom: 20px;">
+                                Sua assinatura do <strong>{{productName}}</strong> foi <strong>renovada com sucesso</strong>! 
+                                Obrigado por continuar confiando em nosso trabalho.
+                            </p>
+
+                            <!-- Detalhes da Renovação -->
+                            <div style="background-color: #e8f5e9; border: 2px solid #4caf50; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h3 style="color: #2e7d32; margin: 0 0 15px 0; text-align: center;">
+                                    ✅ Detalhes da Renovação
+                                </h3>
+                                <table style="width: 100%; color: #666; font-size: 15px;">
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Plano:</strong></td>
+                                        <td style="text-align: right;">{{planName}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Período:</strong></td>
+                                        <td style="text-align: right;">{{billingPeriod}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Valor:</strong></td>
+                                        <td style="text-align: right; color: #2e7d32; font-weight: bold;">{{renewalAmount}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Próxima renovação:</strong></td>
+                                        <td style="text-align: right;">{{nextRenewalDate}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Protocolo:</strong></td>
+                                        <td style="text-align: right;">{{renewalProtocol}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Benefícios Continuados -->
+                            <div style="background-color: #f0f8ff; padding: 25px; border-radius: 8px; margin: 20px 0;">
+                                <h3 style="color: #1976d2; margin: 0 0 20px 0; text-align: center;">
+                                    🚀 Você continua tendo acesso a:
+                                </h3>
+                                
+                                <ul style="color: #666; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li><strong>Todo conteúdo premium</strong> do {{productName}}</li>
+                                    <li><strong>Atualizações mensais</strong> com novos materiais</li>
+                                    <li><strong>Suporte prioritário</strong> via WhatsApp</li>
+                                    <li><strong>Comunidade exclusiva</strong> de membros</li>
+                                    <li><strong>Lives mensais</strong> com Q&A ao vivo</li>
+                                    {{#if hasExclusiveBonus}}
+                                    <li><strong>Bônus exclusivo:</strong> {{exclusiveBonusName}}</li>
+                                    {{/if}}
+                                </ul>
+                            </div>
+
+                            <!-- Novidades do Mês -->
+                            {{#if monthlyUpdates}}
+                            <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h3 style="color: #856404; margin: 0 0 15px 0; text-align: center;">
+                                    🆕 Novidades deste mês:
+                                </h3>
+                                <ul style="color: #666; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    {{#each monthlyUpdates}}
+                                    <li>{{this}}</li>
+                                    {{/each}}
+                                </ul>
+                            </div>
+                            {{/if}}
+
+                            <!-- Desconto de Fidelidade -->
+                            {{#if loyaltyDiscount}}
+                            <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #2196f3; text-align: center;">
+                                <h4 style="color: #1565c0; margin: 0 0 10px 0;">
+                                    🎁 Parabéns! Você ganhou um desconto de fidelidade!
+                                </h4>
+                                <p style="color: #666; font-size: 15px; margin: 0;">
+                                    Por estar conosco há <strong>{{membershipMonths}} meses</strong>, você ganhou:
+                                </p>
+                                <p style="color: #1565c0; font-size: 24px; font-weight: bold; margin: 15px 0;">
+                                    {{loyaltyDiscountPercent}}% de desconto
+                                </p>
+                                <p style="color: #666; font-size: 14px; margin: 0;">
+                                    Já aplicado automaticamente na sua próxima renovação!
+                                </p>
+                            </div>
+                            {{/if}}
+
+                            <!-- Estatísticas de Uso -->
+                            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 15px 0; text-align: center;">
+                                    📊 Seu progresso até agora:
+                                </h4>
+                                <div style="text-align: center;">
+                                    <div style="display: inline-block; margin: 0 15px;">
+                                        <p style="color: #667eea; font-size: 32px; font-weight: bold; margin: 0;">{{completedLessons}}</p>
+                                        <p style="color: #666; font-size: 14px; margin: 5px 0 0 0;">Aulas assistidas</p>
+                                    </div>
+                                    <div style="display: inline-block; margin: 0 15px;">
+                                        <p style="color: #43e97b; font-size: 32px; font-weight: bold; margin: 0;">{{certificatesEarned}}</p>
+                                        <p style="color: #666; font-size: 14px; margin: 5px 0 0 0;">Certificados</p>
+                                    </div>
+                                    <div style="display: inline-block; margin: 0 15px;">
+                                        <p style="color: #ff6b6b; font-size: 32px; font-weight: bold; margin: 0;">{{hoursWatched}}h</p>
+                                        <p style="color: #666; font-size: 14px; margin: 5px 0 0 0;">De conteúdo</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CTA para Continuar -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{platformUrl}}" style="display: inline-block; background-color: #667eea; color: white; padding: 15px 40px; text-decoration: none; border-radius: 50px; font-size: 18px; font-weight: bold;">
+                                    CONTINUAR ESTUDANDO →
+                                </a>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    Novos conteúdos te esperam!
+                                </p>
+                            </div>
+
+                            <!-- Gerenciar Assinatura -->
+                            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                                <h4 style="color: #333; margin: 0 0 10px 0;">
+                                    ⚙️ Precisa gerenciar sua assinatura?
+                                </h4>
+                                <p style="color: #666; font-size: 14px; margin: 0 0 15px 0;">
+                                    Você pode atualizar dados de pagamento, mudar de plano ou cancelar a qualquer momento.
+                                </p>
+                                <a href="{{subscriptionManagementUrl}}" style="color: #667eea; text-decoration: none; font-weight: bold;">
+                                    Gerenciar Assinatura →
+                                </a>
+                            </div>
+
+                            <!-- Mensagem Pessoal -->
+                            <div style="border: 2px dashed #667eea; padding: 20px; border-radius: 8px; margin: 20px 0; background-color: #f8f7ff;">
+                                <p style="color: #666; font-size: 15px; line-height: 1.8; margin: 0;">
+                                    {{customerName}}, muito obrigado por renovar sua confiança em nosso trabalho!<br><br>
+                                    
+                                    É uma honra continuar fazendo parte da sua jornada de aprendizado. 
+                                    Estamos sempre trabalhando para trazer o melhor conteúdo para você.<br><br>
+                                    
+                                    Conte sempre comigo,<br>
+                                    <strong>{{organizationOwner}}</strong>
+                                </p>
+                            </div>
+
+                            <!-- Suporte -->
+                            <div style="text-align: center; background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #155724; margin: 0 0 10px 0;">
+                                    🤝 Alguma dúvida?
+                                </h4>
+                                <p style="color: #666; font-size: 14px; margin: 0;">
+                                    Estamos sempre aqui para ajudar!<br>
+                                    <a href="https://wa.me/{{whatsappNumber}}" style="color: #25d366; font-weight: bold; text-decoration: none;">
+                                        WhatsApp: {{whatsappNumber}}
+                                    </a><br>
+                                    <a href="mailto:{{supportEmail}}" style="color: #667eea; text-decoration: none;">
+                                        Email: {{supportEmail}}
+                                    </a>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                Este é um email de confirmação de renovação automática.<br>
+                                {{organizationName}} • CNPJ: {{organizationCNPJ}}<br>
+                                Nota fiscal será enviada em até 24 horas.<br>
+                                <a href="{{termsUrl}}" style="color: #999;">Termos</a> | 
+                                <a href="{{privacyUrl}}" style="color: #999;">Privacidade</a> | 
+                                <a href="{{unsubscribeUrl}}" style="color: #999;">Cancelar assinatura</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 

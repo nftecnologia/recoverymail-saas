@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>❌ {{customerName}}, houve um problema com seu pagamento</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header Alerta -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h2 style="margin: 0; font-size: 28px;">⚠️ Pagamento Não Aprovado</h2>
+                            <p style="margin: 10px 0 0 0; font-size: 16px;">Mas ainda dá tempo de garantir sua vaga!</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px;">
+                                Oi {{customerName}}, tudo bem?
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #555; line-height: 1.6; margin-bottom: 20px;">
+                                Tentamos processar seu pagamento para o <strong>{{productName}}</strong>, 
+                                mas infelizmente <strong>não foi aprovado</strong> pela operadora do cartão.
+                            </p>
+
+                            <!-- Box de Motivos Comuns -->
+                            <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h4 style="color: #856404; margin: 0 0 15px 0;">
+                                    🤔 Motivos mais comuns de recusa:
+                                </h4>
+                                <ul style="color: #666; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li><strong>Limite insuficiente</strong> no cartão</li>
+                                    <li><strong>Dados incorretos</strong> (número, validade ou CVV)</li>
+                                    <li><strong>Cartão bloqueado</strong> para compras online</li>
+                                    <li><strong>Suspeita de fraude</strong> pelo banco (compra fora do padrão)</li>
+                                </ul>
+                            </div>
+
+                            <!-- Soluções Rápidas -->
+                            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #2e7d32; margin: 0 0 15px 0;">
+                                    ✅ Como resolver rapidamente:
+                                </h4>
+                                <ol style="color: #555; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li><strong>Verifique os dados do cartão</strong> e tente novamente</li>
+                                    <li><strong>Use outro cartão</strong> de crédito ou débito</li>
+                                    <li><strong>Ligue para seu banco</strong> e libere a compra</li>
+                                    <li><strong>Escolha outra forma de pagamento</strong> (PIX ou Boleto)</li>
+                                </ol>
+                            </div>
+
+                            <!-- CTA Principal -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{checkoutUrl}}?retry=true&utm_content=tentar_novamente" style="display: inline-block; background-color: #4caf50; color: white; padding: 18px 50px; text-decoration: none; border-radius: 50px; font-size: 20px; font-weight: bold;">
+                                    TENTAR NOVAMENTE →
+                                </a>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    Clique e finalize sua compra em 2 minutos
+                                </p>
+                            </div>
+
+                            <!-- Formas Alternativas de Pagamento -->
+                            <div style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #1976d2; margin: 0 0 15px 0; text-align: center;">
+                                    💳 Outras formas de pagamento disponíveis:
+                                </h4>
+                                
+                                <div style="text-align: center;">
+                                    <a href="{{checkoutUrl}}?payment=pix" style="display: inline-block; background-color: #00b4d8; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
+                                        ⚡ PIX (Aprovação Imediata)
+                                    </a>
+                                    <a href="{{checkoutUrl}}?payment=boleto" style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
+                                        📄 Boleto Bancário
+                                    </a>
+                                </div>
+                                
+                                <p style="color: #666; font-size: 14px; margin: 15px 0 0 0; text-align: center;">
+                                    💡 <strong>Dica:</strong> Com PIX você tem {{pixDiscount}}% de desconto!
+                                </p>
+                            </div>
+
+                            <!-- Urgência -->
+                            <div style="text-align: center; background-color: #ffebee; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <p style="color: #c62828; font-size: 16px; margin: 0;">
+                                    ⏰ <strong>Atenção:</strong> Sua vaga está reservada por apenas<br>
+                                    <span style="font-size: 24px; font-weight: bold;">24 HORAS</span>
+                                </p>
+                                <p style="color: #666; font-size: 14px; margin: 10px 0 0 0;">
+                                    Depois desse prazo, ela será liberada para outros alunos
+                                </p>
+                            </div>
+
+                            <!-- O Que Você Vai Perder -->
+                            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 15px 0;">
+                                    😢 Não deixe de garantir:
+                                </h4>
+                                <ul style="color: #555; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li>Acesso <strong>vitalício</strong> ao {{productName}}</li>
+                                    <li><strong>{{totalModules}} módulos</strong> de conteúdo prático</li>
+                                    <li><strong>Bônus exclusivos</strong> por tempo limitado</li>
+                                    <li><strong>Garantia de 7 dias</strong> sem risco</li>
+                                    <li><strong>Comunidade</strong> com +{{communityMembers}} alunos</li>
+                                </ul>
+                            </div>
+
+                            <!-- WhatsApp Support -->
+                            <div style="text-align: center; background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <p style="color: #155724; font-size: 16px; margin: 0;">
+                                    <strong>Precisa de ajuda?</strong> Estou aqui para você!
+                                </p>
+                                <a href="https://wa.me/{{whatsappNumber}}?text=Oi,%20meu%20pagamento%20foi%20recusado" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-size: 18px; font-weight: bold; margin-top: 15px;">
+                                    💬 CHAMAR NO WHATSAPP
+                                </a>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    Respondo em até 5 minutos!
+                                </p>
+                            </div>
+
+                            <!-- PS -->
+                            <div style="border-top: 2px solid #eee; margin-top: 30px; padding-top: 20px;">
+                                <p style="color: #666; font-size: 14px; line-height: 1.6;">
+                                    <strong>PS:</strong> {{customerName}}, sei que você quer muito fazer parte do {{productName}}. 
+                                    Não deixe um problema técnico te impedir de transformar sua vida. 
+                                    <a href="{{checkoutUrl}}?payment=pix" style="color: #00b4d8;">
+                                        Clique aqui e pague com PIX →
+                                    </a>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                Este email foi enviado porque houve uma tentativa de compra em seu nome.<br>
+                                {{organizationName}} • {{domain}}<br>
+                                Dúvidas? Responda este email ou chame no WhatsApp.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 
