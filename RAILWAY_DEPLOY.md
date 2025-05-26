@@ -39,13 +39,11 @@
 
 ### 3. Obter Railway Token
 
-```bash
-# No terminal
-railway login
-railway tokens create github-actions
-```
-
-Copie o token gerado e cole no GitHub Secret.
+1. Acesse: https://railway.app/account/tokens
+2. Clique em **"Create Token"**
+3. Nome do token: `github-actions`
+4. Copie o token gerado (ele só aparece uma vez!)
+5. Cole no GitHub Secret
 
 ### 4. Configuração Automática
 
