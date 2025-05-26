@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { prisma } from '../config/database';
 import { z } from 'zod';
 import { logger } from '../utils/logger';
+import domainRoutes from './domain.routes';
 
 const router = Router();
 
@@ -340,5 +341,8 @@ router.put('/settings/email', validateOrgId, async (req, res) => {
     res.status(500).json({ error: 'Failed to update email settings' });
   }
 });
+
+// Rotas de domínio
+router.use('/domain', validateOrgId, domainRoutes);
 
 export default router; 

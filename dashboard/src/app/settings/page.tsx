@@ -489,13 +489,25 @@ export default function SettingsPage() {
           <TabsContent value="email" className="space-y-6">
             <Card className="border-0 shadow-lg">
               <CardHeader className="border-b bg-gray-50/50">
-                <CardTitle className="flex items-center gap-2">
-                  <Mail className="h-5 w-5" />
-                  Configurações de Email
-                </CardTitle>
-                <CardDescription>
-                  Configure o remetente e preferências de envio
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Mail className="h-5 w-5" />
+                      Configurações de Email
+                    </CardTitle>
+                    <CardDescription>
+                      Configure o remetente e preferências de envio
+                    </CardDescription>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="gap-2"
+                    onClick={() => window.location.href = '/settings/email'}
+                  >
+                    <Globe className="h-4 w-4" />
+                    Configurar Domínio
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-6 p-6">
                 <div className="grid gap-6 md:grid-cols-2">
