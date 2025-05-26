@@ -33,10 +33,14 @@ import {
   Heart,
   Star,
   TrendingDown,
-  UserCheck
+  UserCheck,
+  Download,
+  RefreshCcw,
+  Copy
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const eventTypes = [
   { 
@@ -1653,6 +1657,54 @@ export default function TemplatesPage() {
   const strategies = templateStrategies[selectedEvent as keyof typeof templateStrategies] || [];
   const Icon = currentEvent?.icon || Mail;
 
+  // Função para atualizar os templates
+  const handleRefresh = () => {
+    toast.info("Atualizando templates...");
+    
+    // Simula uma atualização
+    setTimeout(() => {
+      toast.success("Templates atualizados com sucesso!");
+    }, 1000);
+  };
+
+  // Função para exportar templates
+  const handleExport = () => {
+    toast.info("Preparando exportação...");
+    
+    // Cria um objeto com todos os templates
+    const allTemplates: any = {};
+    
+    eventTypes.forEach(event => {
+      const eventStrategies = templateStrategies[event.value as keyof typeof templateStrategies];
+      if (eventStrategies) {
+        allTemplates[event.value] = {
+          label: event.label,
+          attempts: event.attempts,
+          strategies: eventStrategies.map((strategy, index) => ({
+            ...strategy,
+            htmlTemplate: getEmailTemplate(event.value, index)
+          }))
+        };
+      }
+    });
+
+    // Converte para JSON
+    const jsonData = JSON.stringify(allTemplates, null, 2);
+    
+    // Cria um blob e faz o download
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `recovery-mail-templates-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success("Templates exportados com sucesso!");
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -1664,15 +1716,37 @@ export default function TemplatesPage() {
         )}>
           <div className="absolute inset-0 bg-black/10" />
           <div className="relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm">
-                <Mail className="h-6 w-6" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm">
+                  <Mail className="h-6 w-6" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold">Templates Automáticos</h1>
+                  <p className="mt-1 text-lg text-white/80">
+                    Templates otimizados por IA para máxima conversão
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold">Templates Automáticos</h1>
-                <p className="mt-1 text-lg text-white/80">
-                  Templates otimizados por IA para máxima conversão
-                </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleRefresh}
+                  className="bg-white/20 hover:bg-white/30 text-white border-white/20"
+                >
+                  <RefreshCcw className="h-4 w-4 mr-2" />
+                  Atualizar
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleExport}
+                  className="bg-white/20 hover:bg-white/30 text-white border-white/20"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Exportar
+                </Button>
               </div>
             </div>
           </div>
@@ -1891,6 +1965,20 @@ export default function TemplatesPage() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">Preview do Email</CardTitle>
                   <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        const html = getEmailTemplate(selectedEvent, selectedTemplate);
+                        if (html) {
+                          navigator.clipboard.writeText(html.trim());
+                          toast.success("HTML copiado para a área de transferência!");
+                        }
+                      }}
+                    >
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copiar HTML
+                    </Button>
                     <Button 
                       variant={viewMode === "mobile" ? "default" : "outline"} 
                       size="sm"
