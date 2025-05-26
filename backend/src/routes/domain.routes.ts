@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import { DnsVerificationService } from '../services/dns-verification.service';
 import { prisma } from '../config/database';
-import { logger } from '../config/logger';
+import { logger } from '../utils/logger';
 import { EmailSettings } from '../types/email-config.types';
 
 const router = Router();
 
 // Verificar domínio
-router.post('/verify', async (req, res) => {
+router.post('/verify', async (req, res): Promise<void> => {
   try {
-    const { domain, useSubdomain = true } = req.body;
+    const { domain } = req.body;
     const organizationId = req.headers['x-organization-id'] as string;
 
     if (!domain) {
@@ -25,7 +25,7 @@ router.post('/verify', async (req, res) => {
         where: { id: organizationId }
       });
 
-      const currentSettings = (organization?.emailSettings as EmailSettings) || {
+      const currentSettings = (organization?.emailSettings as unknown as EmailSettings) || {
         provider: 'MANAGED'
       };
 
@@ -38,7 +38,7 @@ router.post('/verify', async (req, res) => {
               ...currentSettings.managed,
               customDomain: verification
             }
-          }
+          } as any
         }
       });
     }
@@ -78,7 +78,7 @@ router.get('/status', async (req, res) => {
       select: { emailSettings: true }
     });
 
-    const settings = organization?.emailSettings as EmailSettings;
+    const settings = organization?.emailSettings as unknown as EmailSettings;
     const customDomain = settings?.managed?.customDomain;
 
     res.json({

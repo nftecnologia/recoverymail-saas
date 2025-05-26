@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { EventType } from '@prisma/client';
-import { emailQueue } from '../config/queue.config';
+import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../types/queue.types';
+import type { EmailJobData } from '../services/queue.service';
 
 // Schema específico para SALE_REFUNDED
 const saleRefundedSchema = z.object({
@@ -65,11 +64,9 @@ export async function handleSaleRefunded(
   const jobData: EmailJobData = {
     eventId,
     organizationId,
-    eventType: EventType.SALE_REFUNDED,
+    eventType: 'SALE_REFUNDED',
     attemptNumber: 1,
-    to: validatedPayload.customer.email,
-    customerName: validatedPayload.customer.name,
-    payload: validatedPayload
+    payload: validatedPayload as any
   };
 
   const jobId = `${eventId}-refund-confirmation`;
@@ -94,10 +91,10 @@ export async function handleSaleRefunded(
     }
   );
 
-  logger.info('Refund confirmation email job enqueued', {
+  logger.info('Refund confirmation job enqueued', {
     jobId,
     eventId,
-    eventType: EventType.SALE_REFUNDED,
+    eventType: 'SALE_REFUNDED',
     delay,
     forceImmediate
   });

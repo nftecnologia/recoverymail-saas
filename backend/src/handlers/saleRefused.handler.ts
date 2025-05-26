@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { EventType } from '@prisma/client';
-import { emailQueue } from '../config/queue.config';
+import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../types/queue.types';
+import type { EmailJobData } from '../services/queue.service';
 
 // Schema específico para SALE_REFUSED
 const saleRefusedSchema = z.object({
@@ -66,11 +65,9 @@ export async function handleSaleRefused(
     const jobData: EmailJobData = {
       eventId,
       organizationId,
-      eventType: EventType.SALE_REFUSED,
+      eventType: 'SALE_REFUSED',
       attemptNumber,
-      to: validatedPayload.customer.email,
-      customerName: validatedPayload.customer.name,
-      payload: validatedPayload
+      payload: validatedPayload as any
     };
 
     const jobId = `${eventId}-attempt-${attemptNumber}`;
@@ -79,7 +76,7 @@ export async function handleSaleRefused(
       'send-email',
       jobData,
       {
-        delay,
+        delay: delay || 0,
         jobId,
         attempts: 3,
         backoff: {
@@ -94,10 +91,10 @@ export async function handleSaleRefused(
       }
     );
 
-    logger.info('Email job enqueued', {
+    logger.info('Sale refused email job enqueued', {
       jobId,
       eventId,
-      eventType: EventType.SALE_REFUSED,
+      eventType: 'SALE_REFUSED',
       attemptNumber,
       delay,
       forceImmediate

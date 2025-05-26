@@ -1,4 +1,4 @@
-import { Job } from 'bull';
+import { Job } from 'bullmq';
 import { EmailJobData } from '../services/queue.service';
 import { logger } from '../utils/logger';
 

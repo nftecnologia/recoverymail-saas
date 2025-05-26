@@ -17,7 +17,7 @@ export interface WebhookRequest extends Request {
  */
 export async function validateHMAC(
   req: WebhookRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
@@ -30,7 +30,7 @@ export async function validateHMAC(
 
     // Buscar o secret da organização
     const organization = await prisma.organization.findUnique({
-      where: { id: orgId },
+      where: { id: orgId || '' },
       select: { id: true, webhookSecret: true },
     });
 
@@ -56,10 +56,16 @@ export async function validateHMAC(
       .digest('hex');
 
     // Comparar de forma segura (timing-safe)
-    const isValid = crypto.timingSafeEqual(
-      Buffer.from(receivedHash, 'hex'),
-      Buffer.from(expectedHash, 'hex')
-    );
+    let isValid = false;
+    try {
+      isValid = crypto.timingSafeEqual(
+        Buffer.from(receivedHash, 'hex'),
+        Buffer.from(expectedHash, 'hex')
+      );
+    } catch (err) {
+      // Buffers de tamanhos diferentes
+      isValid = false;
+    }
 
     if (!isValid) {
       logger.warn('Invalid webhook signature', {
@@ -71,7 +77,10 @@ export async function validateHMAC(
     }
 
     // Adicionar organização ao request para uso posterior
-    req.organization = organization;
+    req.organization = {
+      id: organization.id,
+      webhookSecret: organization.webhookSecret || ''
+    };
     
     logger.debug('Webhook signature validated', { orgId });
     next();

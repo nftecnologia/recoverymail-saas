@@ -7,7 +7,7 @@ import domainRoutes from './domain.routes';
 const router = Router();
 
 // Middleware para validar organizationId
-const validateOrgId = async (req: any, res: any, next: any) => {
+const validateOrgId = async (req: any, res: any, next: any): Promise<void> => {
   const orgId = req.headers['x-organization-id'] as string;
   
   if (!orgId) {
@@ -37,7 +37,6 @@ router.get('/dashboard/metrics', validateOrgId, async (req, res) => {
     const { organizationId } = req as any;
     const now = new Date();
     const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const last30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     // Total de eventos
     const totalEvents = await prisma.webhookEvent.count({
@@ -303,7 +302,7 @@ router.get('/settings', validateOrgId, async (req, res) => {
     res.json({
       organization: {
         ...organization,
-        webhookUrl: `${process.env.API_URL || 'http://localhost:4000'}/webhook/${organization.id}`
+        webhookUrl: `${process.env['API_URL'] || 'http://localhost:4000'}/webhook/${organization.id}`
       },
       emailsToday
     });

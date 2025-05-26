@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { EventType } from '@prisma/client';
-import { emailQueue } from '../config/queue.config';
+import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../types/queue.types';
+import type { EmailJobData } from '../services/queue.service';
 
 // Schema específico para SALE_CHARGEBACK
 const saleChargebackSchema = z.object({
@@ -60,11 +59,9 @@ export async function handleSaleChargeback(
   const jobData: EmailJobData = {
     eventId,
     organizationId,
-    eventType: EventType.SALE_CHARGEBACK,
+    eventType: 'SALE_CHARGEBACK',
     attemptNumber: 1,
-    to: validatedPayload.customer.email,
-    customerName: validatedPayload.customer.name,
-    payload: validatedPayload
+    payload: validatedPayload as any
   };
 
   const jobId = `${eventId}-urgent-notice`;
@@ -89,11 +86,12 @@ export async function handleSaleChargeback(
     }
   );
 
-  logger.info('URGENT chargeback email job enqueued', {
+  logger.info('Chargeback notification job enqueued', {
     jobId,
     eventId,
-    eventType: EventType.SALE_CHARGEBACK,
-    priority: 'URGENT'
+    eventType: 'SALE_CHARGEBACK',
+    delay,
+    forceImmediate
   });
 
   // Opcionalmente, poderíamos enviar notificações adicionais (SMS, Push, etc.)

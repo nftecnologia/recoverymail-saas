@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { EventType } from '@prisma/client';
-import { emailQueue } from '../config/queue.config';
+import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../types/queue.types';
+import type { EmailJobData } from '../services/queue.service';
 
 // Schema específico para SALE_APPROVED
 const saleApprovedSchema = z.object({
@@ -67,11 +66,9 @@ export async function handleSaleApproved(
   const jobData: EmailJobData = {
     eventId,
     organizationId,
-    eventType: EventType.SALE_APPROVED,
+    eventType: 'SALE_APPROVED',
     attemptNumber: 1,
-    to: validatedPayload.customer.email,
-    customerName: validatedPayload.customer.name,
-    payload: validatedPayload
+    payload: validatedPayload as any
   };
 
   const jobId = `${eventId}-confirmation`;
@@ -99,7 +96,7 @@ export async function handleSaleApproved(
   logger.info('Confirmation email job enqueued', {
     jobId,
     eventId,
-    eventType: EventType.SALE_APPROVED,
+    eventType: 'SALE_APPROVED',
     delay,
     forceImmediate
   });

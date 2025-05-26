@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { EventType } from '@prisma/client';
-import { emailQueue } from '../config/queue.config';
+import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../types/queue.types';
+import type { EmailJobData } from '../services/queue.service';
 
 // Schema específico para SUBSCRIPTION_RENEWED
 const subscriptionRenewedSchema = z.object({
@@ -79,11 +78,9 @@ export async function handleSubscriptionRenewed(
   const jobData: EmailJobData = {
     eventId,
     organizationId,
-    eventType: EventType.SUBSCRIPTION_RENEWED,
+    eventType: 'SUBSCRIPTION_RENEWED',
     attemptNumber: 1,
-    to: validatedPayload.customer.email,
-    customerName: validatedPayload.customer.name,
-    payload: validatedPayload
+    payload: validatedPayload as any
   };
 
   const jobId = `${eventId}-renewal-confirmation`;
@@ -108,10 +105,10 @@ export async function handleSubscriptionRenewed(
     }
   );
 
-  logger.info('Renewal confirmation email job enqueued', {
+  logger.info('Renewal confirmation job enqueued', {
     jobId,
     eventId,
-    eventType: EventType.SUBSCRIPTION_RENEWED,
+    eventType: 'SUBSCRIPTION_RENEWED',
     delay,
     forceImmediate
   });

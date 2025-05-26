@@ -1,13 +1,12 @@
-import { Job } from 'bull';
+import { Job } from 'bullmq';
 import { EmailJobData } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import { AbandonedCartEvent } from '../types/webhook.types';
 import { sendEmail } from '../services/email.service';
 import { prisma } from '../config/database';
 
 export async function processAbandonedCart(job: Job<EmailJobData>): Promise<void> {
   const { eventId, organizationId, payload, attemptNumber } = job.data;
-  const event = payload as AbandonedCartEvent;
+  const event = payload as any;
 
   logger.info('Processing abandoned cart email', {
     eventId,

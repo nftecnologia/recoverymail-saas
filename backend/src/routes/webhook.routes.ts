@@ -3,10 +3,8 @@ import { z } from 'zod';
 import { logger } from '../utils/logger';
 import { AppError } from '../utils/errors';
 import { prisma } from '../config/database';
-import { WebhookEvent } from '../types/webhook.types';
 import { validateWebhookPayload } from '../utils/webhook.validator';
 import { enqueueEmailJob } from '../services/queue.service';
-import { validateHMAC } from '../middleware/hmac.middleware';
 
 const router = Router();
 
@@ -19,7 +17,7 @@ const webhookSchema = z.object({
 // POST /webhook/:orgId
 // Descomente a linha abaixo para ativar validação HMAC em produção
 // router.post('/:orgId', validateHMAC, async (req, res, next) => {
-router.post('/:orgId', async (req, res, next) => {
+router.post('/:orgId', async (req, res, next): Promise<void> => {
   try {
     const { orgId } = req.params;
     const payload = req.body;
@@ -55,11 +53,16 @@ router.post('/:orgId', async (req, res, next) => {
     const validatedPayload = validateWebhookPayload(payload);
 
     // Verificar idempotência
+    const externalId = (validatedPayload as any).checkout_id || 
+                      (validatedPayload as any).transaction_id || 
+                      (validatedPayload as any).order_number || 
+                      '';
+    
     const existingEvent = await prisma.webhookEvent.findFirst({
       where: {
         organizationId: orgId,
         eventType: validatedPayload.event,
-        externalId: validatedPayload.checkout_id || validatedPayload.transaction_id || '',
+        externalId: externalId,
       }
     });
 
@@ -80,7 +83,7 @@ router.post('/:orgId', async (req, res, next) => {
         organizationId: orgId,
         eventType: validatedPayload.event,
         payload: payload,
-        externalId: validatedPayload.checkout_id || validatedPayload.transaction_id || '',
+        externalId: externalId,
         status: 'PENDING',
       }
     });

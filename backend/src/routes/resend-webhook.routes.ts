@@ -71,7 +71,7 @@ function verifyResendSignature(
  * POST /resend-webhook
  * Recebe eventos de tracking do Resend
  */
-router.post('/resend-webhook', async (req, res) => {
+router.post('/resend-webhook', async (req, res): Promise<void> => {
   try {
     // Verificar assinatura (em produção)
     if (env.NODE_ENV === 'production') {
@@ -138,7 +138,7 @@ router.post('/resend-webhook', async (req, res) => {
         });
         logger.info('Email opened', {
           emailId: data.email_id,
-          to: data.to[0],
+          to: data.to?.[0] || 'unknown',
           organizationId: emailLog.organizationId,
         });
         break;
@@ -155,7 +155,7 @@ router.post('/resend-webhook', async (req, res) => {
         // Log detalhado do clique
         logger.info('Email link clicked', {
           emailId: data.email_id,
-          to: data.to[0],
+          to: data.to?.[0] || 'unknown',
           link: data.click?.link,
           userAgent: data.click?.user_agent,
           ipAddress: data.click?.ip_address,
