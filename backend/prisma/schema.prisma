@@ -33,9 +33,10 @@ model Organization {
 model WebhookEvent {
   id              String         @id @default(cuid())
   organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id])
   eventType       String
   payload         Json
-  externalId      String         // ID do checkout/transação externa
+  externalId      String?        // ID externo do evento
   status          EventStatus    @default(PENDING)
   processedAt     DateTime?
   error           String?
@@ -45,12 +46,12 @@ model WebhookEvent {
   updatedAt       DateTime       @updatedAt
   
   // Relações
-  organization    Organization   @relation(fields: [organizationId], references: [id])
+  emailLogs       EmailLog[]
   emailJobs       EmailJob[]
   
   // Índices
-  @@index([organizationId, eventType])
-  @@index([externalId])
+  @@unique([organizationId, externalId])
+  @@index([organizationId])
   @@index([status])
 }
 
@@ -84,37 +85,36 @@ model EmailJob {
 
 // Templates de email customizados
 model EmailTemplate {
-  id              String         @id @default(cuid())
-  organizationId  String
-  name            String
-  subject         String
-  htmlContent     String
-  textContent     String?
-  variables       Json?          // Variáveis disponíveis
-  isActive        Boolean        @default(true)
-  
-  // Timestamps
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  
-  // Relações
-  organization    Organization   @relation(fields: [organizationId], references: [id])
-  
-  // Índices
-  @@unique([organizationId, name])
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  eventType      String       // Tipo do evento (ABANDONED_CART, etc)
+  attemptNumber  Int
+  name           String
+  subject        String
+  htmlContent    String       @db.Text
+  variables      Json         // Lista de variáveis disponíveis
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, eventType, attemptNumber])
+  @@index([organizationId])
 }
 
 // Logs de emails enviados
 model EmailLog {
   id              String         @id @default(cuid())
   organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id])
   eventId         String
-  emailId         String?        // ID do provedor (Resend)
+  event           WebhookEvent   @relation(fields: [eventId], references: [id])
+  emailId         String?        // ID do email no Resend
   to              String
   subject         String
   template        String
   status          EmailStatus    @default(PENDING)
-  attemptNumber   Int            @default(1)
+  attemptNumber   Int
   sentAt          DateTime?
   openedAt        DateTime?
   clickedAt       DateTime?
@@ -123,9 +123,6 @@ model EmailLog {
   // Timestamps
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
-  
-  // Relações
-  organization    Organization   @relation(fields: [organizationId], references: [id])
   
   // Índices
   @@index([organizationId])

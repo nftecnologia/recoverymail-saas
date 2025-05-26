@@ -15,11 +15,15 @@ import {
 import {
   LayoutDashboard,
   Mail,
-  Webhook,
   Settings,
   LogOut,
+  Menu,
+  X,
   User,
   BarChart3,
+  Activity,
+  FileText,
+  Webhook,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +31,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Eventos", href: "/events", icon: Webhook },
   { name: "Emails", href: "/emails", icon: Mail },
+  { name: "Templates", href: "/templates", icon: FileText },
   { name: "Métricas", href: "/metrics", icon: BarChart3 },
   { name: "Configurações", href: "/settings", icon: Settings },
 ];
