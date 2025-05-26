@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # PostgreSQL (desenvolvimento local - em produção usar Neon)
+  postgres:
+    image: postgres:16-alpine
+    container_name: recovery-postgres
+    environment:
+      POSTGRES_USER: recovery_user
+      POSTGRES_PASSWORD: recovery_pass
+      POSTGRES_DB: recovery_saas
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U recovery_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: recovery-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # n8n
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: recovery-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=development
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - N8N_METRICS=true
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - postgres
+      - redis
+
+  # Mailhog (para testes de email em desenvolvimento)
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: recovery-mailhog
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    logging:
+      driver: 'none' # Desabilitar logs excessivos
+
+  # Adminer (interface web para PostgreSQL)
+  adminer:
+    image: adminer:latest
+    container_name: recovery-adminer
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  redis_data:
+  n8n_data:
+
+networks:
+  default:
+    name: recovery-network 

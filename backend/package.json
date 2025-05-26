@@ -1,0 +1,68 @@
+{
+  "name": "recovery-saas-backend",
+  "version": "1.0.0",
+  "description": "Backend do Recovery SaaS - Sistema de recuperação de vendas",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "start:prod": "node -r tsconfig-paths/register dist/server.js",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "postinstall": "prisma generate"
+  },
+  "keywords": [
+    "recovery",
+    "saas",
+    "webhooks",
+    "email",
+    "automation"
+  ],
+  "author": "Recovery SaaS Team",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^6.8.2",
+    "@types/express": "^5.0.0",
+    "@types/handlebars": "^4.0.40",
+    "@types/node": "^22.10.2",
+    "compression": "^1.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "handlebars": "^4.7.8",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.0",
+    "prisma": "^6.8.2",
+    "resend": "^4.5.1",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "winston": "^3.17.0",
+    "zod": "^3.25.28"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.8.0",
+    "@types/cors": "^2.8.18",
+    "@types/morgan": "^1.9.9",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.4.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

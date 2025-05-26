@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⏰ Seus produtos podem acabar!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+        .urgency-banner {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px;
+            text-align: center;
+        }
+        .urgency-banner strong {
+            color: #856404;
+            font-size: 18px;
+        }
+        .content {
+            padding: 40px 20px;
+        }
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        .message {
+            font-size: 16px;
+            color: #666666;
+            margin-bottom: 30px;
+        }
+        .stock-alert {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .stock-alert p {
+            margin: 0;
+            color: #721c24;
+            font-weight: bold;
+        }
+        .products {
+            margin: 30px 0;
+            border-top: 1px solid #eeeeee;
+            padding-top: 20px;
+        }
+        .product {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .product-name {
+            flex: 1;
+            font-weight: bold;
+            font-size: 16px;
+            color: #1a1a1a;
+        }
+        .product-price {
+            font-size: 18px;
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #dc3545;
+            color: #ffffff !important;
+            padding: 18px 50px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .cta-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .countdown {
+            font-size: 24px;
+            color: #dc3545;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .benefits {
+            background-color: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        .benefits h3 {
+            color: #0066cc;
+            margin-bottom: 15px;
+        }
+        .benefits ul {
+            list-style: none;
+            padding: 0;
+        }
+        .benefits li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        .benefits li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #f8f8f8;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #999999;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>⏰ Últimas unidades disponíveis!</h1>
+        </div>
+        
+        <div class="urgency-banner">
+            <strong>🔥 ATENÇÃO: Seus produtos estão quase esgotados!</strong>
+        </div>
+        
+        <div class="content">
+            <p class="greeting">{{customerName}}, não queremos que você perca essa oportunidade!</p>
+            
+            <div class="stock-alert">
+                <p>⚠️ Outros clientes estão visualizando os mesmos produtos agora!</p>
+            </div>
+            
+            <p class="message">
+                Seus itens ainda estão reservados, mas não podemos garantir por muito tempo. 
+                O estoque está acabando rapidamente!
+            </p>
+            
+            <div class="products">
+                <h3 style="margin-bottom: 15px;">Itens no seu carrinho:</h3>
+                {{#each products}}
+                <div class="product">
+                    <div class="product-name">{{name}}</div>
+                    <div class="product-price">{{price}}</div>
+                </div>
+                {{/each}}
+            </div>
+            
+            <div class="cta-container">
+                <p class="countdown">⏱️ Reserva expira em 2 HORAS!</p>
+                <a href="{{checkoutUrl}}" class="cta-button">Garantir Meus Produtos Agora</a>
+            </div>
+            
+            <div class="benefits">
+                <h3>Por que finalizar agora?</h3>
+                <ul>
+                    <li>Produtos com estoque limitado</li>
+                    <li>Preços especiais mantidos</li>
+                    <li>Entrega garantida no prazo</li>
+                    <li>Parcelamento sem juros disponível</li>
+                </ul>
+            </div>
+            
+            <p style="text-align: center; font-style: italic; color: #666666; margin-top: 30px;">
+                "Não deixe para depois o que você pode garantir agora!"
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>Este é um lembrete automático sobre seu carrinho abandonado</p>
+            <p style="margin-top: 10px;">
+                Email enviado para {{customerEmail}}
+            </p>
+        </div>
+    </div>
+</body>
+</html> 

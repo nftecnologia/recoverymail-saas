@@ -1,0 +1,382 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+#!/bin/bash
+# Script para criar a estrutura inicial do Memory Bank
+
+# Criar estrutura de diretórios
+mkdir -p memory-bank/snapshots
+
+# Criar projectbrief.md
+cat > memory-bank/projectbrief.md << 'EOF'
+# Recovery SaaS - Project Brief
+
+## Visão do Projeto
+Criar um SaaS multi-tenant para recuperação automática de vendas perdidas através de campanhas de email inteligentes, processando webhooks de plataformas de e-commerce e automatizando o envio de emails de recuperação com timing otimizado.
+
+## Problema Resolvido
+- 70% dos carrinhos são abandonados no e-commerce brasileiro
+- Boletos expiram e vendas são perdidas por falta de follow-up
+- Processos manuais de recuperação são ineficientes e caros
+
+## Requisitos Core
+
+### Funcionais
+- [ ] Receber e processar 12 tipos diferentes de webhooks
+- [ ] Sistema de filas com delays customizados por evento
+- [ ] Templates de email responsivos e personalizáveis
+- [ ] Geração de conteúdo com IA para otimizar conversão
+- [ ] Dashboard com métricas em tempo real
+- [ ] Multi-tenancy com isolamento completo de dados
+- [ ] API para integração com sistemas externos
+
+### Não-Funcionais
+- [ ] Processar 1000 webhooks/segundo
+- [ ] Taxa de entrega de email > 95%
+- [ ] Uptime 99.9%
+- [ ] Conformidade com LGPD
+- [ ] Escalabilidade horizontal
+
+## Stack Técnica Definida
+- **Backend**: Node.js + Express + TypeScript
+- **Automação**: n8n (workflows visuais)
+- **Banco de Dados**: PostgreSQL (Neon)
+- **Cache/Filas**: Redis + Bull
+- **Email**: Resend API
+- **Frontend**: Next.js 14 (App Router)
+- **IA**: OpenAI/Claude para geração de conteúdo
+- **Monitoramento**: Sentry + Prometheus
+- **Hospedagem**: Vercel (Frontend) + Railway (Backend)
+## Critérios de Sucesso
+- Aumentar taxa de recuperação em 30% vs. email manual
+- ROI positivo em 3 meses
+- Reduzir tempo de setup para < 10 minutos
+- NPS > 8 dos usuários
+
+## Marcos do Projeto
+1. **MVP (4 semanas)**: Webhooks + 3 tipos de evento + emails básicos
+2. **Beta (8 semanas)**: Todos eventos + dashboard + IA
+3. **v1.0 (12 semanas)**: Multi-tenancy completo + API pública
+EOF
+
+# Criar webhookContext.md
+cat > memory-bank/webhookContext.md << 'EOF'
+# Contexto de Webhooks - Recovery SaaS
+
+## Status Geral: 2/12 webhooks implementados
+
+## Detalhamento por Webhook
+
+### 1. ABANDONED_CART ✅ [100% completo]
+**Descrição**: Carrinho abandonado pelo cliente
+**Payload Recebido**:
+```json
+{
+  "event": "ABANDONED_CART",
+  "checkout_id": "Q8J1N6K3",
+  "checkout_url": "http://example.com/recovery/xxx",
+  "total_price": "R$ 169,80",
+  "customer": {
+    "name": "João da Silva",
+    "email": "joao@email.com",
+    "phone_number": "5511987654321"
+  },
+  "products": [{
+    "name": "Produto X",
+    "price": "R$ 119,90"
+  }]
+}
+```
+**Fluxo de Email Implementado**:
+- ✅ Email 1 (2h): Lembrete gentil - "Você esqueceu algo especial"
+- ✅ Email 2 (24h): Criando urgência - "Seus produtos podem acabar"
+- ✅ Email 3 (72h): Última chance - "10% de desconto exclusivo"
+
+**Código**: `/backend/src/handlers/abandonedCart.handler.ts`
+**Template**: `/backend/src/templates/abandoned-cart/`
+
+### 2. BANK_SLIP_EXPIRED 🟡 [60% completo]
+**Descrição**: Boleto bancário expirou sem pagamento
+**Handler**: ✅ Implementado
+**Queue**: ✅ Configurado
+**Templates**: 🔴 Pendente
+**Worker**: 🟡 Em desenvolvimento
+
+### 3. PIX_EXPIRED 🔴 [0% completo]
+**Descrição**: QR Code PIX expirou
+**Próximos passos**:
+- [ ] Criar handler
+- [ ] Configurar delays (15min, 2h)
+- [ ] Criar templates urgentes
+
+### 4. SALE_REFUSED 🔴 [0% completo]
+**Descrição**: Pagamento recusado pela operadora
+
+### 5. SALE_APPROVED 🔴 [0% completo]
+**Descrição**: Venda aprovada (confirmação)
+
+### 6. SALE_CHARGEBACK 🔴 [0% completo]
+**Descrição**: Chargeback recebido
+
+### 7. SALE_REFUNDED 🔴 [0% completo]
+**Descrição**: Reembolso processado
+
+### 8. BANK_SLIP_GENERATED 🔴 [0% completo]
+**Descrição**: Boleto gerado (lembrete de pagamento)
+
+### 9. PIX_GENERATED 🔴 [0% completo]
+**Descrição**: PIX gerado (enviar QR Code)
+
+### 10. SUBSCRIPTION_CANCELED 🔴 [0% completo]
+**Descrição**: Assinatura cancelada (win-back)
+
+### 11. SUBSCRIPTION_EXPIRED 🔴 [0% completo]
+**Descrição**: Assinatura expirada (renovação)
+
+### 12. SUBSCRIPTION_RENEWED 🔴 [0% completo]
+**Descrição**: Assinatura renovada (confirmação)
+EOF
+
+# Criar taskBreakdown.md
+cat > memory-bank/taskBreakdown.md << 'EOF'
+# Breakdown de Tarefas - Recovery SaaS
+
+## 🎯 Sprint Atual: Backend Core (Semana 1-2)
+
+### TAREFA 1: Sistema Base de Webhooks [85% completo]
+#### ✅ Subtarefas Completas:
+- [x] Setup Express + TypeScript
+- [x] Estrutura de pastas do projeto
+- [x] Configurar Prisma com schema inicial
+- [x] Conexão com Neon PostgreSQL
+- [x] Endpoint POST /webhook/:orgId básico
+- [x] Validação de payload com Zod
+- [x] Salvar eventos no banco
+- [x] Docker Compose para desenvolvimento
+
+#### 🟡 Em Progresso:
+- [ ] Validação de assinatura HMAC (50%)
+  - [x] Função de validação criada
+  - [ ] Middleware implementado
+  - [ ] Testes com diferentes secrets
+  
+#### 🔴 Pendentes:
+- [ ] Rate limiting por organização
+  - [ ] Instalar express-rate-limit + redis-store
+  - [ ] Configurar 100 req/min por org
+  - [ ] Testes de carga
+- [ ] Tratamento de erros padronizado
+- [ ] Logs estruturados com Winston
+
+### TAREFA 2: Sistema de Filas [40% completo]
+#### ✅ Completas:
+- [x] Redis rodando no Docker
+- [x] Bull instalado e configurado
+- [x] Queue básica "email-queue" criada
+- [x] Conexão Redis testada
+
+#### 🟡 Em Progresso:
+- [ ] Worker principal (30%)
+  ```typescript
+  // Estrutura implementada:
+  emailQueue.process(async (job) => {
+    // TODO: Buscar evento do banco
+    // TODO: Determinar template
+    // TODO: Enviar email
+  });
+  ```
+
+#### 🔴 Pendentes:
+- [ ] Mapeamento evento → delays
+- [ ] Dead letter queue
+- [ ] Bull Board para monitoramento
+- [ ] Métricas de processamento
+
+### TAREFA 3: Integração n8n [25% completo]
+#### ✅ Completas:
+- [x] n8n rodando no Docker
+- [x] Acesso configurado (admin/admin)
+- [x] Workflow teste criado
+
+#### 🔴 Pendentes:
+- [ ] Webhook receiver no n8n
+- [ ] Conexão n8n → PostgreSQL
+- [ ] Workflows por tipo de evento
+- [ ] Documentação dos workflows
+
+## 📋 Checklist Diário
+
+### Segunda-feira
+- [ ] Finalizar HMAC validation
+- [ ] Criar testes para webhook handler
+- [ ] Implementar primeiro worker completo
+
+### Terça-feira
+- [ ] Rate limiting
+- [ ] Error handling middleware
+- [ ] Início dos templates
+
+### Quarta-feira
+- [ ] Integração Resend
+- [ ] Primeiro email enviado
+- [ ] Tracking de abertura
+
+## 🚀 Próximas Sprints
+
+### Sprint 2: Templates e Email (Semana 3)
+- [ ] Sistema de templates com Handlebars
+- [ ] Integração completa com Resend
+- [ ] 5 templates principais
+- [ ] A/B testing básico
+
+### Sprint 3: n8n Workflows (Semana 4)
+- [ ] Workflow para cada tipo de evento
+- [ ] Nodes customizados
+- [ ] Integração com filas
+- [ ] Documentação
+
+### Sprint 4: Dashboard MVP (Semana 5-6)
+- [ ] Setup Next.js
+- [ ] Tela de eventos
+- [ ] Métricas básicas
+- [ ] Configurações
+
+## 📝 Notas Importantes
+- Priorizar ABANDONED_CART e BANK_SLIP_EXPIRED (80% dos casos)
+- Delay de emails deve ser configurável por organização
+- Sempre testar com webhook real antes de marcar como completo
+EOF
+
+# Criar activeContext.md
+cat > memory-bank/activeContext.md << 'EOF'
+# Contexto Ativo - Sessão Atual
+
+## 📅 Data: [ATUALIZAR NO INÍCIO DA SESSÃO]
+
+## 🎯 Foco da Sessão Anterior
+Implementação do sistema base de webhooks e configuração inicial do projeto.
+
+## 💻 Último Código Trabalhado
+
+### Arquivo: `backend/src/server.ts`
+```typescript
+// Último estado: Webhook receiver básico funcionando
+app.post('/webhook/:orgId', async (req, res) => {
+  // Validação básica implementada
+  // Salvamento no banco OK
+  // Falta: HMAC validation, rate limiting
+});
+```
+
+### Arquivo: `backend/src/workers/email.worker.ts`
+```typescript
+// Estado: Estrutura básica criada
+emailQueue.process(async (job) => {
+  // TODO: Implementar lógica de processamento
+});
+```
+
+## 🐛 Problemas Encontrados e Soluções
+1. **Problema**: Prisma Client não gerado automaticamente
+   **Solução**: Adicionar postinstall script: `"postinstall": "prisma generate"`
+
+2. **Problema**: Redis connection refused no Docker
+   **Solução**: Usar `redis://redis:6379` dentro do Docker, `localhost` fora
+
+## 📝 Decisões Técnicas Tomadas
+- Usar Zod para validação de webhooks (type-safe)
+- IDs como CUID ao invés de UUID (mais curtos)
+- Separar workers em arquivos individuais por tipo
+
+## ⏭️ Próximos Passos Imediatos
+1. **PRIORIDADE ALTA**: Completar HMAC validation
+   - Implementar validateSignature middleware
+   - Adicionar testes
+   
+2. **PRIORIDADE MÉDIA**: Worker de ABANDONED_CART
+   - Buscar evento do banco
+   - Implementar delays (2h, 24h, 72h)
+   - Criar job para cada delay
+
+3. **PRIORIDADE BAIXA**: Bull Board
+   - Configurar rota /admin/queues
+   - Adicionar autenticação básica
+
+## 🔧 Comandos Úteis para Retomar
+```bash
+# Subir ambiente de dev
+docker-compose up -d
+
+# Rodar backend
+cd backend && npm run dev
+
+# Testar webhook
+node test-webhook.js
+
+# Acessar n8n
+open http://localhost:5678
+
+# Ver logs do Redis
+docker logs recovery-saas_redis_1
+```
+
+## 🔗 Contexto para o Cursor
+"Estou desenvolvendo um Recovery SaaS. Implemente a validação HMAC para o webhook handler em /backend/src/middleware/validateSignature.ts seguindo o padrão já estabelecido no projeto."
+EOF
+
+# Criar snapshot inicial
+DATE=$(date +%Y-%m-%d)
+cat > memory-bank/snapshots/$DATE-inicio.md << 'EOF'
+# Snapshot - Início do Projeto
+
+## Resumo
+Início do desenvolvimento do Recovery SaaS com foco na estrutura base do backend.
+
+## Conquistas
+- ✅ Estrutura do projeto criada
+- ✅ Memory Bank configurado
+- ✅ Docker Compose funcionando
+- ✅ Webhook receiver básico
+- ✅ Conexão com PostgreSQL (Neon)
+
+## Estrutura Criada
+```
+recovery-saas/
+├── backend/
+│   ├── src/
+│   │   ├── server.ts
+│   │   ├── routes/
+│   │   ├── handlers/
+│   │   ├── workers/
+│   │   └── types/
+│   └── prisma/
+├── memory-bank/
+├── docker-compose.yml
+└── test-webhook.js
+```
+
+## Próximos Marcos
+1. Sistema de webhooks completo com segurança
+2. Processamento de filas funcionando
+3. Primeiro email enviado com sucesso
+
+## Aprendizados
+- Neon requer SSL em produção
+- Bull precisa de Redis 2.8.18+
+- n8n pode consumir muita memória, limitar no Docker
+EOF
+
+echo "✅ Memory Bank criado com sucesso!"
+echo ""
+echo "📁 Estrutura criada em ./memory-bank/"
+echo ""
+echo "🚀 Próximos passos:"
+echo "1. Revise os arquivos criados"
+echo "2. Ajuste o projectbrief.md com seus requisitos específicos"
+echo "3. Use o activeContext.md no início de cada sessão"
+echo "4. Mantenha o taskBreakdown.md sempre atualizado"
+echo ""
+echo "💡 Dica: Configure o Cursor para abrir automaticamente o Memory Bank:"
+echo "   Preferences > Open Folders > Add ./memory-bank"
