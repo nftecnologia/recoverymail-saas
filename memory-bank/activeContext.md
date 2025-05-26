@@ -2,6 +2,68 @@
 
 ## 📅 Data: 26/05/2025
 
+## 🎯 Foco da Sessão Atual
+- Implementação completa da integração dashboard + backend com React Query
+- Discussão sobre personalização de templates
+- **DECISÃO IMPORTANTE**: Templates serão 100% automáticos, sem personalização
+
+## 💻 Último Código Trabalhado
+
+### Dashboard com React Query
+- Todas as páginas agora consomem dados reais da API
+- Implementado React Query para cache e sincronização
+- Página de templates refatorada para mostrar apenas preview dos templates automáticos
+
+### Decisão sobre Templates
+**Templates 100% Automáticos** - Razões:
+1. Zero configuração necessária
+2. Dados vêm direto do webhook (nome da loja, produtos, etc)
+3. Onboarding instantâneo - cliente só precisa apontar webhook
+4. Menos suporte e bugs
+5. Foco na automação inteligente, não em editor de templates
+
+## 🐛 Problemas Encontrados e Soluções
+1. **Problema**: Erro no React sobre campos com `value` sem `onChange`
+   **Solução**: Mudado para `defaultValue` ou adicionado `readOnly`
+
+2. **Problema**: CORS no backend
+   **Solução**: Configurado CORS para permitir requisições do dashboard
+
+3. **Problema**: Erro de relação Prisma `event` em EmailLog
+   **Solução**: Precisa regenerar Prisma Client após mudanças no schema
+
+## 📝 Decisões Técnicas Tomadas
+- Templates 100% automáticos sem personalização
+- Usar dados do webhook para preencher variáveis
+- React Query para gerenciamento de estado no dashboard
+- Página de templates apenas informativa (sem edição)
+
+## ⏭️ Próximos Passos Imediatos
+1. **Deploy para Produção**
+   - Backend no Railway
+   - Dashboard na Vercel
+   - Configurar variáveis de ambiente
+
+2. **Documentação**
+   - Como integrar (webhook URL)
+   - Tipos de eventos suportados
+   - Exemplos de payload
+
+3. **Landing Page**
+   - Página de vendas simples
+   - Foco nos benefícios da automação
+   - "Integre em 5 minutos"
+
+## 🔧 Status do Sistema
+- ✅ Backend 100% completo (12/12 webhooks)
+- ✅ Dashboard funcional com dados reais
+- ✅ Templates automáticos definidos
+- ✅ Sistema de filas funcionando
+- ✅ Integração com Resend testada
+
+## 🔗 Contexto para o Cursor
+"Recovery SaaS com templates 100% automáticos. Sistema usa apenas dados do webhook para personalizar emails, sem necessidade de configuração pelo cliente."
+
 ## 🎯 Foco da Sessão
 Implementação completa de TODOS os handlers e templates restantes do sistema, finalizando 100% do backend do Recovery SaaS.
 
@@ -44,13 +106,6 @@ backend/src/templates/emails/
 - Adicionado suporte para todos os 12 tipos de eventos
 - Mapeamento completo de dados específicos por evento
 - Personalização avançada para infoprodutos
-
-## 🐛 Problemas Encontrados e Soluções
-1. **Problema**: Validação falhando em SALE_REFUSED
-   **Solução**: Campo `product.price` adicionado ao schema
-
-2. **Problema**: Templates genéricos demais
-   **Solução**: Pivot completo para infoprodutos com copy específico
 
 ## 📝 Decisões Técnicas Tomadas
 - Foco total em infoprodutos (cursos online, mentorias)
