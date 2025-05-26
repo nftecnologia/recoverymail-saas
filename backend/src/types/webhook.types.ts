@@ -90,12 +90,159 @@ export interface PixExpiredPayload extends WebhookPayload {
   };
 }
 
+// Additional webhook payloads
+export interface SaleRefusedPayload extends WebhookPayload {
+  event: 'SALE_REFUSED';
+  data: {
+    order_id: string;
+    refused_at: string;
+    reason: string;
+    amount: number;
+    customer: Customer;
+    payment_method: string;
+  };
+}
+
+export interface SaleApprovedPayload extends WebhookPayload {
+  event: 'SALE_APPROVED';
+  data: {
+    order_id: string;
+    approved_at: string;
+    amount: number;
+    customer: Customer;
+    items: Product[];
+  };
+}
+
+export interface SaleChargebackPayload extends WebhookPayload {
+  event: 'SALE_CHARGEBACK';
+  data: {
+    order_id: string;
+    chargeback_at: string;
+    amount: number;
+    reason: string;
+    customer: Customer;
+  };
+}
+
+export interface SaleRefundedPayload extends WebhookPayload {
+  event: 'SALE_REFUNDED';
+  data: {
+    order_id: string;
+    refunded_at: string;
+    amount: number;
+    reason?: string;
+    customer: Customer;
+  };
+}
+
+export interface BankSlipGeneratedPayload extends WebhookPayload {
+  event: 'BANK_SLIP_GENERATED';
+  data: {
+    order_id: string;
+    bank_slip_id: string;
+    bank_slip_url: string;
+    bar_code: string;
+    due_date: string;
+    amount: number;
+    customer: Customer;
+  };
+}
+
+export interface PixGeneratedPayload extends WebhookPayload {
+  event: 'PIX_GENERATED';
+  data: {
+    order_id: string;
+    pix_id: string;
+    qr_code: string;
+    qr_code_url: string;
+    expires_at: string;
+    amount: number;
+    customer: Customer;
+  };
+}
+
+export interface SubscriptionCanceledPayload extends WebhookPayload {
+  event: 'SUBSCRIPTION_CANCELED';
+  data: {
+    subscription_id: string;
+    canceled_at: string;
+    reason?: string;
+    customer: Customer;
+    plan: {
+      name: string;
+      price: number;
+      interval: string;
+    };
+    stats?: {
+      months_active: number;
+      total_paid: number;
+      last_payment_date: string;
+      usage_percentage: number;
+    };
+    benefits?: {
+      used: string[];
+      unused: string[];
+      most_accessed_feature: string;
+      total_logins: number;
+      last_login_date: string;
+    };
+    community?: {
+      posts_created: number;
+      comments: number;
+      likes_received: number;
+      connections_made: number;
+    };
+  };
+}
+
+export interface SubscriptionExpiredPayload extends WebhookPayload {
+  event: 'SUBSCRIPTION_EXPIRED';
+  data: {
+    subscription_id: string;
+    expired_at: string;
+    customer: Customer;
+    plan: {
+      name: string;
+      price: number;
+      interval: string;
+    };
+  };
+}
+
+export interface SubscriptionRenewedPayload extends WebhookPayload {
+  event: 'SUBSCRIPTION_RENEWED';
+  data: {
+    subscription_id: string;
+    renewed_at: string;
+    next_renewal_date: string;
+    renewal_id: string;
+    customer: Customer;
+    plan: {
+      name: string;
+      price: number;
+      interval: string;
+    };
+    product?: {
+      name: string;
+    };
+  };
+}
+
 // Union type for all webhook payloads
 export type WebhookEvent =
   | AbandonedCartPayload
   | BankSlipExpiredPayload
   | PixExpiredPayload
-  | WebhookPayload; // fallback for other events
+  | SaleRefusedPayload
+  | SaleApprovedPayload
+  | SaleChargebackPayload
+  | SaleRefundedPayload
+  | BankSlipGeneratedPayload
+  | PixGeneratedPayload
+  | SubscriptionCanceledPayload
+  | SubscriptionExpiredPayload
+  | SubscriptionRenewedPayload;
 
 // Webhook processing result
 export interface WebhookResult {
