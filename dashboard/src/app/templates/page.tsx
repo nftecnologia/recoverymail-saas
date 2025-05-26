@@ -2,360 +2,289 @@
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Mail, 
   Eye,
-  Save,
-  RotateCcw,
-  Palette,
-  Type,
-  Image,
-  Link
+  Info,
+  Clock,
+  Zap,
+  Target
 } from "lucide-react";
 import { useState } from "react";
 
 const eventTypes = [
-  { value: "ABANDONED_CART", label: "Carrinho Abandonado", attempts: 3 },
-  { value: "PIX_EXPIRED", label: "PIX Expirado", attempts: 2 },
-  { value: "BANK_SLIP_EXPIRED", label: "Boleto Expirado", attempts: 3 },
-  { value: "SALE_REFUSED", label: "Venda Recusada", attempts: 2 },
-  { value: "SALE_APPROVED", label: "Venda Aprovada", attempts: 1 },
+  { 
+    value: "ABANDONED_CART", 
+    label: "Carrinho Abandonado", 
+    attempts: 3,
+    description: "Recupera vendas de carrinhos abandonados com sequência otimizada"
+  },
+  { 
+    value: "PIX_EXPIRED", 
+    label: "PIX Expirado", 
+    attempts: 2,
+    description: "Ação rápida para PIX que expira em minutos"
+  },
+  { 
+    value: "BANK_SLIP_EXPIRED", 
+    label: "Boleto Expirado", 
+    attempts: 3,
+    description: "Sequência espaçada para boletos com prazo maior"
+  },
+  { 
+    value: "SALE_REFUSED", 
+    label: "Venda Recusada", 
+    attempts: 2,
+    description: "Oferece alternativas de pagamento rapidamente"
+  },
+  { 
+    value: "SALE_APPROVED", 
+    label: "Venda Aprovada", 
+    attempts: 1,
+    description: "Confirmação e boas-vindas ao cliente"
+  },
 ];
+
+const templateStrategies = {
+  ABANDONED_CART: [
+    { delay: "2 horas", strategy: "Lembrete gentil", emoji: "👋" },
+    { delay: "24 horas", strategy: "Criar urgência", emoji: "⏰" },
+    { delay: "72 horas", strategy: "Oferta especial", emoji: "🎁" }
+  ],
+  PIX_EXPIRED: [
+    { delay: "15 minutos", strategy: "Urgência máxima", emoji: "🚨" },
+    { delay: "2 horas", strategy: "Última chance", emoji: "⚡" }
+  ],
+  BANK_SLIP_EXPIRED: [
+    { delay: "1 dia", strategy: "Lembrete amigável", emoji: "📋" },
+    { delay: "3 dias", strategy: "Facilitar pagamento", emoji: "💳" },
+    { delay: "7 dias", strategy: "Oferta irrecusável", emoji: "🎯" }
+  ],
+  SALE_REFUSED: [
+    { delay: "30 minutos", strategy: "Alternativas rápidas", emoji: "🔄" },
+    { delay: "6 horas", strategy: "Suporte personalizado", emoji: "🤝" }
+  ],
+  SALE_APPROVED: [
+    { delay: "Imediato", strategy: "Confirmação e próximos passos", emoji: "✅" }
+  ]
+};
 
 export default function TemplatesPage() {
   const [selectedEvent, setSelectedEvent] = useState("ABANDONED_CART");
-  const [selectedAttempt, setSelectedAttempt] = useState(1);
   
-  // Configurações de personalização
-  const [customization, setCustomization] = useState({
-    logoUrl: "https://example.com/logo.png",
-    primaryColor: "#3B82F6",
-    secondaryColor: "#8B5CF6",
-    companyName: "Recovery Mail",
-    supportEmail: "suporte@recoverymail.com",
-    whatsappNumber: "11999999999",
-    facebookUrl: "https://facebook.com/recoverymail",
-    instagramUrl: "https://instagram.com/recoverymail",
-    footerText: "© 2025 Recovery Mail. Todos os direitos reservados.",
-  });
-
-  const handleSave = () => {
-    // Aqui salvaria as configurações via API
-    console.log("Salvando configurações:", customization);
-  };
-
-  const variables = [
-    { name: "{{customer.name}}", description: "Nome do cliente" },
-    { name: "{{product.name}}", description: "Nome do produto" },
-    { name: "{{total_price}}", description: "Valor total" },
-    { name: "{{checkout_url}}", description: "Link de recuperação" },
-    { name: "{{company.name}}", description: "Nome da sua empresa" },
-    { name: "{{support.email}}", description: "Email de suporte" },
-  ];
+  const currentEvent = eventTypes.find(e => e.value === selectedEvent);
+  const strategies = templateStrategies[selectedEvent as keyof typeof templateStrategies] || [];
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Templates de Email
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Personalize a aparência dos seus emails
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline">
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Restaurar Padrão
-            </Button>
-            <Button onClick={handleSave}>
-              <Save className="h-4 w-4 mr-2" />
-              Salvar Alterações
-            </Button>
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Templates Automáticos
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Templates otimizados para máxima conversão em cada situação
+          </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Configurações */}
-          <div className="lg:col-span-1 space-y-4">
-            {/* Seletor de Template */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Selecionar Template</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Tipo de Evento</label>
-                  <select
-                    value={selectedEvent}
-                    onChange={(e) => {
-                      setSelectedEvent(e.target.value);
-                      setSelectedAttempt(1);
-                    }}
-                    className="mt-1 w-full px-3 py-2 border rounded-md"
+        {/* Info Card */}
+        <Card className="bg-blue-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-blue-900">
+              <Info className="h-5 w-5 mr-2" />
+              Como funcionam os templates
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-blue-800">
+            <ul className="space-y-2">
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>Templates criados por especialistas em copywriting e conversão</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>Personalizados automaticamente com dados do cliente e produto</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>Timing otimizado baseado em dados de milhares de campanhas</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span>A/B testing contínuo para melhorar conversões</span>
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Event Type Selector */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Tipos de Evento</CardTitle>
+            <CardDescription>
+              Selecione um tipo de evento para ver a estratégia de recuperação
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={selectedEvent} onValueChange={setSelectedEvent}>
+              <TabsList className="grid grid-cols-2 lg:grid-cols-5 h-auto">
+                {eventTypes.map((event) => (
+                  <TabsTrigger
+                    key={event.value}
+                    value={event.value}
+                    className="flex flex-col py-3"
                   >
-                    {eventTypes.map((event) => (
-                      <option key={event.value} value={event.value}>
-                        {event.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium">Tentativa</label>
-                  <div className="mt-1 flex gap-2">
-                    {Array.from({ 
-                      length: eventTypes.find(e => e.value === selectedEvent)?.attempts || 1 
-                    }).map((_, i) => (
-                      <Button
-                        key={i + 1}
-                        variant={selectedAttempt === i + 1 ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedAttempt(i + 1)}
-                      >
-                        {i + 1}ª
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                    <span className="font-medium">{event.label}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {event.attempts} {event.attempts === 1 ? 'email' : 'emails'}
+                    </span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
 
-            {/* Personalização */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Personalização</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="brand">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="brand">Marca</TabsTrigger>
-                    <TabsTrigger value="social">Social</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="brand" className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium flex items-center">
-                        <Image className="h-4 w-4 mr-2" />
-                        URL do Logo
-                      </label>
-                      <input
-                        type="url"
-                        value={customization.logoUrl}
-                        onChange={(e) => setCustomization({...customization, logoUrl: e.target.value})}
-                        className="mt-1 w-full px-3 py-2 border rounded-md text-sm"
-                        placeholder="https://..."
-                      />
+              {eventTypes.map((event) => (
+                <TabsContent key={event.value} value={event.value} className="mt-6">
+                  <div className="space-y-6">
+                    {/* Event Description */}
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">{event.description}</p>
                     </div>
-                    
+
+                    {/* Email Sequence */}
                     <div>
-                      <label className="text-sm font-medium flex items-center">
-                        <Palette className="h-4 w-4 mr-2" />
-                        Cor Primária
-                      </label>
-                      <div className="mt-1 flex gap-2">
-                        <input
-                          type="color"
-                          value={customization.primaryColor}
-                          onChange={(e) => setCustomization({...customization, primaryColor: e.target.value})}
-                          className="h-10 w-20"
-                        />
-                        <input
-                          type="text"
-                          value={customization.primaryColor}
-                          onChange={(e) => setCustomization({...customization, primaryColor: e.target.value})}
-                          className="flex-1 px-3 py-2 border rounded-md text-sm"
-                        />
+                      <h3 className="text-lg font-semibold mb-4">Sequência de Emails</h3>
+                      <div className="space-y-4">
+                        {strategies.map((strategy, index) => (
+                          <Card key={index}>
+                            <CardContent className="pt-6">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center mb-2">
+                                    <span className="text-2xl mr-3">{strategy.emoji}</span>
+                                    <div>
+                                      <h4 className="font-medium">
+                                        {index + 1}ª Tentativa - {strategy.strategy}
+                                      </h4>
+                                      <div className="flex items-center mt-1 text-sm text-gray-500">
+                                        <Clock className="h-3 w-3 mr-1" />
+                                        <span>Enviado após {strategy.delay}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Preview do conteúdo */}
+                                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                                    <p className="text-sm font-medium mb-2">Exemplo de conteúdo:</p>
+                                    {event.value === "ABANDONED_CART" && index === 0 && (
+                                      <div className="text-sm text-gray-600">
+                                        <p className="mb-2">Assunto: 🛒 Oi João, você esqueceu alguns itens!</p>
+                                        <p>Notamos que você deixou o "Curso de Marketing Digital" no carrinho. 
+                                        Que tal finalizar sua compra? Seu carrinho está guardado e pronto!</p>
+                                      </div>
+                                    )}
+                                    {event.value === "ABANDONED_CART" && index === 1 && (
+                                      <div className="text-sm text-gray-600">
+                                        <p className="mb-2">Assunto: ⏰ João, seus itens podem acabar!</p>
+                                        <p>O "Curso de Marketing Digital" está com alta procura. 
+                                        Garantimos seu carrinho por mais 24h, mas não podemos segurar por muito tempo!</p>
+                                      </div>
+                                    )}
+                                    {event.value === "ABANDONED_CART" && index === 2 && (
+                                      <div className="text-sm text-gray-600">
+                                        <p className="mb-2">Assunto: 🎁 10% OFF exclusivo para você, João!</p>
+                                        <p>Última chance! Use o cupom VOLTA10 e ganhe 10% de desconto 
+                                        no "Curso de Marketing Digital". Oferta válida por 48h!</p>
+                                      </div>
+                                    )}
+                                    {event.value === "PIX_EXPIRED" && index === 0 && (
+                                      <div className="text-sm text-gray-600">
+                                        <p className="mb-2">Assunto: 🚨 Seu PIX expira em 15 minutos!</p>
+                                        <p>João, o PIX do seu pedido expira em breve! 
+                                        Clique aqui para copiar o código e finalizar agora mesmo.</p>
+                                      </div>
+                                    )}
+                                    {event.value === "BANK_SLIP_EXPIRED" && index === 0 && (
+                                      <div className="text-sm text-gray-600">
+                                        <p className="mb-2">Assunto: 📋 Seu boleto venceu ontem</p>
+                                        <p>Oi João! Seu boleto venceu, mas não se preocupe. 
+                                        Geramos um novo boleto com a mesma facilidade de pagamento!</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
                       </div>
                     </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium flex items-center">
-                        <Type className="h-4 w-4 mr-2" />
-                        Nome da Empresa
-                      </label>
-                      <input
-                        type="text"
-                        value={customization.companyName}
-                        onChange={(e) => setCustomization({...customization, companyName: e.target.value})}
-                        className="mt-1 w-full px-3 py-2 border rounded-md text-sm"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium">Email de Suporte</label>
-                      <input
-                        type="email"
-                        value={customization.supportEmail}
-                        onChange={(e) => setCustomization({...customization, supportEmail: e.target.value})}
-                        className="mt-1 w-full px-3 py-2 border rounded-md text-sm"
-                      />
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="social" className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium">WhatsApp</label>
-                      <input
-                        type="tel"
-                        value={customization.whatsappNumber}
-                        onChange={(e) => setCustomization({...customization, whatsappNumber: e.target.value})}
-                        className="mt-1 w-full px-3 py-2 border rounded-md text-sm"
-                        placeholder="11999999999"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium flex items-center">
-                        <Link className="h-4 w-4 mr-2" />
-                        Facebook
-                      </label>
-                      <input
-                        type="url"
-                        value={customization.facebookUrl}
-                        onChange={(e) => setCustomization({...customization, facebookUrl: e.target.value})}
-                        className="mt-1 w-full px-3 py-2 border rounded-md text-sm"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium flex items-center">
-                        <Link className="h-4 w-4 mr-2" />
-                        Instagram
-                      </label>
-                      <input
-                        type="url"
-                        value={customization.instagramUrl}
-                        onChange={(e) => setCustomization({...customization, instagramUrl: e.target.value})}
-                        className="mt-1 w-full px-3 py-2 border rounded-md text-sm"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium">Texto do Rodapé</label>
-                      <textarea
-                        value={customization.footerText}
-                        onChange={(e) => setCustomization({...customization, footerText: e.target.value})}
-                        className="mt-1 w-full px-3 py-2 border rounded-md text-sm"
-                        rows={2}
-                      />
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
 
-            {/* Variáveis Disponíveis */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Variáveis Disponíveis</CardTitle>
-                <CardDescription>
-                  Use estas variáveis nos templates
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {variables.map((variable) => (
-                    <div key={variable.name} className="flex justify-between text-sm">
-                      <code className="bg-gray-100 px-2 py-1 rounded">
-                        {variable.name}
-                      </code>
-                      <span className="text-gray-500">{variable.description}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Preview */}
-          <div className="lg:col-span-2">
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center">
-                    <Eye className="h-4 w-4 mr-2" />
-                    Preview
-                  </span>
-                  <Badge variant="outline">
-                    {selectedEvent.replace(/_/g, ' ')} - Tentativa {selectedAttempt}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="border rounded-lg overflow-hidden">
-                  <div className="bg-gray-50 p-4 border-b">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-500">De: {customization.companyName}</p>
-                        <p className="text-sm text-gray-500">Para: cliente@exemplo.com</p>
-                      </div>
-                      <Mail className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <p className="mt-2 font-medium">
-                      Assunto: 🛒 Você esqueceu alguns itens no seu carrinho
-                    </p>
-                  </div>
-                  
-                  <div className="bg-white p-8">
-                    {/* Email Preview */}
-                    <div className="max-w-2xl mx-auto">
-                      <div className="text-center mb-8">
-                        <div 
-                          className="inline-block h-16 w-32 rounded"
-                          style={{ backgroundColor: customization.primaryColor }}
-                        />
-                        <p className="mt-2 text-sm text-gray-500">{customization.companyName}</p>
-                      </div>
-                      
-                      <h1 className="text-2xl font-bold mb-4">
-                        Olá, João!
-                      </h1>
-                      
-                      <p className="text-gray-700 mb-6">
-                        Notamos que você deixou alguns itens incríveis no seu carrinho. 
-                        Que tal finalizar sua compra agora?
-                      </p>
-                      
-                      <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                        <h3 className="font-medium mb-3">Seus itens:</h3>
-                        <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span>Curso de Marketing Digital</span>
-                            <span className="font-medium">R$ 297,00</span>
+                    {/* Performance Stats */}
+                    <Card className="bg-green-50 border-green-200">
+                      <CardHeader>
+                        <CardTitle className="flex items-center text-green-900">
+                          <Target className="h-5 w-5 mr-2" />
+                          Performance Média
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                          <div>
+                            <p className="text-2xl font-bold text-green-900">32%</p>
+                            <p className="text-sm text-green-700">Taxa de Recuperação</p>
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-green-900">68%</p>
+                            <p className="text-sm text-green-700">Taxa de Abertura</p>
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-green-900">24%</p>
+                            <p className="text-sm text-green-700">Taxa de Clique</p>
                           </div>
                         </div>
-                      </div>
-                      
-                      <div className="text-center mb-8">
-                        <a
-                          href="#"
-                          className="inline-block px-8 py-3 rounded-lg text-white font-medium"
-                          style={{ backgroundColor: customization.primaryColor }}
-                        >
-                          Finalizar Compra
-                        </a>
-                      </div>
-                      
-                      <div className="border-t pt-6 text-center text-sm text-gray-500">
-                        <p className="mb-2">Precisa de ajuda? Entre em contato:</p>
-                        <p>{customization.supportEmail}</p>
-                        <p className="mt-4">{customization.footerText}</p>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        {/* Variables Info */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Personalização Automática</CardTitle>
+            <CardDescription>
+              Variáveis preenchidas automaticamente em cada email
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="font-medium mb-2">Dados do Cliente</h4>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li>• Nome completo e primeiro nome</li>
+                  <li>• Email e telefone</li>
+                  <li>• Histórico de compras</li>
+                  <li>• Localização</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-medium mb-2">Dados do Pedido</h4>
+                <ul className="space-y-1 text-sm text-gray-600">
+                  <li>• Produtos no carrinho</li>
+                  <li>• Valor total e descontos</li>
+                  <li>• Link de recuperação</li>
+                  <li>• Prazo de validade</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );
