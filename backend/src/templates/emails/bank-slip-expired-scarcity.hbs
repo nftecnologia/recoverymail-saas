@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⏰ Últimas {{remainingSpots}} vagas disponíveis!</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header Urgente -->
+                    <tr>
+                        <td style="background-color: #ff4444; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h2 style="margin: 0; font-size: 24px;">⚠️ ATENÇÃO: Apenas {{remainingSpots}} vagas restantes!</h2>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px;">
+                                Olá <strong>{{customerName}}</strong>,
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #555; line-height: 1.6; margin-bottom: 20px;">
+                                Seu boleto para o <strong>{{productName}}</strong> expirou, mas consegui 
+                                <span style="color: #ff4444; font-weight: bold;">segurar sua vaga por mais algumas horas!</span>
+                            </p>
+
+                            <!-- Box de Urgência -->
+                            <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <p style="margin: 0; font-size: 16px; color: #856404;">
+                                    <strong>🔥 {{enrolledToday}} pessoas entraram hoje</strong><br>
+                                    Das 100 vagas disponíveis, restam apenas {{remainingSpots}}!
+                                </p>
+                            </div>
+
+                            <!-- Benefícios -->
+                            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h3 style="color: #333; margin-bottom: 15px;">O que você está prestes a perder:</h3>
+                                <ul style="color: #555; font-size: 15px; line-height: 1.8;">
+                                    <li><strong>Acesso vitalício</strong> ao conteúdo completo</li>
+                                    <li><strong>Grupo VIP no WhatsApp</strong> com mentoria direta</li>
+                                    <li><strong>3 bônus exclusivos</strong> (valor de R$ {{bonusValue}})</li>
+                                    <li><strong>Certificado de conclusão</strong> reconhecido</li>
+                                    <li><strong>Garantia de 7 dias</strong> - risco zero!</li>
+                                </ul>
+                            </div>
+
+                            <!-- Depoimento -->
+                            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4caf50;">
+                                <p style="font-style: italic; color: #555; margin: 0;">
+                                    "{{testimonial}}"
+                                </p>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    — <strong>{{testimonialAuthor}}</strong>, {{testimonialResult}}
+                                </p>
+                            </div>
+
+                            <!-- CTA Principal -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{checkoutUrl}}" style="display: inline-block; background-color: #28a745; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-size: 18px; font-weight: bold;">
+                                    GARANTIR MINHA VAGA AGORA →
+                                </a>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    Clique e gere um novo boleto em segundos
+                                </p>
+                            </div>
+
+                            <!-- Outras formas de pagamento -->
+                            <div style="text-align: center; background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                <p style="color: #333; font-size: 16px; margin-bottom: 15px;">
+                                    <strong>Prefere pagar de outra forma?</strong>
+                                </p>
+                                <a href="{{checkoutUrl}}?payment=pix" style="display: inline-block; background-color: #00b4d8; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
+                                    PIX (5% desconto)
+                                </a>
+                                <a href="{{checkoutUrl}}?payment=card" style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
+                                    Cartão (até 12x)
+                                </a>
+                            </div>
+
+                            <!-- Timer psicológico -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <p style="color: #ff4444; font-size: 16px; font-weight: bold;">
+                                    ⏰ Esta oferta expira em {{expirationHours}} horas
+                                </p>
+                                <p style="color: #666; font-size: 14px;">
+                                    Depois disso, o valor volta para R$ {{regularPrice}}
+                                </p>
+                            </div>
+
+                            <!-- Assinatura -->
+                            <p style="color: #999; font-size: 14px; text-align: center; margin-top: 30px;">
+                                Um abraço,<br>
+                                <strong>{{organizationName}}</strong>
+                            </p>
+
+                            <!-- PS -->
+                            <p style="color: #666; font-size: 14px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                                <strong>PS:</strong> Lembre-se que {{competitorName}} cobra R$ {{competitorPrice}} 
+                                por um conteúdo similar. Você está economizando {{savingsAmount}}!
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                Este email foi enviado porque você iniciou uma compra em nosso site.<br>
+                                <a href="#" style="color: #999;">Descadastrar</a> | 
+                                <a href="{{domain}}/suporte" style="color: #999;">Suporte</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 

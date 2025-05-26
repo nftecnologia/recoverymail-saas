@@ -7,16 +7,54 @@ const customerSchema = z.object({
   name: z.string(),
   email: z.string().email(),
   phone_number: z.string().optional(),
+  document: z.string().optional(), // CPF/CNPJ para infoprodutos
 });
 
+// Schema atualizado para produtos de infoprodutos
 const productSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   price: z.string(),
   quantity: z.number().optional(),
   image_url: z.string().url().optional(),
+  // Campos específicos de infoprodutos
+  offer_id: z.string().optional(),
+  offer_name: z.string().optional(),
+  description: z.string().optional(),
+  photo: z.string().url().optional(),
+  is_order_bump: z.boolean().optional(),
 });
 
-// Schema para ABANDONED_CART
+// Schema para dados UTM (tracking de campanhas)
+const utmSchema = z.object({
+  src: z.string().optional(),
+  utm_source: z.string().optional(),
+  utm_medium: z.string().optional(),
+  utm_campaign: z.string().optional(),
+  utm_term: z.string().optional(),
+  utm_content: z.string().optional(),
+}).optional();
+
+// Schema para dados de pagamento
+const paymentSchema = z.object({
+  method: z.enum(['CREDIT_CARD', 'BANK_SLIP', 'PIX']).optional(),
+  brand: z.string().optional(),
+  installments: z.number().optional(),
+  link: z.string().url().optional(),
+  digitable_line: z.string().optional(),
+  barcode: z.string().optional(),
+  expires_at: z.string().optional(),
+  finished_at: z.string().optional(),
+}).optional();
+
+// Schema para planos de assinatura
+const planSchema = z.object({
+  name: z.string(),
+  charge_frequency: z.enum(['MONTHLY', 'QUARTERLY', 'ANNUALLY']).optional(),
+  next_charge_date: z.string().optional(),
+}).optional();
+
+// Schema para ABANDONED_CART com campos de infoprodutos
 const abandonedCartSchema = z.object({
   event: z.literal('ABANDONED_CART'),
   checkout_id: z.string(),
@@ -25,18 +63,34 @@ const abandonedCartSchema = z.object({
   customer: customerSchema,
   products: z.array(productSchema),
   abandoned_at: z.string().optional(),
+  // Campos adicionais de infoprodutos
+  sale_id: z.string().optional(),
+  payment_method: z.string().optional(),
+  type: z.enum(['ONE_TIME', 'RECURRING']).optional(),
+  status: z.string().optional(),
+  created_at: z.string().optional(),
+  utm: utmSchema,
 });
 
 // Schema para BANK_SLIP_EXPIRED
 const bankSlipExpiredSchema = z.object({
   event: z.literal('BANK_SLIP_EXPIRED'),
-  transaction_id: z.string(),
-  bank_slip_url: z.string().url(),
-  bank_slip_code: z.string(),
+  transaction_id: z.string().optional(),
+  bank_slip_url: z.string().url().optional(),
+  bank_slip_code: z.string().optional(),
   total_price: z.string(),
   customer: customerSchema,
-  expired_at: z.string(),
+  expired_at: z.string().optional(),
   checkout_url: z.string().url().optional(),
+  // Campos de infoprodutos
+  sale_id: z.string().optional(),
+  payment_method: z.string().optional(),
+  type: z.enum(['ONE_TIME', 'RECURRING']).optional(),
+  status: z.string().optional(),
+  created_at: z.string().optional(),
+  payment: paymentSchema,
+  products: z.array(productSchema).optional(),
+  utm: utmSchema,
 });
 
 // Schema para PIX_EXPIRED
@@ -95,15 +149,25 @@ const saleRefundedSchema = z.object({
   refund_date: z.string(),
 });
 
-// Schema para BANK_SLIP_GENERATED
+// Schema para BANK_SLIP_GENERATED compatível com Kirvano
 const bankSlipGeneratedSchema = z.object({
   event: z.literal('BANK_SLIP_GENERATED'),
-  transaction_id: z.string(),
-  bank_slip_url: z.string().url(),
-  bank_slip_code: z.string(),
+  transaction_id: z.string().optional(),
+  bank_slip_url: z.string().url().optional(),
+  bank_slip_code: z.string().optional(),
   total_price: z.string(),
   customer: customerSchema,
-  due_date: z.string(),
+  due_date: z.string().optional(),
+  // Campos de infoprodutos
+  checkout_id: z.string().optional(),
+  sale_id: z.string().optional(),
+  payment_method: z.string().optional(),
+  type: z.enum(['ONE_TIME', 'RECURRING']).optional(),
+  status: z.string().optional(),
+  created_at: z.string().optional(),
+  payment: paymentSchema,
+  products: z.array(productSchema).optional(),
+  utm: utmSchema,
 });
 
 // Schema para PIX_GENERATED
@@ -127,24 +191,47 @@ const subscriptionCanceledSchema = z.object({
   canceled_at: z.string(),
 });
 
-// Schema para SUBSCRIPTION_EXPIRED
+// Schema para SUBSCRIPTION_EXPIRED compatível com infoprodutos
 const subscriptionExpiredSchema = z.object({
   event: z.literal('SUBSCRIPTION_EXPIRED'),
-  subscription_id: z.string(),
+  subscription_id: z.string().optional(),
   customer: customerSchema,
-  plan_name: z.string(),
-  expired_at: z.string(),
+  plan_name: z.string().optional(),
+  expired_at: z.string().optional(),
   renewal_url: z.string().url().optional(),
+  // Campos de infoprodutos
+  checkout_id: z.string().optional(),
+  sale_id: z.string().optional(),
+  payment_method: z.string().optional(),
+  total_price: z.string().optional(),
+  type: z.literal('RECURRING').optional(),
+  status: z.string().optional(),
+  created_at: z.string().optional(),
+  payment: paymentSchema,
+  plan: planSchema,
+  products: z.array(productSchema).optional(),
+  utm: utmSchema,
 });
 
-// Schema para SUBSCRIPTION_RENEWED
+// Schema para SUBSCRIPTION_RENEWED compatível com infoprodutos
 const subscriptionRenewedSchema = z.object({
   event: z.literal('SUBSCRIPTION_RENEWED'),
-  subscription_id: z.string(),
+  subscription_id: z.string().optional(),
   customer: customerSchema,
-  plan_name: z.string(),
-  next_billing_date: z.string(),
+  plan_name: z.string().optional(),
+  next_billing_date: z.string().optional(),
   total_price: z.string(),
+  // Campos de infoprodutos
+  checkout_id: z.string().optional(),
+  sale_id: z.string().optional(),
+  payment_method: z.string().optional(),
+  type: z.literal('RECURRING').optional(),
+  status: z.string().optional(),
+  created_at: z.string().optional(),
+  payment: paymentSchema,
+  plan: planSchema,
+  products: z.array(productSchema).optional(),
+  utm: utmSchema,
 });
 
 // União de todos os schemas

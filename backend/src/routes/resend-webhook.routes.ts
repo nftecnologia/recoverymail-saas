@@ -16,20 +16,26 @@ const resendWebhookSchema = z.object({
     'email.clicked',
     'email.bounced',
     'email.complained',
+    'domain.created',
+    'domain.updated',
+    'domain.deleted',
+    'contact.created',
+    'contact.updated',
+    'contact.deleted',
   ]),
   created_at: z.string(),
   data: z.object({
-    email_id: z.string(),
-    from: z.string(),
-    to: z.array(z.string()),
-    subject: z.string(),
+    email_id: z.string().optional(),
+    from: z.string().optional(),
+    to: z.array(z.string()).optional(),
+    subject: z.string().optional(),
     click: z.object({
       link: z.string(),
-      timestamp: z.number(),
+      timestamp: z.string(),
       user_agent: z.string().optional(),
       ip_address: z.string().optional(),
     }).optional(),
-  }),
+  }).passthrough(),
 });
 
 /**
@@ -86,6 +92,18 @@ router.post('/resend-webhook', async (req, res) => {
       emailId: data.email_id,
       to: data.to,
     });
+
+    // Ignorar eventos que não são de email
+    if (!type.startsWith('email.')) {
+      logger.info('Non-email event received, ignoring', { type });
+      return res.status(200).json({ received: true });
+    }
+
+    // Verificar se temos email_id
+    if (!data.email_id) {
+      logger.warn('Email event without email_id', { type });
+      return res.status(200).json({ received: true });
+    }
 
     // Buscar log de email pelo ID do Resend
     const emailLog = await prisma.emailLog.findFirst({

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Queue } = require('bullmq');
 const IORedis = require('ioredis');
 
