@@ -109,44 +109,91 @@ const pixExpiredSchema = z.object({
 const saleRefusedSchema = z.object({
   event: z.literal('SALE_REFUSED'),
   transaction_id: z.string(),
-  reason: z.string(),
-  total_price: z.string(),
-  customer: customerSchema,
-  checkout_url: z.string().url().optional(),
+  order_number: z.string(),
   payment_method: z.string(),
+  refusal_reason: z.string().optional(),
+  refusal_code: z.string().optional(),
+  amount: z.string(),
+  customer: customerSchema,
+  product: productSchema,
+  checkout_url: z.string().url(),
+  utm: utmSchema,
 });
 
 // Schema para SALE_APPROVED
 const saleApprovedSchema = z.object({
   event: z.literal('SALE_APPROVED'),
   transaction_id: z.string(),
-  order_id: z.string(),
-  total_price: z.string(),
+  order_number: z.string(),
+  payment_method: z.string(),
+  amount: z.string(),
+  installments: z.number().optional(),
   customer: customerSchema,
-  products: z.array(productSchema),
-  tracking_url: z.string().url().optional(),
+  product: productSchema,
+  access: z.object({
+    platform_url: z.string().url(),
+    email: z.string().email(),
+    password: z.string().optional(),
+    temporary_password: z.boolean().optional()
+  }).optional(),
+  bonuses: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string().optional()
+  })).optional(),
+  community: z.object({
+    discord_url: z.string().url().optional(),
+    telegram_url: z.string().url().optional(),
+    facebook_group_url: z.string().url().optional(),
+    members_count: z.number().optional()
+  }).optional(),
 });
 
 // Schema para SALE_CHARGEBACK
 const saleChargebackSchema = z.object({
   event: z.literal('SALE_CHARGEBACK'),
   transaction_id: z.string(),
-  order_id: z.string(),
-  reason: z.string(),
-  total_price: z.string(),
-  customer: customerSchema,
+  order_number: z.string(),
+  chargeback_id: z.string(),
   chargeback_date: z.string(),
+  chargeback_reason: z.string().optional(),
+  amount: z.string(),
+  purchase_date: z.string(),
+  days_to_resolve: z.number().default(7),
+  customer: customerSchema,
+  product: productSchema,
+  payment_details: z.object({
+    method: z.string(),
+    card_last_digits: z.string().optional(),
+    billing_descriptor: z.string().optional()
+  }).optional(),
+  resolution_url: z.string().url().optional()
 });
 
 // Schema para SALE_REFUNDED
 const saleRefundedSchema = z.object({
   event: z.literal('SALE_REFUNDED'),
   transaction_id: z.string(),
-  order_id: z.string(),
-  refund_amount: z.string(),
-  reason: z.string().optional(),
-  customer: customerSchema,
+  order_number: z.string(),
+  refund_id: z.string(),
   refund_date: z.string(),
+  refund_reason: z.string().optional(),
+  refund_amount: z.string(),
+  refund_method: z.string(),
+  estimated_credit_date: z.string().optional(),
+  customer: customerSchema,
+  product: productSchema,
+  payment_original: z.object({
+    method: z.string(),
+    amount: z.string(),
+    date: z.string()
+  }).optional(),
+  feedback_url: z.string().url().optional(),
+  special_offer: z.object({
+    discount_code: z.string(),
+    discount_percent: z.number(),
+    valid_until: z.string()
+  }).optional()
 });
 
 // Schema para BANK_SLIP_GENERATED compatível com Kirvano
@@ -216,22 +263,51 @@ const subscriptionExpiredSchema = z.object({
 // Schema para SUBSCRIPTION_RENEWED compatível com infoprodutos
 const subscriptionRenewedSchema = z.object({
   event: z.literal('SUBSCRIPTION_RENEWED'),
-  subscription_id: z.string().optional(),
-  customer: customerSchema,
-  plan_name: z.string().optional(),
-  next_billing_date: z.string().optional(),
-  total_price: z.string(),
-  // Campos de infoprodutos
-  checkout_id: z.string().optional(),
-  sale_id: z.string().optional(),
-  payment_method: z.string().optional(),
-  type: z.literal('RECURRING').optional(),
-  status: z.string().optional(),
-  created_at: z.string().optional(),
-  payment: paymentSchema,
-  plan: planSchema,
-  products: z.array(productSchema).optional(),
-  utm: utmSchema,
+  subscription_id: z.string(),
+  renewal_id: z.string(),
+  renewal_date: z.string(),
+  next_renewal_date: z.string(),
+  plan: z.object({
+    id: z.string(),
+    name: z.string(),
+    billing_period: z.enum(['monthly', 'quarterly', 'yearly']),
+    amount: z.string()
+  }),
+  customer: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    phone_number: z.string().optional(),
+    document: z.string().optional(),
+    member_since: z.string().optional()
+  }),
+  product: z.object({
+    id: z.string(),
+    name: z.string(),
+    platform_url: z.string().url()
+  }),
+  stats: z.object({
+    completed_lessons: z.number().optional(),
+    certificates_earned: z.number().optional(),
+    hours_watched: z.number().optional(),
+    membership_months: z.number().optional()
+  }).optional(),
+  benefits: z.object({
+    monthly_updates: z.array(z.string()).optional(),
+    loyalty_discount: z.object({
+      percent: z.number(),
+      months: z.number()
+    }).optional(),
+    exclusive_bonus: z.object({
+      name: z.string(),
+      description: z.string()
+    }).optional()
+  }).optional(),
+  community: z.object({
+    discord_url: z.string().url().optional(),
+    telegram_url: z.string().url().optional(),
+    facebook_group_url: z.string().url().optional(),
+    members_count: z.number().optional()
+  }).optional()
 });
 
 // União de todos os schemas
