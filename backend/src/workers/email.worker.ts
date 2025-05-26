@@ -29,6 +29,9 @@ const emailWorker = new Worker<EmailJobData>(
       attemptNumber,
     });
 
+    // Declarar template fora do try-catch
+    let template;
+
     try {
       // Buscar evento do banco
       const event = await prisma.webhookEvent.findUnique({
@@ -41,7 +44,7 @@ const emailWorker = new Worker<EmailJobData>(
       }
 
       // Determinar template baseado no tipo de evento e tentativa
-      const template = getEmailTemplate(eventType, attemptNumber);
+      template = getEmailTemplate(eventType, attemptNumber);
       
       if (!template) {
         logger.warn('No template found for event', { eventType, attemptNumber });
@@ -55,37 +58,29 @@ const emailWorker = new Worker<EmailJobData>(
         template: template.templateName,
         data: {
           customerName: payload.customer.name,
-          ...payload,
+          customerEmail: payload.customer.email,
+          checkoutUrl: payload.checkout_url,
+          totalPrice: payload.total_price,
+          products: payload.products,
           organizationName: event.organization.name,
+          domain: event.organization.domain || 'example.com',
           attemptNumber,
         },
+        organizationId,
+        eventId,
+        attemptNumber,
       };
 
       // Enviar email
-      const result = await sendEmail(emailData);
+      const emailId = await sendEmail(emailData);
       
-      // Registrar no banco
-      await prisma.emailLog.create({
-        data: {
-          organizationId,
-          eventId,
-          emailId: result.id,
-          to: emailData.to,
-          subject: emailData.subject,
-          template: emailData.template,
-          status: 'SENT',
-          attemptNumber,
-          sentAt: new Date(),
-        },
-      });
-
       logger.info('Email sent successfully', {
         jobId: job.id,
-        emailId: result.id,
+        emailId,
         to: emailData.to,
       });
 
-      return { success: true, emailId: result.id };
+      return { success: true, emailId };
 
     } catch (error) {
       logger.error('Failed to process email job', {
@@ -100,8 +95,8 @@ const emailWorker = new Worker<EmailJobData>(
           organizationId,
           eventId,
           to: payload.customer.email,
-          subject: 'Failed to send',
-          template: `${eventType.toLowerCase()}-${attemptNumber}`,
+          subject: template?.subject || 'Failed to send',
+          template: template?.templateName || 'unknown',
           status: 'FAILED',
           attemptNumber,
           error: error instanceof Error ? error.message : 'Unknown error',

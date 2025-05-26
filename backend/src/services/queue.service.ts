@@ -92,8 +92,8 @@ const EVENT_DELAYS: Record<string, number[]> = {
 };
 
 // Função para adicionar jobs à fila
-export async function enqueueEmailJob(event: PrismaWebhookEvent): Promise<void> {
-  const delays = EVENT_DELAYS[event.eventType] || [0];
+export async function enqueueEmailJob(event: PrismaWebhookEvent, forceImmediate = false): Promise<void> {
+  const delays = forceImmediate ? [0] : (EVENT_DELAYS[event.eventType] || [0]);
   const payload = event.payload as unknown as WebhookEvent;
 
   for (let i = 0; i < delays.length; i++) {
@@ -119,6 +119,7 @@ export async function enqueueEmailJob(event: PrismaWebhookEvent): Promise<void> 
       eventType: event.eventType,
       attemptNumber: i + 1,
       delay: delays[i],
+      forceImmediate,
     });
   }
 }

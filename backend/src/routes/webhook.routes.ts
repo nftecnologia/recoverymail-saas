@@ -91,7 +91,8 @@ router.post('/:orgId', async (req, res, next) => {
     });
 
     // Adicionar à fila de processamento
-    await enqueueEmailJob(event);
+    const forceImmediate = req.headers['x-force-immediate'] === 'true';
+    await enqueueEmailJob(event, forceImmediate);
 
     res.status(200).json({ 
       message: 'Webhook received successfully',

@@ -50,9 +50,16 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
   }
 
   try {
-    // Tentar carregar do banco primeiro
+    // TODO: Implementar busca de templates do banco depois
+    // Por enquanto, carregar apenas do arquivo
+    /*
     const dbTemplate = await prisma.emailTemplate.findUnique({
-      where: { name: templateName },
+      where: { 
+        organizationId_name: {
+          organizationId: 'TODO',
+          name: templateName
+        }
+      },
     });
 
     if (dbTemplate && dbTemplate.htmlContent) {
@@ -60,8 +67,9 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
       templateCache.set(templateName, compiled);
       return compiled;
     }
+    */
 
-    // Se não encontrar no banco, carregar do arquivo
+    // Carregar do arquivo
     const templatePath = path.join(
       process.cwd(),
       'src',
