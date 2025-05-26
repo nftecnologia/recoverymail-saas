@@ -1,1 +1,159 @@
- 
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Organização (Multi-tenancy)
+model Organization {
+  id            String          @id @default(cuid())
+  name          String
+  domain        String?
+  webhookSecret String?
+  apiKey        String?         @unique
+  
+  // Configurações
+  emailSettings Json?
+  
+  // Timestamps
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  
+  // Relações
+  webhookEvents WebhookEvent[]
+  emailJobs     EmailJob[]
+  emailTemplates EmailTemplate[]
+  emailLogs     EmailLog[]
+}
+
+// Eventos de webhook recebidos
+model WebhookEvent {
+  id              String         @id @default(cuid())
+  organizationId  String
+  eventType       String
+  payload         Json
+  externalId      String         // ID do checkout/transação externa
+  status          EventStatus    @default(PENDING)
+  processedAt     DateTime?
+  error           String?
+  
+  // Timestamps
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  // Relações
+  organization    Organization   @relation(fields: [organizationId], references: [id])
+  emailJobs       EmailJob[]
+  
+  // Índices
+  @@index([organizationId, eventType])
+  @@index([externalId])
+  @@index([status])
+}
+
+// Jobs de email na fila
+model EmailJob {
+  id              String         @id @default(cuid())
+  organizationId  String
+  eventId         String
+  emailTo         String
+  emailSubject    String
+  templateId      String?
+  templateData    Json
+  status          JobStatus      @default(PENDING)
+  attemptNumber   Int            @default(1)
+  scheduledFor    DateTime
+  processedAt     DateTime?
+  error           String?
+  
+  // Timestamps
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  // Relações
+  organization    Organization   @relation(fields: [organizationId], references: [id])
+  event           WebhookEvent   @relation(fields: [eventId], references: [id])
+  
+  // Índices
+  @@index([organizationId])
+  @@index([status, scheduledFor])
+}
+
+// Templates de email customizados
+model EmailTemplate {
+  id              String         @id @default(cuid())
+  organizationId  String
+  name            String
+  subject         String
+  htmlContent     String
+  textContent     String?
+  variables       Json?          // Variáveis disponíveis
+  isActive        Boolean        @default(true)
+  
+  // Timestamps
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  // Relações
+  organization    Organization   @relation(fields: [organizationId], references: [id])
+  
+  // Índices
+  @@unique([organizationId, name])
+}
+
+// Logs de emails enviados
+model EmailLog {
+  id              String         @id @default(cuid())
+  organizationId  String
+  eventId         String
+  emailId         String?        // ID do provedor (Resend)
+  to              String
+  subject         String
+  template        String
+  status          EmailStatus    @default(PENDING)
+  attemptNumber   Int            @default(1)
+  sentAt          DateTime?
+  openedAt        DateTime?
+  clickedAt       DateTime?
+  error           String?
+  
+  // Timestamps
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  // Relações
+  organization    Organization   @relation(fields: [organizationId], references: [id])
+  
+  // Índices
+  @@index([organizationId])
+  @@index([eventId])
+  @@index([emailId])
+}
+
+// Enums
+enum EventStatus {
+  PENDING
+  PROCESSING
+  PROCESSED
+  FAILED
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  BOUNCED
+  FAILED
+} 

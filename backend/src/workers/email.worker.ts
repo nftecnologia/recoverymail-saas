@@ -1,132 +1,145 @@
-import { Job } from 'bull';
-import { emailQueue, EmailJobData } from '../services/queue.service';
+import { Worker, Job } from 'bullmq';
+import IORedis from 'ioredis';
 import { logger } from '../utils/logger';
+import { EmailJobData } from '../services/queue.service';
 import { prisma } from '../config/database';
-import { processAbandonedCart } from '../handlers/abandonedCart.handler';
-import { processBankSlipExpired } from '../handlers/bankSlipExpired.handler';
-import { processPixExpired } from '../handlers/pixExpired.handler';
-import { processSaleRefused } from '../handlers/saleRefused.handler';
+import { sendEmail } from '../services/email.service';
+import { getEmailTemplate } from '../utils/email.templates';
+import { env, getRedisConfig } from '../config/env';
 
-// Mapeamento de handlers por tipo de evento
-const eventHandlers: Record<string, (job: Job<EmailJobData>) => Promise<void>> = {
-  ABANDONED_CART: processAbandonedCart,
-  BANK_SLIP_EXPIRED: processBankSlipExpired,
-  PIX_EXPIRED: processPixExpired,
-  SALE_REFUSED: processSaleRefused,
-  // TODO: Adicionar outros handlers conforme implementados
-};
+// Configuração do Redis
+const redisUrl = getRedisConfig();
+const connection = new IORedis(redisUrl, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+  tls: redisUrl.startsWith('rediss://') ? {} : undefined,
+  family: 4,
+});
 
-// Processar jobs de email
-emailQueue.process(async (job: Job<EmailJobData>) => {
-  const { eventId, eventType, organizationId, payload, attemptNumber } = job.data;
+// Worker de processamento de emails
+const emailWorker = new Worker<EmailJobData>(
+  'email-queue',
+  async (job: Job<EmailJobData>) => {
+    const { eventId, organizationId, eventType, payload, attemptNumber } = job.data;
 
-  logger.info('Processing email job', {
-    jobId: job.id,
-    eventId,
-    eventType,
-    attemptNumber,
-  });
-
-  try {
-    // Verificar se o evento ainda está pendente
-    const event = await prisma.webhookEvent.findUnique({
-      where: { id: eventId },
-      include: {
-        organization: true,
-      },
-    });
-
-    if (!event) {
-      logger.warn('Event not found', { eventId });
-      return;
-    }
-
-    if (event.status === 'PROCESSED' && attemptNumber === 1) {
-      logger.info('Event already processed', { eventId });
-      return;
-    }
-
-    // Buscar handler específico do evento
-    const handler = eventHandlers[eventType];
-    
-    if (!handler) {
-      logger.error('No handler found for event type', { eventType });
-      throw new Error(`No handler for event type: ${eventType}`);
-    }
-
-    // Executar handler
-    await handler(job);
-
-    // Atualizar status do evento (apenas no primeiro email)
-    if (attemptNumber === 1) {
-      await prisma.webhookEvent.update({
-        where: { id: eventId },
-        data: {
-          status: 'PROCESSING',
-          processedAt: new Date(),
-        },
-      });
-    }
-
-    // Se for o último email da sequência, marcar como processado
-    const totalEmails = getTotalEmailsForEvent(eventType);
-    if (attemptNumber === totalEmails) {
-      await prisma.webhookEvent.update({
-        where: { id: eventId },
-        data: {
-          status: 'PROCESSED',
-          processedAt: new Date(),
-        },
-      });
-    }
-
-    logger.info('Email job processed successfully', {
+    logger.info('Processing email job', {
       jobId: job.id,
       eventId,
+      eventType,
       attemptNumber,
     });
 
-  } catch (error) {
-    logger.error('Failed to process email job', {
-      jobId: job.id,
-      eventId,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-    });
-
-    // Marcar evento como falho se for o último retry
-    if (job.attemptsMade === job.opts.attempts) {
-      await prisma.webhookEvent.update({
+    try {
+      // Buscar evento do banco
+      const event = await prisma.webhookEvent.findUnique({
         where: { id: eventId },
+        include: { organization: true },
+      });
+
+      if (!event) {
+        throw new Error('Event not found');
+      }
+
+      // Determinar template baseado no tipo de evento e tentativa
+      const template = getEmailTemplate(eventType, attemptNumber);
+      
+      if (!template) {
+        logger.warn('No template found for event', { eventType, attemptNumber });
+        return;
+      }
+
+      // Preparar dados do email
+      const emailData = {
+        to: payload.customer.email,
+        subject: template.subject,
+        template: template.templateName,
         data: {
-          status: 'FAILED',
-          error: error instanceof Error ? error.message : 'Unknown error',
+          customerName: payload.customer.name,
+          ...payload,
+          organizationName: event.organization.name,
+          attemptNumber,
+        },
+      };
+
+      // Enviar email
+      const result = await sendEmail(emailData);
+      
+      // Registrar no banco
+      await prisma.emailLog.create({
+        data: {
+          organizationId,
+          eventId,
+          emailId: result.id,
+          to: emailData.to,
+          subject: emailData.subject,
+          template: emailData.template,
+          status: 'SENT',
+          attemptNumber,
+          sentAt: new Date(),
         },
       });
-    }
 
-    throw error;
+      logger.info('Email sent successfully', {
+        jobId: job.id,
+        emailId: result.id,
+        to: emailData.to,
+      });
+
+      return { success: true, emailId: result.id };
+
+    } catch (error) {
+      logger.error('Failed to process email job', {
+        jobId: job.id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
+      // Registrar falha no banco
+      await prisma.emailLog.create({
+        data: {
+          organizationId,
+          eventId,
+          to: payload.customer.email,
+          subject: 'Failed to send',
+          template: `${eventType.toLowerCase()}-${attemptNumber}`,
+          status: 'FAILED',
+          attemptNumber,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        },
+      }).catch((err) => {
+        logger.error('Failed to log email failure', err);
+      });
+
+      throw error;
+    }
+  },
+  {
+    connection,
+    concurrency: 5,
+    autorun: true,
   }
+);
+
+// Eventos do worker
+emailWorker.on('completed', (job) => {
+  logger.info('Worker completed job', { jobId: job.id });
 });
 
-// Função auxiliar para obter total de emails por evento
-function getTotalEmailsForEvent(eventType: string): number {
-  const emailCounts: Record<string, number> = {
-    ABANDONED_CART: 3,
-    BANK_SLIP_EXPIRED: 3,
-    PIX_EXPIRED: 2,
-    SALE_REFUSED: 2,
-    SALE_APPROVED: 1,
-    SALE_CHARGEBACK: 1,
-    SALE_REFUNDED: 1,
-    BANK_SLIP_GENERATED: 2,
-    PIX_GENERATED: 1,
-    SUBSCRIPTION_CANCELED: 3,
-    SUBSCRIPTION_EXPIRED: 2,
-    SUBSCRIPTION_RENEWED: 1,
-  };
+emailWorker.on('failed', (job, err) => {
+  logger.error('Worker failed job', { 
+    jobId: job?.id, 
+    error: err.message 
+  });
+});
 
-  return emailCounts[eventType] || 1;
-}
+emailWorker.on('error', (err) => {
+  logger.error('Worker error', err);
+});
 
-logger.info('Email worker initialized'); 
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  await emailWorker.close();
+  connection.disconnect();
+});
+
+export { emailWorker }; 

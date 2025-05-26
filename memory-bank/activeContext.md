@@ -1,6 +1,92 @@
 # Contexto Ativo - Sessão Atual
 
-## 📅 Data: [SESSÃO ATUAL - Integração Resend + Produção]
+## 📅 Data: 26/05/2025
+
+## 🎯 Foco da Sessão
+Migração do sistema de filas de Bull para BullMQ para suportar Upstash Redis em produção e teste completo do fluxo de webhooks + emails.
+
+## 💻 Último Código Trabalhado
+
+### Arquivo: `backend/src/services/queue.service.ts`
+```typescript
+// Migrado de Bull para BullMQ com suporte a Upstash
+const connection = new IORedis(redisUrl, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+  tls: redisUrl.startsWith('rediss://') ? {} : undefined,
+  family: 4,
+});
+```
+
+### Arquivo: `backend/src/workers/email.worker.ts`
+```typescript
+// Worker atualizado para BullMQ
+const emailWorker = new Worker<EmailJobData>(
+  'email-queue',
+  async (job: Job<EmailJobData>) => {
+    // Processar e enviar emails via Resend
+  }
+);
+```
+
+## 🐛 Problemas Encontrados e Soluções
+1. **Problema**: Bull não é compatível com Upstash Redis (REST API)
+   **Solução**: Migrar para BullMQ com IORedis configurado para Upstash
+
+2. **Problema**: Arquivo .env não era lido (estava oculto)
+   **Solução**: Usar comandos específicos para arquivos ocultos
+
+3. **Problema**: Docker não disponível no terminal
+   **Solução**: Usar Upstash Redis diretamente (melhor para produção)
+
+## 📝 Decisões Técnicas Tomadas
+- Migrar de Bull para BullMQ (melhor suporte a Redis customizado)
+- Usar Upstash Redis em vez de Redis local (simplicidade e produção-ready)
+- Criar sistema de templates centralizado para emails
+- Implementar worker unificado em vez de handlers separados
+
+## ✅ Conquistas da Sessão
+- Sistema de filas funcionando com Upstash Redis ✅
+- Webhook processando e criando jobs de email ✅
+- 3 emails agendados com delays corretos (2h, 24h, 72h) ✅
+- Organização de teste criada no banco ✅
+- Scripts utilitários criados (seed, check-status) ✅
+
+## ⏭️ Próximos Passos Imediatos
+1. **Criar templates HTML para os outros eventos**
+   - bank-slip-expired (3 templates)
+   - pix-expired (2 templates)
+   - sale-refused (2 templates)
+
+2. **Implementar tracking de emails**
+   - Adicionar pixel de tracking
+   - Webhook do Resend para atualizações
+
+3. **Dashboard básico**
+   - Visualizar eventos recebidos
+   - Status dos emails enviados
+   - Métricas de conversão
+
+## 🔧 Comandos Úteis para Retomar
+```bash
+# Iniciar servidor
+cd backend && npm run dev
+
+# Verificar filas
+node -r dotenv/config check-queue-status.js
+
+# Enviar webhook de teste
+node test-webhook.js
+
+# Criar nova organização
+node seed-organization.js
+
+# Ver logs do Prisma
+npx prisma studio
+```
+
+## 🔗 Contexto para o Cursor
+"O Recovery SaaS está funcionando com BullMQ + Upstash Redis. Preciso criar os templates HTML para os outros tipos de eventos seguindo o padrão dos templates de ABANDONED_CART já criados."
 
 ## 🎯 Foco da Sessão Atual
 Integração completa com Resend para envio real de emails e configuração das credenciais de produção.

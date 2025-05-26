@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import { rateLimit } from 'express-rate-limit';
 import { env } from '@/config/env';
 import { logger } from '@/utils/logger';
-import { errorMiddleware } from '@/middleware/error.middleware';
+import { errorHandler } from '@/middleware/error.middleware';
 import { testDatabaseConnection } from '@/config/database';
 import webhookRoutes from '@/routes/webhook.routes';
 import { cleanOldJobs } from '@/services/queue.service';
@@ -74,7 +74,7 @@ app.get('/', (_req, res) => {
 app.use('/webhook', webhookRoutes);
 
 // Middleware de erro (deve ser o último)
-app.use(errorMiddleware);
+app.use(errorHandler);
 
 // Inicialização do servidor
 async function startServer() {

@@ -1,14 +1,23 @@
-import Bull from 'bull';
+import { Queue, Worker, QueueEvents } from 'bullmq';
+import IORedis from 'ioredis';
 import { env, getRedisConfig } from '../config/env';
 import { logger } from '../utils/logger';
 import { WebhookEvent as PrismaWebhookEvent } from '@prisma/client';
 import { WebhookEvent } from '../types/webhook.types';
 
-// Configuração do Redis
+// Configuração do Redis com suporte a Upstash
 const redisUrl = getRedisConfig();
+const connection = new IORedis(redisUrl, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+  // Configurações específicas para Upstash
+  tls: redisUrl.startsWith('rediss://') ? {} : undefined,
+  family: 4,
+});
 
 // Fila principal de emails
-export const emailQueue = new Bull('email-queue', redisUrl, {
+export const emailQueue = new Queue('email-queue', {
+  connection,
   defaultJobOptions: {
     removeOnComplete: true,
     removeOnFail: false,
@@ -19,6 +28,9 @@ export const emailQueue = new Bull('email-queue', redisUrl, {
     },
   },
 });
+
+// Eventos da fila
+export const emailQueueEvents = new QueueEvents('email-queue', { connection });
 
 // Tipo para os jobs de email
 export interface EmailJobData {
@@ -93,20 +105,13 @@ export async function enqueueEmailJob(event: PrismaWebhookEvent): Promise<void> 
       attemptNumber: i + 1,
     };
 
-    const jobOptions: Bull.JobOptions = {
-      delay: delays[i],
-      attempts: 3,
-      backoff: {
-        type: 'exponential',
-        delay: 2000,
-      },
-    };
-
     // Adicionar um ID único para evitar duplicatas
     const jobId = `${event.id}-attempt-${i + 1}`;
-    jobOptions.jobId = jobId;
 
-    await emailQueue.add(jobData, jobOptions);
+    await emailQueue.add('send-email', jobData, {
+      jobId,
+      delay: delays[i],
+    });
 
     logger.info('Email job enqueued', {
       jobId,
@@ -119,48 +124,31 @@ export async function enqueueEmailJob(event: PrismaWebhookEvent): Promise<void> 
 }
 
 // Eventos da fila
-emailQueue.on('error', (error) => {
-  logger.error('Queue error', error);
-});
-
-emailQueue.on('waiting', (jobId) => {
+emailQueueEvents.on('waiting', ({ jobId }) => {
   logger.debug('Job waiting', { jobId });
 });
 
-emailQueue.on('active', (job) => {
-  logger.info('Job active', {
-    jobId: job.id,
-    data: job.data,
-  });
+emailQueueEvents.on('active', ({ jobId, prev }) => {
+  logger.info('Job active', { jobId, previousState: prev });
 });
 
-emailQueue.on('completed', (job) => {
-  logger.info('Job completed', {
-    jobId: job.id,
-    data: job.data,
-  });
+emailQueueEvents.on('completed', ({ jobId, returnvalue }) => {
+  logger.info('Job completed', { jobId, result: returnvalue });
 });
 
-emailQueue.on('failed', (job, err) => {
-  logger.error('Job failed', {
-    jobId: job.id,
-    error: err.message,
-    stack: err.stack,
-    data: job.data,
-  });
+emailQueueEvents.on('failed', ({ jobId, failedReason }) => {
+  logger.error('Job failed', { jobId, reason: failedReason });
 });
 
-emailQueue.on('stalled', (job) => {
-  logger.warn('Job stalled', {
-    jobId: job.id,
-    data: job.data,
-  });
+emailQueueEvents.on('error', (error) => {
+  logger.error('Queue error', error);
 });
 
 // Função para limpar jobs antigos
 export async function cleanOldJobs(): Promise<void> {
   const jobs = await emailQueue.clean(
     24 * 60 * 60 * 1000, // 24 horas
+    100,
     'completed'
   );
   
@@ -185,4 +173,10 @@ export async function getQueueStats() {
     delayed,
     total: waiting + active + completed + failed + delayed,
   };
-} 
+}
+
+// Fechar conexão ao encerrar
+process.on('SIGTERM', async () => {
+  await emailQueue.close();
+  connection.disconnect();
+}); 
