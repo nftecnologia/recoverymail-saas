@@ -1,4 +1,4 @@
-# 🚀 Deploy Quick Start - Recovery SaaS
+# 🚀 Deploy Quick Start - Inbox Recovery
 
 ## 🎯 O que fazer AGORA (Passo a Passo)
 

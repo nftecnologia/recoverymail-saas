@@ -44,7 +44,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            Recovery Mail
+            Inbox Recovery
           </CardTitle>
           <CardDescription className="text-center">
             Entre com suas credenciais para acessar o dashboard
@@ -61,7 +61,7 @@ export default function LoginPage() {
                 <input
                   id="email"
                   type="email"
-                  placeholder="admin@recoverymail.com"
+                  placeholder="admin@inboxrecovery.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -109,7 +109,7 @@ export default function LoginPage() {
 
             <div className="text-xs text-center text-gray-500 mt-4">
               <p>Credenciais de teste:</p>
-              <p>Email: admin@recoverymail.com</p>
+              <p>Email: admin@inboxrecovery.com</p>
               <p>Senha: admin123</p>
             </div>
           </form>

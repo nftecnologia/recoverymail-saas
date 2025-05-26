@@ -60,7 +60,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <Mail className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Recovery Mail</h2>
+                <h2 className="text-lg font-bold text-gray-900">Inbox Recovery</h2>
                 <p className="text-xs text-gray-500">Sistema de Recuperação</p>
               </div>
             </div>
@@ -126,7 +126,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900">Admin</p>
-                <p className="text-xs text-gray-500">admin@recoverymail.com</p>
+                <p className="text-xs text-gray-500">admin@inboxrecovery.com</p>
               </div>
             </div>
             <Button
@@ -155,7 +155,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           
           <div className="flex flex-1 items-center justify-between">
             <h1 className="text-lg font-semibold text-gray-900 lg:hidden">
-              Recovery Mail
+              Inbox Recovery
             </h1>
             
             {/* Quick stats */}

@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 // Em produção, isso viria do banco de dados
 const DEMO_USER = {
   id: "1",
-  email: "admin@recoverymail.com",
+  email: "admin@inboxrecovery.com",
   name: "Admin",
   password: "$2b$10$VfmXiCRdvKxbNUURFAbfKuAnhEuTixAoVQe2JWhPGyDpPVC4EuKk2", // senha: admin123
 };

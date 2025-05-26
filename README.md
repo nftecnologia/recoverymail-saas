@@ -1,4 +1,4 @@
-# 🚀 Recovery Mail - Recuperação Automática de Vendas
+# 🚀 Inbox Recovery - Recuperação Automática de Vendas
 
 <div align="center">
   <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
@@ -10,7 +10,7 @@
 
 ## 📋 Sobre o Projeto
 
-Recovery Mail é um SaaS que automatiza a recuperação de vendas perdidas através de campanhas de email inteligentes. Processa webhooks de plataformas de e-commerce e envia emails personalizados com timing otimizado para maximizar conversões.
+Inbox Recovery é um SaaS que automatiza a recuperação de vendas perdidas através de campanhas de email inteligentes. Processa webhooks de plataformas de e-commerce e envia emails personalizados com timing otimizado para maximizar conversões.
 
 ### 🎯 Problemas Resolvidos
 - **70% dos carrinhos** são abandonados no e-commerce
@@ -56,7 +56,7 @@ Recovery Mail é um SaaS que automatiza a recuperação de vendas perdidas atrav
 
 1. **Clone o repositório**
 ```bash
-git clone https://github.com/seu-usuario/recoverymail.git
+git clone https://github.com/nicolasferoli/recoverymail.git
 cd recoverymail
 ```
 
@@ -137,7 +137,7 @@ curl -X POST http://localhost:4000/webhook/test-org-123 \
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/deploy)
 
 ### Dashboard (Vercel)
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/seu-usuario/recoverymail)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nicolasferoli/recoverymail)
 
 Veja o [Guia de Deploy](./DEPLOY_QUICK_START.md) para instruções detalhadas.
 
@@ -158,12 +158,12 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](./LI
 
 ## 📞 Suporte
 
-- 📧 Email: suporte@recoverymail.com
-- 💬 Discord: [Comunidade Recovery Mail](https://discord.gg/recoverymail)
-- 📚 Docs: [docs.recoverymail.com](https://docs.recoverymail.com)
+- 📧 Email: suporte@inboxrecovery.com
+- 💬 Discord: [Comunidade Inbox Recovery](https://discord.gg/inboxrecovery)
+- 📚 Docs: [docs.inboxrecovery.com](https://docs.inboxrecovery.com)
 
 ---
 
 <div align="center">
-  Feito com ❤️ por <a href="https://github.com/seu-usuario">Recovery Mail Team</a>
+  Feito com ❤️ por <a href="https://github.com/nicolasferoli">Inbox Recovery Team</a>
 </div> 

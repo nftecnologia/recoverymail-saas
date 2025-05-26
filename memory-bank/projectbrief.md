@@ -1,4 +1,4 @@
-# Recovery SaaS - Project Brief
+# Inbox Recovery - Project Brief
 
 ## 🎯 Visão do Projeto
 Criar um SaaS multi-tenant para recuperação automática de vendas perdidas através de campanhas de email inteligentes, processando webhooks de plataformas de e-commerce e automatizando o envio de emails de recuperação com timing otimizado.

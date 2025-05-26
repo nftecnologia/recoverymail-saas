@@ -1,7 +1,7 @@
 {
-  "name": "recovery-saas-backend",
+  "name": "inbox-recovery-backend",
   "version": "1.0.0",
-  "description": "Backend do Recovery SaaS - Sistema de recuperação de vendas",
+  "description": "Backend do Inbox Recovery - Sistema de recuperação de vendas",
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon",
@@ -26,7 +26,7 @@
     "email",
     "automation"
   ],
-  "author": "Recovery SaaS Team",
+  "author": "Inbox Recovery Team",
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^6.8.2",

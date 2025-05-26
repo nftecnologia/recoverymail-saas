@@ -1,4 +1,4 @@
-# 🚀 Deploy Checklist - Recovery SaaS
+# 🚀 Deploy Checklist - Inbox Recovery
 
 ## 📋 Pré-Deploy
 
