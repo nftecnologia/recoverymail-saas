@@ -24,20 +24,61 @@ import {
   XCircle,
   Clock,
   RefreshCw,
-  Filter
+  Filter,
+  Download,
+  TrendingUp,
+  AlertCircle,
+  MailOpen,
+  Sparkles
 } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 const statusConfig = {
-  PENDING: { label: "Pendente", icon: Clock, color: "bg-gray-100 text-gray-800" },
-  SENT: { label: "Enviado", icon: Send, color: "bg-blue-100 text-blue-800" },
-  DELIVERED: { label: "Entregue", icon: CheckCircle, color: "bg-green-100 text-green-800" },
-  OPENED: { label: "Aberto", icon: Eye, color: "bg-purple-100 text-purple-800" },
-  CLICKED: { label: "Clicado", icon: MousePointerClick, color: "bg-orange-100 text-orange-800" },
-  BOUNCED: { label: "Rejeitado", icon: XCircle, color: "bg-red-100 text-red-800" },
-  FAILED: { label: "Falhou", icon: XCircle, color: "bg-red-100 text-red-800" },
+  PENDING: { 
+    label: "Pendente", 
+    icon: Clock, 
+    color: "border-yellow-500/20 bg-yellow-50 text-yellow-700",
+    gradient: "from-yellow-500 to-orange-500"
+  },
+  SENT: { 
+    label: "Enviado", 
+    icon: Send, 
+    color: "border-blue-500/20 bg-blue-50 text-blue-700",
+    gradient: "from-blue-500 to-indigo-500"
+  },
+  DELIVERED: { 
+    label: "Entregue", 
+    icon: CheckCircle, 
+    color: "border-green-500/20 bg-green-50 text-green-700",
+    gradient: "from-green-500 to-emerald-500"
+  },
+  OPENED: { 
+    label: "Aberto", 
+    icon: Eye, 
+    color: "border-purple-500/20 bg-purple-50 text-purple-700",
+    gradient: "from-purple-500 to-pink-500"
+  },
+  CLICKED: { 
+    label: "Clicado", 
+    icon: MousePointerClick, 
+    color: "border-indigo-500/20 bg-indigo-50 text-indigo-700",
+    gradient: "from-indigo-500 to-purple-500"
+  },
+  BOUNCED: { 
+    label: "Rejeitado", 
+    icon: XCircle, 
+    color: "border-red-500/20 bg-red-50 text-red-700",
+    gradient: "from-red-500 to-pink-500"
+  },
+  FAILED: { 
+    label: "Falhou", 
+    icon: AlertCircle, 
+    color: "border-red-500/20 bg-red-50 text-red-700",
+    gradient: "from-red-600 to-red-800"
+  },
 };
 
 const templateLabels: Record<string, string> = {
@@ -97,200 +138,272 @@ export default function EmailsPage() {
     ? Array.from(new Set(data.emails.map(e => e.template)))
     : [];
 
+  // Calcular estatísticas
+  const stats = {
+    sent: data?.emails?.filter(e => e.status === 'SENT').length || 0,
+    delivered: data?.emails?.filter(e => e.status === 'DELIVERED').length || 0,
+    opened: data?.emails?.filter(e => e.status === 'OPENED').length || 0,
+    clicked: data?.emails?.filter(e => e.status === 'CLICKED').length || 0,
+  };
+
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Emails
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Histórico de emails enviados
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Atualizar
-          </Button>
-        </div>
-
-        {/* Metrics */}
-        <div className="grid gap-4 md:grid-cols-6">
-          {Object.entries(statusConfig).map(([status, config]) => {
-            let count = 0;
-            if (status === 'SENT') count = metrics?.sentEmails || 0;
-            else if (status === 'DELIVERED') count = metrics?.deliveredEmails || 0;
-            else if (status === 'OPENED') count = metrics?.openedEmails || 0;
-            else if (status === 'CLICKED') count = metrics?.clickedEmails || 0;
-            else if (status === 'BOUNCED') count = metrics?.bouncedEmails || 0;
-            
-            return (
-              <Card key={status}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center">
-                    <config.icon className="h-4 w-4 mr-2" />
-                    {config.label}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{count}</div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center">
-              <Filter className="h-4 w-4 mr-2" />
-              Filtros
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm font-medium mb-2">Status</p>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant={selectedStatus === null ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      setSelectedStatus(null);
-                      setPage(1);
-                    }}
-                  >
-                    Todos
-                  </Button>
-                  {Object.entries(statusConfig).map(([status, config]) => (
-                    <Button
-                      key={status}
-                      variant={selectedStatus === status ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        setSelectedStatus(status);
-                        setPage(1);
-                      }}
-                    >
-                      <config.icon className="h-3 w-3 mr-1" />
-                      {config.label}
-                    </Button>
-                  ))}
-                </div>
+      <div className="space-y-8">
+        {/* Header com gradiente */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 p-8 text-white">
+          <div className="absolute inset-0 bg-black/10" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm">
+                <Mail className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-sm font-medium mb-2">Template</p>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant={selectedTemplate === null ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      setSelectedTemplate(null);
-                      setPage(1);
-                    }}
-                  >
-                    Todos
-                  </Button>
-                  {uniqueTemplates.map((template) => (
-                    <Button
-                      key={template}
-                      variant={selectedTemplate === template ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        setSelectedTemplate(template);
-                        setPage(1);
-                      }}
-                    >
-                      {templateLabels[template] || template}
-                    </Button>
-                  ))}
-                </div>
+                <h1 className="text-3xl font-bold">Central de Emails</h1>
+                <p className="mt-1 text-lg text-white/80">
+                  Acompanhe o desempenho das suas campanhas de recuperação
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
+          <div className="absolute -top-10 -left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
+          <Sparkles className="absolute right-8 top-8 h-8 w-8 text-white/20" />
+        </div>
 
-        {/* Emails Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Histórico de Emails</CardTitle>
-            <CardDescription>
-              {data?.pagination.total || 0} emails encontrados
-            </CardDescription>
+        {/* Cards de estatísticas */}
+        <div className="grid gap-6 md:grid-cols-4">
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg transition-all hover:shadow-xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-indigo-500/5" />
+            <CardHeader className="relative">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-gray-600">Enviados</CardTitle>
+                <div className="rounded-lg bg-blue-500/10 p-2">
+                  <Send className="h-4 w-4 text-blue-600" />
+                </div>
+              </div>
+              <div className="mt-2">
+                {isLoading ? (
+                  <Skeleton className="h-8 w-20" />
+                ) : (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-gray-900">{stats.sent}</span>
+                    <span className="text-sm font-medium text-blue-600">emails</span>
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+          </Card>
+
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-green-50 to-emerald-50 shadow-lg transition-all hover:shadow-xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5" />
+            <CardHeader className="relative">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-gray-600">Entregues</CardTitle>
+                <div className="rounded-lg bg-green-500/10 p-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                </div>
+              </div>
+              <div className="mt-2">
+                {isLoading ? (
+                  <Skeleton className="h-8 w-20" />
+                ) : (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-gray-900">{stats.delivered}</span>
+                    <span className="text-sm text-gray-500">
+                      {stats.sent > 0 ? `(${Math.round((stats.delivered / stats.sent) * 100)}%)` : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+          </Card>
+
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg transition-all hover:shadow-xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5" />
+            <CardHeader className="relative">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-gray-600">Abertos</CardTitle>
+                <div className="rounded-lg bg-purple-500/10 p-2">
+                  <Eye className="h-4 w-4 text-purple-600" />
+                </div>
+              </div>
+              <div className="mt-2">
+                {isLoading ? (
+                  <Skeleton className="h-8 w-20" />
+                ) : (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-gray-900">{stats.opened}</span>
+                    <span className="text-sm text-gray-500">
+                      {stats.delivered > 0 ? `(${Math.round((stats.opened / stats.delivered) * 100)}%)` : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+          </Card>
+
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-indigo-50 to-purple-50 shadow-lg transition-all hover:shadow-xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5" />
+            <CardHeader className="relative">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-gray-600">Clicados</CardTitle>
+                <div className="rounded-lg bg-indigo-500/10 p-2">
+                  <MousePointerClick className="h-4 w-4 text-indigo-600" />
+                </div>
+              </div>
+              <div className="mt-2">
+                {isLoading ? (
+                  <Skeleton className="h-8 w-20" />
+                ) : (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-gray-900">{stats.clicked}</span>
+                    <span className="text-sm text-gray-500">
+                      {stats.opened > 0 ? `(${Math.round((stats.clicked / stats.opened) * 100)}%)` : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+          </Card>
+        </div>
+
+        {/* Lista de emails */}
+        <Card className="border-0 shadow-lg">
+          <CardHeader className="border-b bg-gray-50/50">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle className="text-lg">Histórico de Emails</CardTitle>
+                <CardDescription>Todos os emails enviados pelo sistema</CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  className="gap-2 border-gray-200 hover:bg-gray-50"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Atualizar
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 border-gray-200 hover:bg-gray-50"
+                >
+                  <Download className="h-4 w-4" />
+                  Exportar
+                </Button>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
+
+          {/* Filtros por status */}
+          <div className="border-b p-4">
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={selectedStatus === null ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedStatus(null)}
+                className={cn(
+                  "transition-all",
+                  selectedStatus === null && "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
+                )}
+              >
+                Todos
+              </Button>
+              {Object.entries(statusConfig).map(([status, config]) => {
+                const Icon = config.icon;
+                return (
+                  <Button
+                    key={status}
+                    variant={selectedStatus === status ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedStatus(status)}
+                    className={cn(
+                      "gap-2 transition-all",
+                      selectedStatus === status && `bg-gradient-to-r ${config.gradient} text-white shadow-lg`
+                    )}
+                  >
+                    <Icon className="h-3 w-3" />
+                    {config.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          <CardContent className="p-0">
             {isLoading ? (
-              <div className="space-y-2">
-                {[...Array(10)].map((_, i) => (
-                  <Skeleton key={i} className="h-16 w-full" />
+              <div className="space-y-4 p-6">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton key={i} className="h-20 w-full" />
                 ))}
               </div>
             ) : (
-              <>
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Destinatário</TableHead>
-                      <TableHead>Assunto</TableHead>
-                      <TableHead>Template</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Enviado em</TableHead>
-                      <TableHead>Interações</TableHead>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="font-semibold">Destinatário</TableHead>
+                      <TableHead className="font-semibold">Assunto</TableHead>
+                      <TableHead className="font-semibold">Status</TableHead>
+                      <TableHead className="font-semibold">Tentativa</TableHead>
+                      <TableHead className="font-semibold">Enviado em</TableHead>
+                      <TableHead className="font-semibold">Interações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data?.emails.map((email) => {
+                    {data?.emails?.map((email: any) => {
                       const status = statusConfig[email.status as keyof typeof statusConfig];
+                      const Icon = status?.icon || Mail;
+                      
                       return (
-                        <TableRow key={email.id}>
+                        <TableRow key={email.id} className="group hover:bg-gray-50">
                           <TableCell>
                             <div>
-                              <p className="font-medium">{email.to}</p>
-                              {email.event && (
-                                <p className="text-xs text-gray-500">
-                                  {eventTypeLabels[email.event.eventType] || email.event.eventType}
-                                </p>
-                              )}
+                              <p className="font-medium text-gray-900">{email.to}</p>
+                              <p className="text-sm text-gray-500">ID: {email.emailId || '-'}</p>
                             </div>
                           </TableCell>
-                          <TableCell className="max-w-xs truncate">
-                            {email.subject}
+                          <TableCell>
+                            <p className="max-w-xs truncate font-medium">{email.subject}</p>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline">
-                              {templateLabels[email.template] || email.template}
+                            <Badge 
+                              variant="outline"
+                              className={cn("gap-1 transition-colors", status?.color)}
+                            >
+                              <Icon className="h-3 w-3" />
+                              {status?.label || email.status}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge className={status.color}>
-                              <status.icon className="h-3 w-3 mr-1" />
-                              {status.label}
+                            <Badge variant="outline" className="font-mono">
+                              {email.attemptNumber}/3
                             </Badge>
                           </TableCell>
-                          <TableCell>
-                            {format(new Date(email.sentAt || email.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                          <TableCell className="text-gray-600">
+                            {email.sentAt ? 
+                              format(new Date(email.sentAt), "dd/MM 'às' HH:mm", { locale: ptBR }) : 
+                              '-'
+                            }
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-center gap-2 text-sm">
+                            <div className="flex items-center gap-3 text-sm">
                               {email.openedAt && (
-                                <span className="flex items-center text-purple-600">
-                                  <Eye className="h-3 w-3 mr-1" />
-                                  {format(new Date(email.openedAt), "HH:mm")}
-                                </span>
+                                <div className="flex items-center gap-1 text-purple-600">
+                                  <Eye className="h-3 w-3" />
+                                  <span>{format(new Date(email.openedAt), "HH:mm")}</span>
+                                </div>
                               )}
                               {email.clickedAt && (
-                                <span className="flex items-center text-orange-600">
-                                  <MousePointerClick className="h-3 w-3 mr-1" />
-                                  {format(new Date(email.clickedAt), "HH:mm")}
-                                </span>
+                                <div className="flex items-center gap-1 text-indigo-600">
+                                  <MousePointerClick className="h-3 w-3" />
+                                  <span>{format(new Date(email.clickedAt), "HH:mm")}</span>
+                                </div>
                               )}
-                              {email.error && (
-                                <span className="text-red-600">
-                                  {email.error}
-                                </span>
+                              {!email.openedAt && !email.clickedAt && (
+                                <span className="text-gray-400">-</span>
                               )}
                             </div>
                           </TableCell>
@@ -299,34 +412,34 @@ export default function EmailsPage() {
                     })}
                   </TableBody>
                 </Table>
+              </div>
+            )}
 
-                {/* Pagination */}
-                {data && data.pagination.pages > 1 && (
-                  <div className="flex items-center justify-between mt-4">
-                    <p className="text-sm text-gray-500">
-                      Página {data.pagination.page} de {data.pagination.pages}
-                    </p>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(page - 1)}
-                        disabled={page === 1}
-                      >
-                        Anterior
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(page + 1)}
-                        disabled={page === data.pagination.pages}
-                      >
-                        Próxima
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </>
+            {/* Paginação */}
+            {data && data.total > 20 && (
+              <div className="flex items-center justify-between border-t p-4">
+                <p className="text-sm text-gray-600">
+                  Mostrando {((page - 1) * 20) + 1} a {Math.min(page * 20, data.total)} de {data.total} emails
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >
+                    Anterior
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(p => p + 1)}
+                    disabled={page * 20 >= data.total}
+                  >
+                    Próximo
+                  </Button>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
