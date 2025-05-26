@@ -1,9 +1,0 @@
-[phases.setup]
-nixPkgs = ["nodejs-18_x", "npm-9_x", "openssl"]
-
-[phases.build]
-cmds = ["cd backend && npx prisma generate"]
-
-[variables]
-NODE_ENV = "production"
-NIXPACKS_NODE_VERSION = "18" 
