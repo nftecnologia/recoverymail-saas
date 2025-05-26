@@ -2,69 +2,73 @@
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-import { apiService } from "@/lib/api";
 import { 
+  Activity, 
   Mail, 
   MousePointerClick, 
-  Eye, 
-  Send,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Eye
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export default function DashboardPage() {
-  // Por enquanto, vamos usar dados mockados
-  // Em produção, isso viria da API
-  const metrics = {
-    totalEvents: 14,
-    totalEmails: 26,
-    deliveryRate: 100,
-    openRate: 85.7,
-    clickRate: 42.3,
-    eventsByType: {
-      ABANDONED_CART: 3,
-      PIX_EXPIRED: 2,
-      BANK_SLIP_EXPIRED: 3,
-      SALE_REFUSED: 2,
-      SALE_APPROVED: 1,
-      SALE_CHARGEBACK: 1,
-      SALE_REFUNDED: 1,
-      SUBSCRIPTION_CANCELED: 1,
-    },
+  // Buscar métricas
+  const { data: metrics, isLoading: metricsLoading } = useQuery({
+    queryKey: ['dashboard-metrics'],
+    queryFn: () => api.getMetrics(),
+    refetchInterval: 30000, // Atualizar a cada 30 segundos
+  });
+
+  // Buscar eventos recentes
+  const { data: eventsData, isLoading: eventsLoading } = useQuery({
+    queryKey: ['recent-events'],
+    queryFn: () => api.getEvents({ limit: 5 }),
+  });
+
+  // Buscar emails recentes
+  const { data: emailsData, isLoading: emailsLoading } = useQuery({
+    queryKey: ['recent-emails'],
+    queryFn: () => api.getEmails({ limit: 5 }),
+  });
+
+  const eventTypeLabels: Record<string, string> = {
+    ABANDONED_CART: "Carrinho Abandonado",
+    PIX_EXPIRED: "PIX Expirado",
+    BANK_SLIP_EXPIRED: "Boleto Expirado",
+    SALE_REFUSED: "Venda Recusada",
+    SALE_APPROVED: "Venda Aprovada",
+    SALE_CHARGEBACK: "Chargeback",
+    SALE_REFUNDED: "Reembolso",
+    BANK_SLIP_GENERATED: "Boleto Gerado",
+    PIX_GENERATED: "PIX Gerado",
+    SUBSCRIPTION_CANCELED: "Assinatura Cancelada",
+    SUBSCRIPTION_EXPIRED: "Assinatura Expirada",
+    SUBSCRIPTION_RENEWED: "Assinatura Renovada",
   };
 
-  const cards = [
-    {
-      title: "Total de Eventos",
-      value: metrics.totalEvents,
-      description: "Webhooks recebidos",
-      icon: AlertCircle,
-      color: "text-blue-600",
-    },
-    {
-      title: "Emails Enviados",
-      value: metrics.totalEmails,
-      description: "Total de emails processados",
-      icon: Send,
-      color: "text-green-600",
-    },
-    {
-      title: "Taxa de Abertura",
-      value: `${metrics.openRate}%`,
-      description: "Emails abertos",
-      icon: Eye,
-      color: "text-purple-600",
-    },
-    {
-      title: "Taxa de Cliques",
-      value: `${metrics.clickRate}%`,
-      description: "Links clicados",
-      icon: MousePointerClick,
-      color: "text-orange-600",
-    },
-  ];
+  const statusConfig = {
+    PENDING: { label: "Pendente", icon: Clock, color: "bg-yellow-100 text-yellow-800" },
+    PROCESSED: { label: "Processado", icon: CheckCircle, color: "bg-green-100 text-green-800" },
+    FAILED: { label: "Falhou", icon: AlertCircle, color: "bg-red-100 text-red-800" },
+  };
+
+  const emailStatusConfig = {
+    PENDING: { label: "Pendente", icon: Clock, color: "bg-gray-100 text-gray-800" },
+    SENT: { label: "Enviado", icon: Mail, color: "bg-blue-100 text-blue-800" },
+    DELIVERED: { label: "Entregue", icon: CheckCircle, color: "bg-green-100 text-green-800" },
+    OPENED: { label: "Aberto", icon: Eye, color: "bg-purple-100 text-purple-800" },
+    CLICKED: { label: "Clicado", icon: MousePointerClick, color: "bg-orange-100 text-orange-800" },
+    BOUNCED: { label: "Rejeitado", icon: AlertCircle, color: "bg-red-100 text-red-800" },
+    FAILED: { label: "Falhou", icon: AlertCircle, color: "bg-red-100 text-red-800" },
+  };
 
   return (
     <DashboardLayout>
@@ -75,100 +79,195 @@ export default function DashboardPage() {
             Dashboard
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Visão geral do sistema de recuperação de vendas
+            Visão geral do sistema de recuperação
           </p>
         </div>
 
         {/* Metrics Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {cards.map((card) => (
-            <Card key={card.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {card.title}
-                </CardTitle>
-                <card.icon className={`h-4 w-4 ${card.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{card.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  {card.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Eventos Processados
+              </CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {metricsLoading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{metrics?.processedEvents || 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {metrics?.processingRate || '0'}% de sucesso
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Emails Enviados
+              </CardTitle>
+              <Mail className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {metricsLoading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{metrics?.totalEmails || 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {metrics?.deliveredEmails || 0} entregues
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Taxa de Abertura
+              </CardTitle>
+              <Eye className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {metricsLoading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{metrics?.openRate || '0'}%</div>
+                  <p className="text-xs text-muted-foreground">
+                    {metrics?.openedEmails || 0} emails abertos
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Taxa de Cliques
+              </CardTitle>
+              <MousePointerClick className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {metricsLoading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{metrics?.clickRate || '0'}%</div>
+                  <p className="text-xs text-muted-foreground">
+                    {metrics?.clickedEmails || 0} cliques
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Events by Type */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Eventos por Tipo</CardTitle>
-            <CardDescription>
-              Distribuição dos webhooks recebidos
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {Object.entries(metrics.eventsByType).map(([type, count]) => (
-                <div key={type} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                    <span className="text-sm font-medium">
-                      {type.replace(/_/g, " ")}
-                    </span>
-                  </div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {count}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Atividade Recente</CardTitle>
-            <CardDescription>
-              Últimos eventos processados
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-green-600 rounded-full" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Email enviado</p>
-                  <p className="text-xs text-gray-500">
-                    SALE_REFUSED - nicolas.fer.oli@gmail.com
-                  </p>
+        <div className="grid gap-4 md:grid-cols-2">
+          {/* Recent Events */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Eventos Recentes</CardTitle>
+              <CardDescription>
+                Últimos webhooks recebidos
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {eventsLoading ? (
+                <div className="space-y-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full" />
+                  ))}
                 </div>
-                <span className="text-xs text-gray-500">2 min atrás</span>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Email aberto</p>
-                  <p className="text-xs text-gray-500">
-                    ABANDONED_CART - cliente@example.com
-                  </p>
+              ) : (
+                <div className="space-y-4">
+                  {eventsData?.events.map((event) => {
+                    const status = statusConfig[event.status as keyof typeof statusConfig];
+                    return (
+                      <div key={event.id} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <status.icon className={`h-4 w-4 ${status.color.split(' ')[1]}`} />
+                          <div>
+                            <p className="text-sm font-medium">
+                              {eventTypeLabels[event.eventType] || event.eventType}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {format(new Date(event.createdAt), "dd/MM HH:mm", { locale: ptBR })}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className={status.color}>
+                          {status.label}
+                        </Badge>
+                      </div>
+                    );
+                  })}
+                  {(!eventsData?.events || eventsData.events.length === 0) && (
+                    <p className="text-sm text-gray-500 text-center py-4">
+                      Nenhum evento recente
+                    </p>
+                  )}
                 </div>
-                <span className="text-xs text-gray-500">15 min atrás</span>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-orange-600 rounded-full" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Link clicado</p>
-                  <p className="text-xs text-gray-500">
-                    PIX_EXPIRED - usuario@example.com
-                  </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Emails */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Emails Recentes</CardTitle>
+              <CardDescription>
+                Últimos emails enviados
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {emailsLoading ? (
+                <div className="space-y-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full" />
+                  ))}
                 </div>
-                <span className="text-xs text-gray-500">1 hora atrás</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              ) : (
+                <div className="space-y-4">
+                  {emailsData?.emails.map((email) => {
+                    const status = emailStatusConfig[email.status as keyof typeof emailStatusConfig];
+                    return (
+                      <div key={email.id} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <status.icon className={`h-4 w-4 ${status.color.split(' ')[1]}`} />
+                          <div>
+                            <p className="text-sm font-medium truncate max-w-[200px]">
+                              {email.to}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {email.event?.eventType ? eventTypeLabels[email.event.eventType] : email.template}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className={status.color}>
+                          {status.label}
+                        </Badge>
+                      </div>
+                    );
+                  })}
+                  {(!emailsData?.emails || emailsData.emails.length === 0) && (
+                    <p className="text-sm text-gray-500 text-center py-4">
+                      Nenhum email recente
+                    </p>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </DashboardLayout>
   );

@@ -34,13 +34,13 @@ export default function SettingsPage() {
     createdAt: "2025-05-01T00:00:00.000Z",
   };
 
-  const emailSettings = {
+  const [emailSettings, setEmailSettings] = useState({
     fromName: "Recovery Mail",
     fromEmail: "noreply@recoverymail.com",
     replyTo: "suporte@recoverymail.com",
     dailyLimit: 1000,
     usedToday: 26,
-  };
+  });
 
   const delays = [
     { event: "ABANDONED_CART", attempts: [
@@ -100,18 +100,16 @@ export default function SettingsPage() {
                     <label className="text-sm font-medium">Nome da Organização</label>
                     <input
                       type="text"
-                      value={organization.name}
+                      defaultValue={organization.name}
                       className="mt-1 w-full px-3 py-2 border rounded-md"
-                      readOnly
                     />
                   </div>
                   <div>
                     <label className="text-sm font-medium">Domínio</label>
                     <input
                       type="text"
-                      value={organization.domain}
+                      defaultValue={organization.domain}
                       className="mt-1 w-full px-3 py-2 border rounded-md"
-                      readOnly
                     />
                   </div>
                   <div>
@@ -258,6 +256,7 @@ export default function SettingsPage() {
                     <input
                       type="text"
                       value={emailSettings.fromName}
+                      onChange={(e) => setEmailSettings({...emailSettings, fromName: e.target.value})}
                       className="mt-1 w-full px-3 py-2 border rounded-md"
                     />
                   </div>
@@ -266,6 +265,7 @@ export default function SettingsPage() {
                     <input
                       type="email"
                       value={emailSettings.fromEmail}
+                      onChange={(e) => setEmailSettings({...emailSettings, fromEmail: e.target.value})}
                       className="mt-1 w-full px-3 py-2 border rounded-md"
                     />
                   </div>
@@ -274,6 +274,7 @@ export default function SettingsPage() {
                     <input
                       type="email"
                       value={emailSettings.replyTo}
+                      onChange={(e) => setEmailSettings({...emailSettings, replyTo: e.target.value})}
                       className="mt-1 w-full px-3 py-2 border rounded-md"
                     />
                   </div>
@@ -282,6 +283,7 @@ export default function SettingsPage() {
                     <input
                       type="number"
                       value={emailSettings.dailyLimit}
+                      onChange={(e) => setEmailSettings({...emailSettings, dailyLimit: parseInt(e.target.value)})}
                       className="mt-1 w-full px-3 py-2 border rounded-md"
                     />
                   </div>

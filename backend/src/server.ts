@@ -10,6 +10,7 @@ import { errorHandler } from '@/middleware/error.middleware';
 import { testDatabaseConnection } from '@/config/database';
 import webhookRoutes from '@/routes/webhook.routes';
 import resendWebhookRoutes from '@/routes/resend-webhook.routes';
+import apiRoutes from '@/routes/api.routes';
 import { cleanOldJobs } from '@/services/queue.service';
 
 // Criar app Express
@@ -76,6 +77,9 @@ app.use('/webhook', webhookRoutes);
 
 // Rotas de webhook do Resend (tracking de emails)
 app.use('/', resendWebhookRoutes);
+
+// Rotas da API
+app.use('/api', apiRoutes);
 
 // Middleware de erro (deve ser o último)
 app.use(errorHandler);

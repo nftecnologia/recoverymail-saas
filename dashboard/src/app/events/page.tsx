@@ -17,57 +17,8 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { RefreshCw, Filter, CheckCircle, XCircle, Clock } from "lucide-react";
 import { useState } from "react";
-
-// Dados mockados por enquanto
-const mockEvents = [
-  {
-    id: "cmb594fx50001mcxrkb1foseg",
-    organizationId: "test-org-123",
-    eventType: "ABANDONED_CART",
-    status: "PROCESSED",
-    processedAt: "2025-05-26T14:37:51.000Z",
-    createdAt: "2025-05-26T14:37:50.000Z",
-    payload: {
-      customer: { name: "João Silva", email: "joao@example.com" },
-      total_price: "R$ 297,00"
-    }
-  },
-  {
-    id: "cmb5chho10001mcw9jlibvxje",
-    organizationId: "test-org-123",
-    eventType: "SALE_REFUSED",
-    status: "PROCESSED",
-    processedAt: "2025-05-26T14:12:00.000Z",
-    createdAt: "2025-05-26T14:11:59.000Z",
-    payload: {
-      customer: { name: "Nicolas Oliveira", email: "nicolas.fer.oli@gmail.com" },
-      total_price: "R$ 497,00"
-    }
-  },
-  {
-    id: "cmb5b3do20003mcuz0tfjo4j1",
-    organizationId: "test-org-123",
-    eventType: "PIX_EXPIRED",
-    status: "FAILED",
-    error: "Template not found",
-    createdAt: "2025-05-26T13:45:00.000Z",
-    payload: {
-      customer: { name: "Maria Santos", email: "maria@example.com" },
-      total_price: "R$ 197,00"
-    }
-  },
-  {
-    id: "cmb5b3do20004mcuz0tfjo4j2",
-    organizationId: "test-org-123",
-    eventType: "BANK_SLIP_EXPIRED",
-    status: "PENDING",
-    createdAt: "2025-05-26T13:30:00.000Z",
-    payload: {
-      customer: { name: "Pedro Costa", email: "pedro@example.com" },
-      total_price: "R$ 997,00"
-    }
-  }
-];
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 const eventTypeLabels: Record<string, string> = {
   ABANDONED_CART: "Carrinho Abandonado",
@@ -93,12 +44,21 @@ const statusConfig = {
 export default function EventsPage() {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
-  const filteredEvents = mockEvents.filter(event => {
-    if (selectedType && event.eventType !== selectedType) return false;
-    if (selectedStatus && event.status !== selectedStatus) return false;
-    return true;
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['events', page, selectedType, selectedStatus],
+    queryFn: () => api.getEvents({
+      page,
+      limit: 20,
+      type: selectedType || undefined,
+      status: selectedStatus || undefined,
+    }),
   });
+
+  const handleRefresh = () => {
+    refetch();
+  };
 
   return (
     <DashboardLayout>
@@ -113,7 +73,7 @@ export default function EventsPage() {
               Webhooks recebidos e processados
             </p>
           </div>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleRefresh}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Atualizar
           </Button>
@@ -132,7 +92,10 @@ export default function EventsPage() {
               <Button
                 variant={selectedType === null ? "default" : "outline"}
                 size="sm"
-                onClick={() => setSelectedType(null)}
+                onClick={() => {
+                  setSelectedType(null);
+                  setPage(1);
+                }}
               >
                 Todos os tipos
               </Button>
@@ -141,7 +104,10 @@ export default function EventsPage() {
                   key={type}
                   variant={selectedType === type ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedType(type)}
+                  onClick={() => {
+                    setSelectedType(type);
+                    setPage(1);
+                  }}
                 >
                   {label}
                 </Button>
@@ -151,7 +117,10 @@ export default function EventsPage() {
               <Button
                 variant={selectedStatus === null ? "default" : "outline"}
                 size="sm"
-                onClick={() => setSelectedStatus(null)}
+                onClick={() => {
+                  setSelectedStatus(null);
+                  setPage(1);
+                }}
               >
                 Todos os status
               </Button>
@@ -160,7 +129,10 @@ export default function EventsPage() {
                   key={status}
                   variant={selectedStatus === status ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedStatus(status)}
+                  onClick={() => {
+                    setSelectedStatus(status);
+                    setPage(1);
+                  }}
                 >
                   <config.icon className="h-3 w-3 mr-1" />
                   {config.label}
@@ -175,57 +147,97 @@ export default function EventsPage() {
           <CardHeader>
             <CardTitle>Lista de Eventos</CardTitle>
             <CardDescription>
-              {filteredEvents.length} eventos encontrados
+              {data?.pagination.total || 0} eventos encontrados
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Valor</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredEvents.map((event) => {
-                  const status = statusConfig[event.status as keyof typeof statusConfig];
-                  return (
-                    <TableRow key={event.id}>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {eventTypeLabels[event.eventType] || event.eventType}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{event.payload.customer.name}</p>
-                          <p className="text-sm text-gray-500">{event.payload.customer.email}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>{event.payload.total_price}</TableCell>
-                      <TableCell>
-                        <Badge className={status.color}>
-                          <status.icon className="h-3 w-3 mr-1" />
-                          {status.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {format(new Date(event.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm">
-                          Ver detalhes
-                        </Button>
-                      </TableCell>
+            {isLoading ? (
+              <div className="space-y-2">
+                {[...Array(10)].map((_, i) => (
+                  <Skeleton key={i} className="h-16 w-full" />
+                ))}
+              </div>
+            ) : (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Cliente</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Ações</TableHead>
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {data?.events.map((event) => {
+                      const status = statusConfig[event.status as keyof typeof statusConfig];
+                      const customer = event.payload?.customer || {};
+                      const totalPrice = event.payload?.total_price || event.payload?.value || '-';
+                      
+                      return (
+                        <TableRow key={event.id}>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {eventTypeLabels[event.eventType] || event.eventType}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{customer.name || 'N/A'}</p>
+                              <p className="text-sm text-gray-500">{customer.email || 'N/A'}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>{totalPrice}</TableCell>
+                          <TableCell>
+                            <Badge className={status.color}>
+                              <status.icon className="h-3 w-3 mr-1" />
+                              {status.label}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {format(new Date(event.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                          </TableCell>
+                          <TableCell>
+                            <Button variant="ghost" size="sm">
+                              Ver detalhes
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+
+                {/* Pagination */}
+                {data && data.pagination.pages > 1 && (
+                  <div className="flex items-center justify-between mt-4">
+                    <p className="text-sm text-gray-500">
+                      Página {data.pagination.page} de {data.pagination.pages}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage(page - 1)}
+                        disabled={page === 1}
+                      >
+                        Anterior
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage(page + 1)}
+                        disabled={page === data.pagination.pages}
+                      >
+                        Próxima
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
