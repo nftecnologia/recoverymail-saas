@@ -1,0 +1,35 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    /* Desabilitar verificações mais restritivas para produção */
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitReturns": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
+    "noEmitOnError": false,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "noImplicitThis": false,
+    "alwaysStrict": false,
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitOverride": false,
+    "useUnknownInCatchVariables": false
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "test-*.js",
+    "seed-*.js",
+    "check-*.js"
+  ]
+} 

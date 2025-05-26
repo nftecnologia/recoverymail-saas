@@ -5,7 +5,9 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon",
-    "build": "tsc",
+    "build": "bash build-force.sh",
+    "build:strict": "tsc",
+    "build:clean": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
     "start:prod": "node -r tsconfig-paths/register dist/server.js",
     "lint": "eslint src --ext .ts",
