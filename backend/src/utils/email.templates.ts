@@ -25,12 +25,12 @@ const EMAIL_TEMPLATES: Record<string, Record<number, EmailTemplate>> = {
       templateName: 'bank-slip-expired-renewal',
     },
     2: {
-      subject: '💳 Que tal pagar com PIX? É mais rápido!',
-      templateName: 'bank-slip-expired-alternative',
+      subject: '🔥 Ainda dá tempo! PIX com desconto exclusivo',
+      templateName: 'bank-slip-expired-urgency',
     },
     3: {
-      subject: '🏷️ Última chance com 5% de desconto',
-      templateName: 'bank-slip-expired-discount',
+      subject: '😢 Última chance com oferta especial',
+      templateName: 'bank-slip-expired-lastchance',
     },
   },
   PIX_EXPIRED: {
@@ -39,8 +39,8 @@ const EMAIL_TEMPLATES: Record<string, Record<number, EmailTemplate>> = {
       templateName: 'pix-expired-renewal',
     },
     2: {
-      subject: '🚀 Complete sua compra em segundos',
-      templateName: 'pix-expired-urgency',
+      subject: '⚡ Último PIX disponível com 10% OFF',
+      templateName: 'pix-expired-lastchance',
     },
   },
   SALE_REFUSED: {
@@ -78,37 +78,37 @@ const EMAIL_TEMPLATES: Record<string, Record<number, EmailTemplate>> = {
     },
     2: {
       subject: '⏰ Último dia para pagar seu boleto!',
-      templateName: 'bank-slip-generated-last-day',
+      templateName: 'bank-slip-generated-lastday',
     },
   },
   PIX_GENERATED: {
     1: {
-      subject: '📱 Pague agora com PIX - Rápido e seguro',
-      templateName: 'pix-generated-reminder',
+      subject: '⚡ Pague agora com PIX - Acesso imediato',
+      templateName: 'pix-generated-qrcode',
     },
   },
   SUBSCRIPTION_CANCELED: {
     1: {
-      subject: '😢 Assinatura cancelada - Sentiremos sua falta',
+      subject: '😢 Assinatura cancelada - Confirmação',
       templateName: 'subscription-canceled-confirmation',
     },
     2: {
-      subject: '🎁 Oferta especial para você voltar',
+      subject: '💔 Sentimos sua falta... Que tal voltar?',
       templateName: 'subscription-canceled-winback',
     },
     3: {
-      subject: '💔 Última chance - 50% de desconto',
+      subject: '🎁 Última oferta imperdível para você voltar',
       templateName: 'subscription-canceled-final',
     },
   },
   SUBSCRIPTION_EXPIRED: {
     1: {
-      subject: '⚠️ Sua assinatura expirou',
-      templateName: 'subscription-expired-notice',
+      subject: '⚠️ Sua assinatura expirou - Não perca seu progresso',
+      templateName: 'subscription-expired-renewal',
     },
     2: {
-      subject: '🔄 Renove agora e ganhe 20% de desconto',
-      templateName: 'subscription-expired-discount',
+      subject: '🔄 Última chance: 50% OFF na renovação',
+      templateName: 'subscription-expired-lastchance',
     },
   },
   SUBSCRIPTION_RENEWED: {

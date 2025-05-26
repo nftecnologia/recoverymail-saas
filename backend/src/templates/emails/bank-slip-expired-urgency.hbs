@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 {{customerName}}, ainda dá tempo de garantir sua vaga!</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header com Contagem Regressiva -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #ff6b6b 0%, #ff4444 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h1 style="margin: 0; font-size: 28px;">⏱️ ÚLTIMAS 24 HORAS!</h1>
+                            <p style="margin: 10px 0 0 0; font-size: 18px;">Para garantir o preço promocional</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo Principal -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px;">
+                                {{customerName}}, ontem você quase garantiu sua vaga no <strong>{{productName}}</strong>...
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #555; line-height: 1.6; margin-bottom: 20px;">
+                                Eu sei que boletos podem ser chatos de pagar, por isso 
+                                <span style="color: #ff4444; font-weight: bold;">preparei algo especial para você!</span>
+                            </p>
+
+                            <!-- Box de Oferta Especial -->
+                            <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%); border: 2px solid #ffc107; border-radius: 8px; padding: 25px; margin: 25px 0;">
+                                <h3 style="color: #856404; margin: 0 0 15px 0; font-size: 20px;">
+                                    🎁 OFERTA EXCLUSIVA POR 24H:
+                                </h3>
+                                <ul style="color: #856404; font-size: 16px; margin: 0; padding-left: 20px;">
+                                    <li><strong>PIX com 7% de desconto</strong> (economize R$ {{pixDiscount}})</li>
+                                    <li><strong>Boleto parcelado em 2x</strong> sem juros</li>
+                                    <li><strong>Cartão em até 12x</strong> com juros do cartão</li>
+                                    <li><strong>+ BÔNUS SURPRESA</strong> (valor de R$ {{bonusValue}})</li>
+                                </ul>
+                            </div>
+
+                            <!-- Prova Social Dinâmica -->
+                            <div style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                                <p style="color: #1e90ff; font-size: 18px; margin: 0;">
+                                    <strong>🚀 {{recentEnrollments}} pessoas</strong> entraram nas últimas 3 horas!
+                                </p>
+                                <p style="color: #666; font-size: 14px; margin: 10px 0 0 0;">
+                                    Junte-se a mais de {{totalStudents}} alunos transformando suas vidas
+                                </p>
+                            </div>
+
+                            <!-- Depoimento Impactante -->
+                            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4caf50;">
+                                <p style="font-style: italic; color: #555; margin: 0; font-size: 15px;">
+                                    "Quase desisti quando meu boleto expirou... Ainda bem que vi o email e paguei no PIX! 
+                                    <strong>Em 30 dias já recuperei 5x o investimento.</strong> 
+                                    {{testimonial}}"
+                                </p>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    — <strong>{{testimonialAuthor}}</strong>, aluno há {{testimonialTime}}
+                                </p>
+                            </div>
+
+                            <!-- Comparação com Concorrente -->
+                            <div style="background-color: #fff0f0; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #d32f2f; margin: 0 0 10px 0;">⚠️ Atenção para não se arrepender:</h4>
+                                <p style="color: #666; margin: 0; line-height: 1.6;">
+                                    O {{competitorName}} cobra <strong>R$ {{competitorPrice}}</strong> por um conteúdo inferior.<br>
+                                    Aqui você paga apenas <strong>R$ {{ourPrice}}</strong> e recebe:
+                                    <br>• 3x mais conteúdo
+                                    <br>• Suporte direto comigo
+                                    <br>• Atualizações vitalícias
+                                    <br>• Comunidade exclusiva
+                                </p>
+                            </div>
+
+                            <!-- CTA Múltiplo -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{checkoutUrl}}?payment=pix&utm_content=botao_principal_24h" style="display: inline-block; background-color: #00b4d8; color: white; padding: 18px 50px; text-decoration: none; border-radius: 50px; font-size: 20px; font-weight: bold; margin-bottom: 15px;">
+                                    PAGAR COM PIX (7% OFF) →
+                                </a>
+                                <br>
+                                <a href="{{checkoutUrl}}?utm_content=link_boleto_24h" style="color: #666; font-size: 16px;">
+                                    Prefere boleto? Clique aqui para gerar um novo
+                                </a>
+                            </div>
+
+                            <!-- Garantia -->
+                            <div style="text-align: center; background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <img src="https://img.icons8.com/color/48/000000/guarantee.png" alt="Garantia" style="margin-bottom: 10px;">
+                                <h4 style="color: #333; margin: 0 0 10px 0;">Garantia Total de 7 Dias</h4>
+                                <p style="color: #666; font-size: 14px; margin: 0;">
+                                    Se não gostar do conteúdo, devolvemos 100% do seu dinheiro.<br>
+                                    <strong>Sem perguntas, sem burocracia.</strong>
+                                </p>
+                            </div>
+
+                            <!-- Escassez Final -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <p style="color: #ff4444; font-size: 18px; font-weight: bold; margin: 0;">
+                                    ⚠️ ATENÇÃO: Esta oferta expira em 24 horas!
+                                </p>
+                                <p style="color: #666; font-size: 14px; margin: 10px 0 0 0;">
+                                    Depois o valor volta para R$ {{regularPrice}} sem os bônus
+                                </p>
+                            </div>
+
+                            <!-- PS Estratégico -->
+                            <div style="border-top: 2px solid #eee; margin-top: 30px; padding-top: 20px;">
+                                <p style="color: #666; font-size: 14px; line-height: 1.6;">
+                                    <strong>PS:</strong> {{customerName}}, sei que você está interessado porque chegou até o checkout. 
+                                    Não deixe que um boleto expirado te impeça de transformar sua vida. 
+                                    <strong>O PIX cai na hora e você já pode começar a estudar hoje!</strong>
+                                </p>
+                                <p style="color: #666; font-size: 14px; margin-top: 15px;">
+                                    <strong>PPS:</strong> Lembra que o {{competitorName}} não tem garantia? 
+                                    Aqui você tem 7 dias para testar sem risco. 
+                                    <a href="{{checkoutUrl}}?payment=pix&utm_content=ps_link_24h" style="color: #00b4d8;">
+                                        Clique aqui e aproveite o desconto →
+                                    </a>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                Você recebeu este email porque iniciou uma compra no {{productName}}.<br>
+                                Dúvidas? Responda este email ou chame no WhatsApp: {{whatsappNumber}}<br>
+                                <a href="#" style="color: #999;">Descadastrar</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 

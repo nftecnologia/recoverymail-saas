@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>😰 {{customerName}}, não perca seu acesso ao {{productName}}!</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header Urgente -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h2 style="margin: 0; font-size: 28px;">⚠️ SUA ASSINATURA EXPIROU!</h2>
+                            <p style="margin: 10px 0 0 0; font-size: 16px;">Mas ainda dá tempo de renovar com desconto</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px;">
+                                {{customerName}}, sua jornada não precisa parar aqui...
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #555; line-height: 1.8; margin-bottom: 20px;">
+                                Sei que você estava aproveitando o <strong>{{productName}}</strong> e obtendo resultados incríveis.
+                                Por isso, <strong>preparei uma oferta especial</strong> para você continuar sua evolução!
+                            </p>
+
+                            <!-- Box de Conquistas -->
+                            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #2e7d32; margin: 0 0 15px 0;">
+                                    🏆 Suas conquistas até agora:
+                                </h4>
+                                <ul style="color: #555; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li>{{completedModules}} módulos concluídos</li>
+                                    <li>{{hoursWatched}} horas de conteúdo assistidas</li>
+                                    <li>{{certificatesEarned}} certificados conquistados</li>
+                                    <li>{{progressPercentage}}% do curso completo</li>
+                                </ul>
+                                <p style="color: #2e7d32; font-weight: bold; margin: 15px 0 0 0; text-align: center;">
+                                    Não deixe todo esse progresso se perder! 🎯
+                                </p>
+                            </div>
+
+                            <!-- Oferta de Renovação -->
+                            <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%); border: 3px solid #ffc107; border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center;">
+                                <h3 style="color: #856404; margin: 0 0 15px 0; font-size: 24px;">
+                                    🎁 OFERTA EXCLUSIVA DE RENOVAÇÃO
+                                </h3>
+                                
+                                <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                                    <p style="color: #666; font-size: 16px; margin: 0;">
+                                        De <s style="color: #999;">R$ {{originalPrice}}/mês</s> por apenas
+                                    </p>
+                                    <p style="color: #ffc107; font-size: 36px; font-weight: bold; margin: 10px 0;">
+                                        R$ {{renewalPrice}}/mês
+                                    </p>
+                                    <p style="color: #4caf50; font-size: 18px; margin: 0;">
+                                        Economize {{discountPercentage}}% para sempre!
+                                    </p>
+                                </div>
+                                
+                                <ul style="color: #856404; font-size: 16px; text-align: left; margin: 15px 0; padding-left: 20px;">
+                                    <li><strong>Preço especial vitalício</strong> - não aumenta nunca!</li>
+                                    <li><strong>Novos módulos</strong> incluídos sem custo extra</li>
+                                    <li><strong>Prioridade</strong> em lançamentos e eventos</li>
+                                    <li><strong>Bônus exclusivo:</strong> {{renewalBonus}}</li>
+                                </ul>
+                            </div>
+
+                            <!-- CTA Principal -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{renewalUrl}}?discount={{discountCode}}" style="display: inline-block; background-color: #4caf50; color: white; padding: 20px 60px; text-decoration: none; border-radius: 50px; font-size: 20px; font-weight: bold; box-shadow: 0 4px 15px rgba(76,175,80,0.3);">
+                                    RENOVAR COM DESCONTO →
+                                </a>
+                                <p style="color: #999; font-size: 14px; margin-top: 10px;">
+                                    ⏰ Oferta válida por apenas 48 horas
+                                </p>
+                            </div>
+
+                            <!-- O Que Você Perde -->
+                            <div style="background-color: #ffebee; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #c62828; margin: 0 0 15px 0;">
+                                    ❌ Ao não renovar, você perde acesso a:
+                                </h4>
+                                <ul style="color: #666; font-size: 15px; line-height: 1.8;">
+                                    <li>Todos os {{totalModules}} módulos do curso</li>
+                                    <li>Atualizações mensais com novos conteúdos</li>
+                                    <li>Comunidade exclusiva de alunos</li>
+                                    <li>Lives semanais ao vivo</li>
+                                    <li>Suporte prioritário da equipe</li>
+                                    <li>Certificados de conclusão</li>
+                                </ul>
+                            </div>
+
+                            <!-- Planos Alternativos -->
+                            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 20px 0; text-align: center;">
+                                    💡 Escolha o plano ideal para você:
+                                </h4>
+                                
+                                <div style="display: grid; gap: 15px;">
+                                    <!-- Plano Mensal -->
+                                    <div style="background-color: white; padding: 20px; border-radius: 8px; border: 2px solid #ddd;">
+                                        <h5 style="color: #333; margin: 0 0 10px 0;">📅 Mensal</h5>
+                                        <p style="color: #4caf50; font-size: 24px; font-weight: bold; margin: 0;">
+                                            R$ {{monthlyPrice}}/mês
+                                        </p>
+                                        <p style="color: #666; font-size: 14px; margin: 10px 0;">
+                                            Flexibilidade total • Cancele quando quiser
+                                        </p>
+                                        <a href="{{renewalUrl}}?plan=monthly" style="display: inline-block; background-color: #2196f3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                                            Escolher Mensal
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Plano Anual -->
+                                    <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; border: 2px solid #4caf50;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <h5 style="color: #2e7d32; margin: 0;">🎯 Anual (Mais Popular)</h5>
+                                            <span style="background-color: #4caf50; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px;">
+                                                40% OFF
+                                            </span>
+                                        </div>
+                                        <p style="color: #4caf50; font-size: 24px; font-weight: bold; margin: 10px 0 0 0;">
+                                            R$ {{annualPrice}}/ano
+                                        </p>
+                                        <p style="color: #666; font-size: 14px; margin: 5px 0;">
+                                            <s>R$ {{annualOriginalPrice}}</s> • Economia de R$ {{annualSavings}}
+                                        </p>
+                                        <p style="color: #666; font-size: 14px; margin: 10px 0;">
+                                            Melhor custo-benefício • 2 meses grátis
+                                        </p>
+                                        <a href="{{renewalUrl}}?plan=annual" style="display: inline-block; background-color: #4caf50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                                            Escolher Anual
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Depoimento de Renovação -->
+                            <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196f3;">
+                                <p style="font-style: italic; color: #555; margin: 0;">
+                                    "Quando minha assinatura expirou, pensei em parar... Mas renovei e 
+                                    foi a melhor decisão! Nos últimos 3 meses, {{testimonialResult}}. 
+                                    O conteúdo novo que foi adicionado vale 10x o valor da mensalidade!"
+                                </p>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    — <strong>{{testimonialAuthor}}</strong>, aluno há {{testimonialTime}}
+                                </p>
+                            </div>
+
+                            <!-- Garantia -->
+                            <div style="text-align: center; background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 10px 0;">
+                                    🛡️ Garantia Total de Satisfação
+                                </h4>
+                                <p style="color: #666; font-size: 14px; margin: 0;">
+                                    Se você não ficar satisfeito com as novidades,<br>
+                                    cancele em 7 dias e receba 100% do valor de volta.
+                                </p>
+                            </div>
+
+                            <!-- Timer -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <div style="display: inline-block; background-color: #ff4444; color: white; padding: 15px 30px; border-radius: 30px;">
+                                    <p style="margin: 0; font-size: 18px; font-weight: bold;">
+                                        ⏱️ OFERTA EXPIRA EM 48 HORAS
+                                    </p>
+                                </div>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    Depois disso, volta ao preço normal de R$ {{originalPrice}}/mês
+                                </p>
+                            </div>
+
+                            <!-- WhatsApp -->
+                            <div style="text-align: center; margin: 20px 0;">
+                                <p style="color: #666; font-size: 16px;">
+                                    Tem alguma dúvida sobre a renovação?<br>
+                                    <a href="https://wa.me/{{whatsappNumber}}?text=Oi,%20quero%20renovar%20minha%20assinatura" style="color: #25d366; font-weight: bold; text-decoration: none; font-size: 18px;">
+                                        📱 Fale Comigo no WhatsApp
+                                    </a>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                Sua assinatura expirou em {{expirationDate}}<br>
+                                {{organizationName}} • {{domain}}<br>
+                                <a href="#" style="color: #999;">Gerenciar assinatura</a> | 
+                                <a href="#" style="color: #999;">Política de cancelamento</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 

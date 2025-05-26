@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ {{customerName}}, seu PIX está pronto - pague em 1 minuto!</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header PIX -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h2 style="margin: 0; font-size: 32px;">⚡ PIX GERADO!</h2>
+                            <p style="margin: 10px 0 0 0; font-size: 18px;">Pague agora e acesse na hora</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px; text-align: center;">
+                                <strong>{{customerName}}</strong>, seu PIX está pronto!<br>
+                                <span style="color: #666; font-size: 16px;">Escaneie o código ou copie e cole no seu banco</span>
+                            </p>
+
+                            <!-- Box do QR Code -->
+                            <div style="background-color: #f8f9fa; border: 3px solid #00b4d8; border-radius: 12px; padding: 30px; margin: 20px 0; text-align: center;">
+                                <p style="color: #333; font-size: 20px; font-weight: bold; margin: 0 0 20px 0;">
+                                    📱 Escaneie com a câmera do celular
+                                </p>
+                                
+                                <!-- QR Code -->
+                                <div style="background-color: white; padding: 20px; display: inline-block; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                    <img src="{{pixQrCodeImage}}" alt="QR Code PIX" style="width: 200px; height: 200px;">
+                                </div>
+                                
+                                <p style="color: #666; font-size: 14px; margin: 20px 0 0 0;">
+                                    ou
+                                </p>
+                            </div>
+
+                            <!-- Código Copia e Cola -->
+                            <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #1976d2; margin: 0 0 15px 0; text-align: center;">
+                                    📋 Copie o código PIX:
+                                </h4>
+                                <div style="background-color: white; padding: 15px; border-radius: 5px; border: 2px dashed #2196f3;">
+                                    <p style="font-family: monospace; font-size: 12px; word-break: break-all; margin: 0; color: #333; line-height: 1.5;">
+                                        {{pixCopyPaste}}
+                                    </p>
+                                </div>
+                                <div style="text-align: center; margin-top: 15px;">
+                                    <a href="{{checkoutUrl}}?copy_pix=true" style="display: inline-block; background-color: #2196f3; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                                        📋 COPIAR CÓDIGO
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Valor e Detalhes -->
+                            <div style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                                <p style="color: #666; font-size: 16px; margin: 0;">
+                                    Valor a pagar:
+                                </p>
+                                <p style="color: #00b4d8; font-size: 36px; font-weight: bold; margin: 10px 0;">
+                                    R$ {{totalPrice}}
+                                </p>
+                                {{#if hasDiscount}}
+                                <p style="color: #4caf50; font-size: 16px; margin: 0;">
+                                    🎉 Você está economizando R$ {{discountAmount}}!
+                                </p>
+                                {{/if}}
+                            </div>
+
+                            <!-- Tempo de Expiração -->
+                            <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+                                <p style="color: #856404; font-size: 18px; font-weight: bold; margin: 0;">
+                                    ⏰ Este PIX expira em {{expirationTime}}
+                                </p>
+                                <p style="color: #856404; font-size: 14px; margin: 10px 0 0 0;">
+                                    Válido até: {{expirationDate}}
+                                </p>
+                            </div>
+
+                            <!-- Como Pagar - Passo a Passo -->
+                            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 15px 0; text-align: center;">
+                                    📱 Como pagar com PIX:
+                                </h4>
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <div style="background-color: white; padding: 15px; border-radius: 5px; display: flex; align-items: center;">
+                                        <span style="background-color: #00b4d8; color: white; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px;">1</span>
+                                        <span style="color: #555;">Abra o app do seu banco</span>
+                                    </div>
+                                    <div style="background-color: white; padding: 15px; border-radius: 5px; display: flex; align-items: center;">
+                                        <span style="background-color: #00b4d8; color: white; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px;">2</span>
+                                        <span style="color: #555;">Escolha pagar com PIX</span>
+                                    </div>
+                                    <div style="background-color: white; padding: 15px; border-radius: 5px; display: flex; align-items: center;">
+                                        <span style="background-color: #00b4d8; color: white; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px;">3</span>
+                                        <span style="color: #555;">Escaneie o QR Code ou cole o código</span>
+                                    </div>
+                                    <div style="background-color: white; padding: 15px; border-radius: 5px; display: flex; align-items: center;">
+                                        <span style="background-color: #4caf50; color: white; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px;">✓</span>
+                                        <span style="color: #555;"><strong>Pronto! Acesso liberado na hora!</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Benefícios Imediatos -->
+                            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #2e7d32; margin: 0 0 15px 0; text-align: center;">
+                                    ✅ Ao pagar agora você garante:
+                                </h4>
+                                <ul style="color: #555; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li><strong>Acesso imediato</strong> ao {{productName}}</li>
+                                    <li><strong>{{totalModules}} módulos</strong> liberados na hora</li>
+                                    <li><strong>Bônus exclusivos</strong> por tempo limitado</li>
+                                    <li><strong>Suporte prioritário</strong> via WhatsApp</li>
+                                    <li><strong>Garantia de 7 dias</strong> - teste sem risco</li>
+                                </ul>
+                            </div>
+
+                            <!-- CTA Alternativo -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <p style="color: #666; font-size: 16px; margin-bottom: 15px;">
+                                    Problemas com o PIX? Temos outras opções:
+                                </p>
+                                <a href="{{checkoutUrl}}?payment=card" style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
+                                    💳 Pagar com Cartão
+                                </a>
+                                <a href="{{checkoutUrl}}?payment=boleto" style="display: inline-block; background-color: #6c757d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
+                                    📄 Gerar Boleto
+                                </a>
+                            </div>
+
+                            <!-- Suporte WhatsApp -->
+                            <div style="text-align: center; background-color: #d4edda; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <p style="color: #155724; font-size: 16px; margin: 0;">
+                                    <strong>Precisa de ajuda para pagar?</strong><br>
+                                    Estou online agora no WhatsApp!
+                                </p>
+                                <a href="https://wa.me/{{whatsappNumber}}?text=Oi,%20preciso%20de%20ajuda%20para%20pagar%20o%20PIX" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-size: 18px; font-weight: bold; margin-top: 15px;">
+                                    💬 CHAMAR NO WHATSAPP
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                PIX gerado para: {{customerEmail}}<br>
+                                {{organizationName}} • {{domain}}<br>
+                                Este é um email transacional sobre sua compra
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 

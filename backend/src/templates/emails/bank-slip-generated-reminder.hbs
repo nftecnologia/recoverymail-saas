@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📄 {{customerName}}, seu boleto está pronto!</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: #4caf50; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h2 style="margin: 0; font-size: 28px;">✅ Boleto Gerado com Sucesso!</h2>
+                            <p style="margin: 10px 0 0 0; font-size: 16px;">Falta só o pagamento para garantir sua vaga</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px;">
+                                Oi {{customerName}}, tudo bem?
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #555; line-height: 1.6; margin-bottom: 20px;">
+                                Seu boleto para o <strong>{{productName}}</strong> foi gerado com sucesso! 
+                                Agora é só pagar para <strong>garantir sua vaga</strong> e começar sua transformação.
+                            </p>
+
+                            <!-- Dados do Boleto -->
+                            <div style="background-color: #f5f5f5; border: 2px solid #ddd; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <h3 style="color: #333; margin: 0 0 15px 0; text-align: center;">
+                                    📄 Dados do Seu Boleto
+                                </h3>
+                                
+                                <div style="background-color: white; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                                    <p style="color: #666; font-size: 14px; margin: 0 0 5px 0;">
+                                        <strong>Valor:</strong>
+                                    </p>
+                                    <p style="color: #4caf50; font-size: 24px; font-weight: bold; margin: 0;">
+                                        R$ {{totalPrice}}
+                                    </p>
+                                </div>
+                                
+                                <div style="background-color: white; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                                    <p style="color: #666; font-size: 14px; margin: 0 0 5px 0;">
+                                        <strong>Vencimento:</strong>
+                                    </p>
+                                    <p style="color: #ff4444; font-size: 18px; font-weight: bold; margin: 0;">
+                                        {{dueDate}}
+                                    </p>
+                                </div>
+                                
+                                <div style="background-color: white; padding: 15px; border-radius: 5px;">
+                                    <p style="color: #666; font-size: 14px; margin: 0 0 10px 0;">
+                                        <strong>Código de barras:</strong>
+                                    </p>
+                                    <div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px; word-break: break-all; font-family: monospace; font-size: 12px; color: #333;">
+                                        {{barcodeNumber}}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botões de Ação -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{bankSlipUrl}}" style="display: inline-block; background-color: #4caf50; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-size: 18px; font-weight: bold; margin-bottom: 15px;">
+                                    📥 BAIXAR BOLETO
+                                </a>
+                                <br>
+                                <a href="{{bankSlipUrl}}?copy=true" style="display: inline-block; background-color: #2196f3; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                                    📋 COPIAR CÓDIGO DE BARRAS
+                                </a>
+                            </div>
+
+                            <!-- Como Pagar -->
+                            <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #1976d2; margin: 0 0 15px 0;">
+                                    💡 Como pagar seu boleto:
+                                </h4>
+                                <ol style="color: #555; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li><strong>Internet Banking:</strong> Use o código de barras acima</li>
+                                    <li><strong>App do Banco:</strong> Escaneie o código de barras do PDF</li>
+                                    <li><strong>Lotéricas:</strong> Imprima o boleto e pague no caixa</li>
+                                    <li><strong>Caixa Eletrônico:</strong> Use a opção "Pagamentos"</li>
+                                </ol>
+                            </div>
+
+                            <!-- Benefícios do Produto -->
+                            <div style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 15px 0; text-align: center;">
+                                    🎯 O que você vai receber:
+                                </h4>
+                                <ul style="color: #555; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li>Acesso <strong>vitalício</strong> ao {{productName}}</li>
+                                    <li><strong>{{totalModules}} módulos</strong> com {{totalHours}} horas de conteúdo</li>
+                                    <li><strong>Certificado</strong> de conclusão</li>
+                                    <li><strong>Suporte direto</strong> comigo e minha equipe</li>
+                                    <li><strong>Garantia de 7 dias</strong> - sem risco!</li>
+                                    {{#if hasBonus}}
+                                    <li>🎁 <strong>BÔNUS:</strong> {{bonusDescription}}</li>
+                                    {{/if}}
+                                </ul>
+                            </div>
+
+                            <!-- Urgência Sutil -->
+                            <div style="text-align: center; background-color: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <p style="color: #856404; font-size: 16px; margin: 0;">
+                                    ⏰ <strong>Atenção:</strong> Após o vencimento, você precisará gerar um novo boleto<br>
+                                    e <span style="text-decoration: underline;">pode perder eventuais descontos ou bônus</span>.
+                                </p>
+                            </div>
+
+                            <!-- Outras Formas de Pagamento -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <p style="color: #666; font-size: 16px; margin-bottom: 15px;">
+                                    Prefere pagar de outra forma?
+                                </p>
+                                <a href="{{checkoutUrl}}?payment=pix" style="color: #00b4d8; font-weight: bold; font-size: 16px; margin: 0 10px;">
+                                    ⚡ PIX (aprovação na hora)
+                                </a>
+                                |
+                                <a href="{{checkoutUrl}}?payment=card" style="color: #666; font-size: 16px; margin: 0 10px;">
+                                    💳 Cartão (em até 12x)
+                                </a>
+                            </div>
+
+                            <!-- FAQ Rápido -->
+                            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 15px 0;">❓ Dúvidas Frequentes:</h4>
+                                
+                                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                                    <strong>Quando vou receber o acesso?</strong><br>
+                                    Assim que o pagamento for compensado (1-2 dias úteis), você recebe o acesso por email.
+                                </p>
+                                
+                                <p style="color: #666; font-size: 14px; margin: 0;">
+                                    <strong>Posso parcelar o boleto?</strong><br>
+                                    Sim! Alguns bancos permitem parcelamento. Consulte seu internet banking.
+                                </p>
+                            </div>
+
+                            <!-- WhatsApp -->
+                            <div style="text-align: center; margin: 20px 0;">
+                                <p style="color: #666; font-size: 16px;">
+                                    Precisa de ajuda?<br>
+                                    <a href="https://wa.me/{{whatsappNumber}}?text=Oi,%20acabei%20de%20gerar%20meu%20boleto" style="color: #25d366; font-weight: bold; text-decoration: none; font-size: 18px;">
+                                        📱 Fale Comigo no WhatsApp
+                                    </a>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                Este boleto foi gerado para: {{customerEmail}}<br>
+                                {{organizationName}} • CNPJ: {{organizationCNPJ}}<br>
+                                <a href="#" style="color: #999;">Política de Privacidade</a> | 
+                                <a href="#" style="color: #999;">Termos de Uso</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 

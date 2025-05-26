@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ {{customerName}}, último PIX disponível com desconto!</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header PIX -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h2 style="margin: 0; font-size: 28px;">⚡ PIX COM 10% OFF</h2>
+                            <p style="margin: 10px 0 0 0; font-size: 18px;">Só por mais 2 horas!</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px;">
+                                {{customerName}}, vi que seu PIX expirou há pouco...
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #555; line-height: 1.6; margin-bottom: 20px;">
+                                Mas consegui <strong>liberar um desconto especial</strong> para você não perder esta oportunidade!
+                            </p>
+
+                            <!-- Box de Desconto PIX -->
+                            <div style="background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%); border: 2px solid #00acc1; border-radius: 8px; padding: 25px; margin: 25px 0; text-align: center;">
+                                <h3 style="color: #00695c; margin: 0 0 15px 0; font-size: 24px;">
+                                    💸 ECONOMIZE R$ {{pixDiscountAmount}}
+                                </h3>
+                                <p style="color: #00695c; font-size: 18px; margin: 0;">
+                                    De <s style="color: #999;">R$ {{originalPrice}}</s> por apenas<br>
+                                    <span style="font-size: 32px; font-weight: bold;">R$ {{discountedPrice}}</span>
+                                </p>
+                                <p style="color: #00acc1; font-size: 14px; margin: 10px 0 0 0;">
+                                    💳 Ou {{installments}}x de R$ {{installmentValue}} no cartão
+                                </p>
+                            </div>
+
+                            <!-- Por que PIX -->
+                            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 15px 0;">✅ Vantagens do PIX:</h4>
+                                <ul style="color: #555; font-size: 15px; line-height: 1.8;">
+                                    <li><strong>Aprovação instantânea</strong> - acesso em minutos</li>
+                                    <li><strong>10% de desconto exclusivo</strong> - economize R$ {{pixDiscountAmount}}</li>
+                                    <li><strong>Sem burocracia</strong> - só escanear e pagar</li>
+                                    <li><strong>100% seguro</strong> - direto pelo seu banco</li>
+                                </ul>
+                            </div>
+
+                            <!-- Urgência com Números -->
+                            <div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <p style="color: #856404; font-size: 16px; margin: 0; text-align: center;">
+                                    <strong>⏰ Nas últimas 2 horas:</strong><br>
+                                    🔥 {{recentSales}} pessoas compraram<br>
+                                    ⚡ Restam apenas {{remainingSpots}} vagas com desconto
+                                </p>
+                            </div>
+
+                            <!-- CTA Principal -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{checkoutUrl}}?payment=pix&discount=10&utm_content=pix_lastchance" style="display: inline-block; background-color: #00b4d8; color: white; padding: 20px 50px; text-decoration: none; border-radius: 50px; font-size: 20px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,180,216,0.3);">
+                                    GERAR NOVO PIX COM DESCONTO →
+                                </a>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    Clique e pague em menos de 1 minuto
+                                </p>
+                            </div>
+
+                            <!-- Tutorial Rápido PIX -->
+                            <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #1976d2; margin: 0 0 15px 0; text-align: center;">
+                                    📱 Como pagar com PIX:
+                                </h4>
+                                <ol style="color: #555; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                                    <li>Clique no botão acima</li>
+                                    <li>Copie o código PIX ou escaneie o QR Code</li>
+                                    <li>Abra o app do seu banco</li>
+                                    <li>Cole o código ou aponte a câmera</li>
+                                    <li>Confirme o pagamento</li>
+                                    <li><strong>Pronto! Acesso liberado na hora!</strong></li>
+                                </ol>
+                            </div>
+
+                            <!-- Outras Opções -->
+                            <div style="text-align: center; background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <p style="color: #666; font-size: 16px; margin: 0 0 15px 0;">
+                                    Prefere outras formas de pagamento?
+                                </p>
+                                <a href="{{checkoutUrl}}?payment=card" style="color: #666; font-size: 14px; margin: 0 10px;">
+                                    💳 Cartão em até 12x
+                                </a>
+                                |
+                                <a href="{{checkoutUrl}}?payment=boleto" style="color: #666; font-size: 14px; margin: 0 10px;">
+                                    📄 Boleto Bancário
+                                </a>
+                            </div>
+
+                            <!-- Timer Final -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <div style="display: inline-block; background-color: #ff4444; color: white; padding: 15px 30px; border-radius: 30px;">
+                                    <p style="margin: 0; font-size: 18px; font-weight: bold;">
+                                        ⏱️ OFERTA EXPIRA EM 2 HORAS
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- WhatsApp -->
+                            <div style="text-align: center; margin: 20px 0;">
+                                <p style="color: #666; font-size: 14px;">
+                                    Dúvidas sobre o pagamento?<br>
+                                    <a href="https://wa.me/{{whatsappNumber}}?text=Oi,%20preciso%20de%20ajuda%20com%20o%20PIX" style="color: #25d366; font-weight: bold; text-decoration: none;">
+                                        📱 Fale comigo no WhatsApp
+                                    </a>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                Você está recebendo este email porque iniciou uma compra via PIX.<br>
+                                {{organizationName}} • {{domain}}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 

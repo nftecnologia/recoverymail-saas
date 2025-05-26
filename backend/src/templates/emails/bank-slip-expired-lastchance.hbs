@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>😢 {{customerName}}, não quero que você perca esta oportunidade...</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header Pessoal -->
+                    <tr>
+                        <td style="background-color: #5c6bc0; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h2 style="margin: 0; font-size: 24px;">Esta é minha última tentativa de te ajudar...</h2>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo com Tom Pessoal -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="font-size: 18px; color: #333; margin-bottom: 20px;">
+                                Oi {{customerName}},
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #555; line-height: 1.8; margin-bottom: 20px;">
+                                Aqui é o {{organizationOwner}}, criador do <strong>{{productName}}</strong>.
+                            </p>
+
+                            <p style="font-size: 16px; color: #555; line-height: 1.8; margin-bottom: 20px;">
+                                Nos últimos 2 dias, tentei de várias formas te mostrar o valor que este conteúdo pode trazer para sua vida...
+                            </p>
+
+                            <p style="font-size: 16px; color: #555; line-height: 1.8; margin-bottom: 20px;">
+                                Mas entendo que às vezes <strong>o momento não é o ideal</strong>, ou você pode ter dúvidas que ainda não foram respondidas.
+                            </p>
+
+                            <!-- Box de Oferta Final -->
+                            <div style="background-color: #e3f2fd; border: 2px solid #2196f3; border-radius: 8px; padding: 25px; margin: 25px 0;">
+                                <h3 style="color: #1976d2; margin: 0 0 15px 0;">
+                                    🎁 Por isso, preparei uma ÚLTIMA OFERTA:
+                                </h3>
+                                <ul style="color: #333; font-size: 16px; margin: 0; padding-left: 20px; line-height: 1.8;">
+                                    <li><strong>10% de desconto</strong> no PIX ou Boleto</li>
+                                    <li><strong>Parcelamento em até 12x</strong> (com juros do cartão)</li>
+                                    <li><strong>3 bônus exclusivos</strong> que somam R$ {{totalBonusValue}}</li>
+                                    <li><strong>Garantia estendida de 15 dias</strong> (dobrei o prazo!)</li>
+                                    <li><strong>Acesso ao meu WhatsApp pessoal</strong> por 30 dias</li>
+                                </ul>
+                                <p style="color: #1976d2; font-weight: bold; margin: 20px 0 0 0; text-align: center;">
+                                    Código do cupom: <span style="background-color: #ffeb3b; padding: 5px 10px; border-radius: 5px; color: #333;">ULTIMA{{discountCode}}</span>
+                                </p>
+                            </div>
+
+                            <!-- História Pessoal -->
+                            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <p style="color: #666; font-size: 15px; line-height: 1.8; margin: 0;">
+                                    <strong>Vou ser sincero com você...</strong><br><br>
+                                    Quando criei o {{productName}}, meu objetivo era ajudar pessoas como você a {{productBenefit}}.<br><br>
+                                    Já são <strong>{{totalStudents}} alunos</strong> que confiaram em mim e hoje estão colhendo resultados incríveis.<br><br>
+                                    <em>Não quero que você seja mais uma pessoa que desiste por causa de um boleto expirado.</em>
+                                </p>
+                            </div>
+
+                            <!-- Resultados de Alunos -->
+                            <div style="margin: 25px 0;">
+                                <h3 style="color: #333; text-align: center; margin-bottom: 20px;">
+                                    Veja o que aconteceu com quem quase desistiu:
+                                </h3>
+                                
+                                <div style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <p style="color: #555; font-size: 14px; margin: 0;">
+                                        "{{testimonial1}}"<br>
+                                        <strong>— {{testimonialAuthor1}}</strong>
+                                    </p>
+                                </div>
+                                
+                                <div style="background-color: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <p style="color: #555; font-size: 14px; margin: 0;">
+                                        "{{testimonial2}}"<br>
+                                        <strong>— {{testimonialAuthor2}}</strong>
+                                    </p>
+                                </div>
+                                
+                                <div style="background-color: #fce4ec; padding: 15px; border-radius: 8px;">
+                                    <p style="color: #555; font-size: 14px; margin: 0;">
+                                        "{{testimonial3}}"<br>
+                                        <strong>— {{testimonialAuthor3}}</strong>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- O Que Você Perde -->
+                            <div style="background-color: #ffebee; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #c62828; margin: 0 0 15px 0;">
+                                    ❌ Se você não agir agora, vai perder:
+                                </h4>
+                                <ul style="color: #666; font-size: 15px; line-height: 1.8;">
+                                    <li>O desconto de 10% (economize R$ {{discountAmount}})</li>
+                                    <li>Os 3 bônus exclusivos (nunca mais serão oferecidos)</li>
+                                    <li>Meu suporte pessoal no WhatsApp</li>
+                                    <li>A garantia estendida de 15 dias</li>
+                                    <li>A chance de transformar sua vida em {{timeToResults}}</li>
+                                </ul>
+                            </div>
+
+                            <!-- CTA Final -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="{{checkoutUrl}}?coupon=ULTIMA{{discountCode}}&utm_content=botao_ultima_chance" style="display: inline-block; background-color: #4caf50; color: white; padding: 20px 60px; text-decoration: none; border-radius: 50px; font-size: 20px; font-weight: bold; box-shadow: 0 4px 15px rgba(76,175,80,0.3);">
+                                    QUERO APROVEITAR A ÚLTIMA CHANCE
+                                </a>
+                                <p style="color: #999; font-size: 14px; margin-top: 15px;">
+                                    ⏰ Esta oferta expira em <strong>12 horas</strong> ou quando as vagas acabarem
+                                </p>
+                            </div>
+
+                            <!-- FAQ Rápido -->
+                            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 15px 0;">🤔 Dúvidas frequentes:</h4>
+                                
+                                <p style="color: #666; font-size: 14px; margin-bottom: 10px;">
+                                    <strong>Posso parcelar?</strong><br>
+                                    Sim! Em até 12x no cartão ou 2x no boleto.
+                                </p>
+                                
+                                <p style="color: #666; font-size: 14px; margin-bottom: 10px;">
+                                    <strong>E se eu não gostar?</strong><br>
+                                    Você tem 15 dias de garantia total. Basta pedir o reembolso.
+                                </p>
+                                
+                                <p style="color: #666; font-size: 14px; margin-bottom: 10px;">
+                                    <strong>Quando posso começar?</strong><br>
+                                    Assim que o pagamento for confirmado, você recebe o acesso na hora!
+                                </p>
+                            </div>
+
+                            <!-- Mensagem Final Pessoal -->
+                            <div style="border: 2px dashed #ccc; padding: 20px; border-radius: 8px; margin: 20px 0; background-color: #fffef7;">
+                                <p style="color: #666; font-size: 15px; line-height: 1.8; margin: 0;">
+                                    {{customerName}}, esta é realmente minha <strong>última tentativa</strong> de te ajudar.<br><br>
+                                    
+                                    Se você não aproveitar agora, vou entender que este não é o momento certo para você.<br><br>
+                                    
+                                    Mas se existe uma pequena parte de você que <strong>acredita que pode ter uma vida melhor</strong>, 
+                                    que pode {{productBenefit}}, então não deixe passar esta chance.<br><br>
+                                    
+                                    <strong>Estou aqui para te ajudar a conseguir isso.</strong><br><br>
+                                    
+                                    Um abraço,<br>
+                                    <strong>{{organizationOwner}}</strong>
+                                </p>
+                            </div>
+
+                            <!-- WhatsApp Direto -->
+                            <div style="text-align: center; margin: 30px 0;">
+                                <p style="color: #666; font-size: 16px;">
+                                    Ainda tem dúvidas? Fale comigo agora:<br>
+                                    <a href="https://wa.me/{{whatsappNumber}}?text=Oi,%20vi%20o%20email%20de%20última%20chance" style="color: #25d366; font-weight: bold; text-decoration: none; font-size: 18px;">
+                                        📱 Chamar no WhatsApp
+                                    </a>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
+                            <p style="color: #999; font-size: 12px; margin: 0;">
+                                Esta é a última vez que vou te enviar um email sobre esta oferta.<br>
+                                Se não quiser mais receber nossas mensagens, <a href="#" style="color: #999;">clique aqui</a>.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 
