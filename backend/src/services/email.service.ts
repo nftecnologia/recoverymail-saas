@@ -50,42 +50,21 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
   }
 
   try {
-    // TODO: Implementar busca de templates do banco depois
-    // Por enquanto, carregar apenas do arquivo
-    /*
-    const dbTemplate = await prisma.emailTemplate.findUnique({
-      where: { 
-        organizationId_name: {
-          organizationId: 'TODO',
-          name: templateName
-        }
-      },
-    });
-
-    if (dbTemplate && dbTemplate.htmlContent) {
-      const compiled = handlebars.compile(dbTemplate.htmlContent);
-      templateCache.set(templateName, compiled);
-      return compiled;
-    }
-    */
-
     // Carregar do arquivo
-    // Em produção, os templates estão em dist/templates
-    // Em desenvolvimento, estão em src/templates
     let templatePath: string;
     
-    if (process.env.NODE_ENV === 'production' || __dirname.includes('dist')) {
-      // Em produção, usar caminho absoluto a partir de process.cwd()
+    // No Render, o CWD é /opt/render/project/src/backend
+    // e os templates estão em dist/templates/emails
+    if (process.env.NODE_ENV === 'production') {
       templatePath = path.join(process.cwd(), 'dist', 'templates', 'emails', `${templateName}.hbs`);
     } else {
       // Em desenvolvimento
       templatePath = path.join(process.cwd(), 'src', 'templates', 'emails', `${templateName}.hbs`);
     }
 
-    logger.debug('Loading template', {
+    logger.info('Loading email template', {
       templateName,
       templatePath,
-      dirname: __dirname,
       cwd: process.cwd(),
       nodeEnv: process.env.NODE_ENV
     });
@@ -94,10 +73,14 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
     const compiled = handlebars.compile(templateContent);
     templateCache.set(templateName, compiled);
     
+    logger.info('Template loaded successfully', { templateName });
+    
     return compiled;
   } catch (error) {
     logger.error('Failed to load email template', {
       templateName,
+      cwd: process.cwd(),
+      nodeEnv: process.env.NODE_ENV,
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
     });

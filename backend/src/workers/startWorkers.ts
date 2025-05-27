@@ -52,14 +52,33 @@ async function processEmailJob(job: Job<EmailJobData>) {
       subject: template.subject.replace('{customerName}', customerData.name || 'Cliente'),
       template: template.templateName,
       data: {
+        // Dados do cliente
         customerName: customerData.name || 'Cliente',
         customerEmail: customerEmail,
+        
+        // Dados da organização
         organizationName: event.organization.name,
         domain: event.organization.domain || 'example.com',
+        
+        // Dados do carrinho/produto
         checkoutUrl: payloadData.checkout_url || '#',
         totalPrice: payloadData.total_price || 'R$ 0,00',
         products: payloadData.products || [],
-        // Adicionar mais campos conforme necessário
+        productName: payloadData.products?.[0]?.name || 'Produto',
+        productPrice: payloadData.products?.[0]?.price || 'R$ 0,00',
+        
+        // Dados para templates específicos
+        discountPercent: attemptNumber === 3 ? 10 : 0,
+        attemptNumber: attemptNumber,
+        
+        // Campos adicionais comuns
+        supportEmail: `contato@${event.organization.domain || 'example.com'}`,
+        unsubscribeUrl: `https://${event.organization.domain || 'example.com'}/unsubscribe`,
+        privacyUrl: `https://${event.organization.domain || 'example.com'}/privacidade`,
+        termsUrl: `https://${event.organization.domain || 'example.com'}/termos`,
+        
+        // Campos específicos do evento
+        ...extractEventSpecificData(eventType, payloadData, event),
       },
       organizationId,
       eventId,
@@ -93,6 +112,32 @@ async function processEmailJob(job: Job<EmailJobData>) {
     });
     throw error;
   }
+}
+
+// Função auxiliar para extrair dados específicos do evento
+function extractEventSpecificData(eventType: string, payloadData: any, event: any) {
+  const data: any = {};
+  
+  switch (eventType) {
+    case 'ABANDONED_CART':
+      data.abandoned_at = payloadData.abandoned_at || new Date().toISOString();
+      data.checkout_id = payloadData.checkout_id || 'N/A';
+      break;
+      
+    case 'BANK_SLIP_EXPIRED':
+      data.bankSlipUrl = payloadData.bank_slip_url || '#';
+      data.dueDate = payloadData.due_date || payloadData.original_due_date || new Date().toISOString();
+      data.barCode = payloadData.bar_code || '00000.00000 00000.000000 00000.000000 0 00000000000000';
+      break;
+      
+    case 'PIX_EXPIRED':
+      data.pixQrCode = payloadData.pix_qr_code || '';
+      data.pixCopyPaste = payloadData.pix_copy_paste || '';
+      data.expiresAt = payloadData.expired_at || new Date().toISOString();
+      break;
+  }
+  
+  return data;
 }
 
 // Função para inicializar workers
