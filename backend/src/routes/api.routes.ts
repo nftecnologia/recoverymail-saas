@@ -348,4 +348,26 @@ router.put('/settings/email', validateOrgId, async (req, res) => {
 // Rotas de domínio
 router.use('/domain', validateOrgId, domainRoutes);
 
+// TEMPORÁRIO: Testar Redis
+router.get('/test-redis', async (_req, res) => {
+  try {
+    const { getQueue } = await import('../services/queue.service');
+    const queue = getQueue();
+    const jobCounts = await queue.getJobCounts();
+    
+    res.json({
+      redis: 'connected',
+      queue: queue.name,
+      jobs: jobCounts,
+      redisUrl: process.env['REDIS_URL'] ? 'configured' : 'NOT CONFIGURED'
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      redis: 'disconnected',
+      error: error.message,
+      redisUrl: process.env['REDIS_URL'] ? 'configured' : 'NOT CONFIGURED'
+    });
+  }
+});
+
 export default router; 

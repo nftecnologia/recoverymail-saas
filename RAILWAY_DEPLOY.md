@@ -174,4 +174,72 @@ railway status
 git add RAILWAY_DEPLOY.md
 git commit -m "Docs(deploy): adiciona guia completo para deploy no Railway"
 git push origin main
-``` 
+```
+
+# Configuração do Redis para Recovery Mail no Render
+
+## 🚨 PROBLEMA ATUAL
+O worker de processamento de emails não está funcionando porque falta a conexão com Redis!
+
+## 🔧 SOLUÇÃO: Usar Upstash Redis (Grátis)
+
+### Passo 1: Criar conta no Upstash
+1. Acesse https://upstash.com
+2. Clique em "Sign Up" 
+3. Faça login com GitHub ou Google
+
+### Passo 2: Criar banco Redis
+1. No dashboard, clique em "Create Database"
+2. Escolha:
+   - **Name**: recovery-mail-redis
+   - **Region**: US-East-1 (ou mais próximo)
+   - **Type**: Regional (não Global)
+3. Clique em "Create"
+
+### Passo 3: Copiar Redis URL
+1. Na página do banco criado
+2. Procure por "REST URL" ou "Redis URL"
+3. Copie a URL completa (começa com `redis://`)
+
+### Passo 4: Adicionar no Render
+1. Acesse https://dashboard.render.com
+2. Vá para seu serviço "inbox-recovery-backend"
+3. Clique em "Environment" no menu lateral
+4. Clique em "Edit" (botão preto no canto)
+5. Adicione nova variável:
+   ```
+   Key: REDIS_URL
+   Value: redis://default:xxxxx@us1-xxx.upstash.io:6379
+   ```
+6. Clique em "Save Changes"
+
+### Passo 5: Aguardar Deploy
+- O Render fará um novo deploy automaticamente
+- Aguarde 2-3 minutos para o serviço reiniciar
+
+## ✅ Verificar se Funcionou
+
+Execute este comando após o deploy:
+```bash
+node test-full-flow.js
+```
+
+Se tudo estiver correto, você verá:
+- Eventos mudando de PENDING para PROCESSED
+- Emails sendo criados e enviados
+- Métricas atualizando no dashboard
+
+## 🎯 Resultado Esperado
+Após configurar o Redis:
+1. Workers começarão a processar eventos
+2. Emails serão enviados automaticamente
+3. Métricas serão atualizadas em tempo real
+4. Dashboard mostrará dados reais
+
+## 💡 Alternativa: Redis do Render (Pago)
+Se preferir usar o Redis nativo do Render:
+1. No Render, clique em "New +"
+2. Escolha "Redis"
+3. Configure e crie
+4. Conecte ao seu backend
+5. REDIS_URL será adicionada automaticamente 
