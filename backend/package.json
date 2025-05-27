@@ -5,7 +5,8 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon",
-    "build": "bash build-force.sh",
+    "build": "tsc",
+    "build:force": "bash build-force.sh",
     "build:strict": "tsc",
     "build:clean": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
