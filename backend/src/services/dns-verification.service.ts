@@ -84,7 +84,7 @@ export class DnsVerificationService {
       // Verificar DKIM
       try {
         const cnameRecords = await dns.resolveCname(`recovery._domainkey.${domain}`);
-        records.dkim.verified = cnameRecords.includes(this.DKIM_CNAME);
+        records.dkim.verified = cnameRecords.includes(DnsVerificationService.SUBDOMAIN_CNAME);
         if (!records.dkim.verified) allVerified = false;
       } catch (error) {
         records.dkim.verified = false;
@@ -106,13 +106,18 @@ export class DnsVerificationService {
         }
       }
 
-      return {
+      const result: DomainVerification = {
         domain,
         status: allVerified ? DomainVerificationStatus.VERIFIED : DomainVerificationStatus.FAILED,
         records,
-        verifiedAt: allVerified ? new Date() : undefined,
         lastCheckedAt: new Date()
       };
+      
+      if (allVerified) {
+        result.verifiedAt = new Date();
+      }
+      
+      return result;
     } catch (error) {
       return {
         domain,

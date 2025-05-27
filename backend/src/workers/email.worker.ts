@@ -5,16 +5,21 @@ import { EmailJobData } from '../services/queue.service';
 import { prisma } from '../config/database';
 import { sendEmail } from '../services/email.service';
 import { getEmailTemplate } from '../utils/email.templates';
-import { env, getRedisConfig } from '../config/env';
+import { getRedisConfig } from '../config/env';
 
 // Configuração do Redis
 const redisUrl = getRedisConfig();
-const connection = new IORedis(redisUrl, {
+const redisOptions: any = {
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
-  tls: redisUrl.startsWith('rediss://') ? {} : undefined,
   family: 4,
-});
+};
+
+if (redisUrl.startsWith('rediss://')) {
+  redisOptions.tls = {};
+}
+
+const connection = new IORedis(redisUrl, redisOptions);
 
 // Worker de processamento de emails
 const emailWorker = new Worker<EmailJobData>(

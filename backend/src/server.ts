@@ -50,13 +50,13 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Health check
-app.get('/health', async (req, res) => {
+app.get('/health', async (_req, res) => {
   const dbHealthy = await testDatabaseConnection();
   
   res.status(dbHealthy ? 200 : 503).json({
     status: dbHealthy ? 'healthy' : 'unhealthy',
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0',
+    version: process.env['npm_package_version'] || '1.0.0',
     services: {
       database: dbHealthy ? 'connected' : 'disconnected',
     },
@@ -147,7 +147,7 @@ process.on('uncaughtException', (error) => {
 });
 
 // Iniciar servidor se não estiver em modo de teste
-if (process.env.NODE_ENV !== 'test') {
+if (process.env['NODE_ENV'] !== 'test') {
   startServer();
 }
 

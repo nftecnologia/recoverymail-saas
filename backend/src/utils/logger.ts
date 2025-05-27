@@ -41,11 +41,11 @@ if (env.NODE_ENV === 'production') {
       filename: 'logs/error.log',
       level: 'error',
       format: winston.format.json(),
-    }),
+    }) as any,
     new winston.transports.File({
       filename: 'logs/combined.log',
       format: winston.format.json(),
-    }),
+    }) as any,
   );
 }
 

@@ -1,19 +1,24 @@
-import { Queue, Worker, QueueEvents } from 'bullmq';
+import { Queue, QueueEvents } from 'bullmq';
 import IORedis from 'ioredis';
-import { env, getRedisConfig } from '../config/env';
+import { getRedisConfig } from '../config/env';
 import { logger } from '../utils/logger';
 import { WebhookEvent as PrismaWebhookEvent } from '@prisma/client';
 import { WebhookEvent } from '../types/webhook.types';
 
 // Configuração do Redis com suporte a Upstash
 const redisUrl = getRedisConfig();
-const connection = new IORedis(redisUrl, {
+const redisOptions: any = {
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
-  // Configurações específicas para Upstash
-  tls: redisUrl.startsWith('rediss://') ? {} : undefined,
   family: 4,
-});
+};
+
+// Configurações específicas para Upstash
+if (redisUrl.startsWith('rediss://')) {
+  redisOptions.tls = {};
+}
+
+const connection = new IORedis(redisUrl, redisOptions);
 
 // Fila principal de emails
 export const emailQueue = new Queue('email-queue', {
@@ -110,7 +115,7 @@ export async function enqueueEmailJob(event: PrismaWebhookEvent, forceImmediate 
 
     await emailQueue.add('send-email', jobData, {
       jobId,
-      delay: delays[i],
+      delay: delays[i] || 0,
     });
 
     logger.info('Email job enqueued', {

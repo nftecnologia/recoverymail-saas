@@ -13,7 +13,8 @@ router.post('/verify', async (req, res): Promise<void> => {
     const organizationId = req.headers['x-organization-id'] as string;
 
     if (!domain) {
-      return res.status(400).json({ error: 'Domain is required' });
+      res.status(400).json({ error: 'Domain is required' });
+      return;
     }
 
     // Verificar DNS

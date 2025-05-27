@@ -71,10 +71,11 @@ router.post('/:orgId', async (req, res, next): Promise<void> => {
         eventId: existingEvent.id,
         orgId 
       });
-      return res.status(200).json({ 
+      res.status(200).json({ 
         message: 'Event already processed',
         eventId: existingEvent.id 
       });
+      return;
     }
 
     // Salvar evento no banco
@@ -108,7 +109,7 @@ router.post('/:orgId', async (req, res, next): Promise<void> => {
 });
 
 // GET /webhook/health
-router.get('/health', (req, res) => {
+router.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 

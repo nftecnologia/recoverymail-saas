@@ -43,10 +43,11 @@ export async function validateHMAC(
     }
 
     // Extrair o algoritmo e hash do header
-    const [algorithm, receivedHash] = signature.split('=');
-    if (algorithm !== 'sha256') {
+    const parts = signature.split('=');
+    if (parts.length !== 2 || parts[0] !== 'sha256') {
       throw new AppError('Invalid signature algorithm', 401);
     }
+    const receivedHash = parts[1];
 
     // Calcular o hash esperado
     const payload = JSON.stringify(req.body);
@@ -58,12 +59,14 @@ export async function validateHMAC(
     // Comparar de forma segura (timing-safe)
     let isValid = false;
     try {
-      isValid = crypto.timingSafeEqual(
-        Buffer.from(receivedHash, 'hex'),
-        Buffer.from(expectedHash, 'hex')
-      );
+      const receivedBuffer = Buffer.from(receivedHash || '', 'hex');
+      const expectedBuffer = Buffer.from(expectedHash, 'hex');
+      
+      if (receivedBuffer.length === expectedBuffer.length) {
+        isValid = crypto.timingSafeEqual(receivedBuffer, expectedBuffer);
+      }
     } catch (err) {
-      // Buffers de tamanhos diferentes
+      // Buffers de tamanhos diferentes ou erro de parsing
       isValid = false;
     }
 

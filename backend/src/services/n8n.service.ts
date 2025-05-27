@@ -13,11 +13,11 @@ interface N8nWebhookPayload {
 
 class N8nService {
   private baseUrl: string;
-  private apiKey?: string;
+  private apiKey: string | undefined;
 
   constructor() {
     this.baseUrl = env.N8N_URL || 'http://localhost:5678';
-    this.apiKey = env.N8N_API_KEY;
+    this.apiKey = env.N8N_API_KEY || undefined;
   }
 
   /**

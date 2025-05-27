@@ -328,7 +328,8 @@ const webhookEventSchema = z.discriminatedUnion('event', [
 
 export function validateWebhookPayload(payload: unknown): WebhookEvent {
   try {
-    return webhookEventSchema.parse(payload);
+    const validated = webhookEventSchema.parse(payload);
+    return validated as any;
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors = error.errors.map(err => ({

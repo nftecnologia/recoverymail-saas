@@ -11,7 +11,8 @@ const validateOrgId = async (req: any, res: any, next: any): Promise<void> => {
   const orgId = req.headers['x-organization-id'] as string;
   
   if (!orgId) {
-    return res.status(401).json({ error: 'Organization ID required' });
+    res.status(401).json({ error: 'Organization ID required' });
+    return;
   }
 
   try {
@@ -20,7 +21,8 @@ const validateOrgId = async (req: any, res: any, next: any): Promise<void> => {
     });
 
     if (!org) {
-      return res.status(404).json({ error: 'Organization not found' });
+      res.status(404).json({ error: 'Organization not found' });
+      return;
     }
 
     req.organizationId = orgId;
@@ -285,7 +287,8 @@ router.get('/settings', validateOrgId, async (req, res) => {
     });
 
     if (!organization) {
-      return res.status(404).json({ error: 'Organization not found' });
+      res.status(404).json({ error: 'Organization not found' });
+      return;
     }
 
     // Contar emails enviados hoje
@@ -334,7 +337,8 @@ router.put('/settings/email', validateOrgId, async (req, res) => {
     res.json({ success: true, emailSettings: updated.emailSettings });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: 'Invalid email settings', details: error.errors });
+      res.status(400).json({ error: 'Invalid email settings', details: error.errors });
+      return;
     }
     logger.error('Error updating email settings', { error });
     res.status(500).json({ error: 'Failed to update email settings' });

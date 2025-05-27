@@ -80,7 +80,8 @@ router.post('/resend-webhook', async (req, res): Promise<void> => {
       
       if (!verifyResendSignature(rawBody, signature)) {
         logger.warn('Invalid Resend webhook signature');
-        return res.status(401).json({ error: 'Invalid signature' });
+        res.status(401).json({ error: 'Invalid signature' });
+        return;
       }
     }
 
@@ -97,13 +98,15 @@ router.post('/resend-webhook', async (req, res): Promise<void> => {
     // Ignorar eventos que não são de email
     if (!type.startsWith('email.')) {
       logger.info('Non-email event received, ignoring', { type });
-      return res.status(200).json({ received: true });
+      res.status(200).json({ received: true });
+      return;
     }
 
     // Verificar se temos email_id
     if (!data.email_id) {
       logger.warn('Email event without email_id', { type });
-      return res.status(200).json({ received: true });
+      res.status(200).json({ received: true });
+      return;
     }
 
     // Buscar log de email pelo ID do Resend
@@ -116,7 +119,8 @@ router.post('/resend-webhook', async (req, res): Promise<void> => {
         emailId: data.email_id,
         type,
       });
-      return res.status(200).json({ received: true });
+      res.status(200).json({ received: true });
+      return;
     }
 
     // Atualizar status baseado no tipo de evento
