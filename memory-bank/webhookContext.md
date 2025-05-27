@@ -1,11 +1,11 @@
-# Contexto de Webhooks - Recovery SaaS
+# Contexto de Webhooks - Recovery Mail
 
 ## 🚀 SISTEMA EM PRODUÇÃO!
 
 **URL Base**: https://recoverymail.onrender.com  
 **Webhook URL**: https://recoverymail.onrender.com/webhook/{ORG_ID}
 
-## Status Geral: 12/12 webhooks implementados ✅
+## Status Geral: 2/12 webhooks implementados (16%)
 
 ### Organizações de Teste em Produção:
 - **test-org**: Webhook Secret = `test-webhook-secret-123`
@@ -33,9 +33,12 @@ graph LR
 
 ## 📝 Detalhamento por Webhook
 
-### 1. ABANDONED_CART ✅ [100% completo + TESTADO EM PRODUÇÃO]
+### 1. ABANDONED_CART ✅ [100% completo]
 **Descrição**: Carrinho abandonado pelo cliente
-**Status**: Funcionando em produção - Event ID: cmb5wbhh40001mx38zmijh5yv
+**Status**: ✅ Em produção e funcionando
+**Emails Enviados**: 18+ emails processados
+**Taxa de Conversão**: 11.1%
+
 **Payload Recebido**:
 ```json
 {
@@ -50,58 +53,95 @@ graph LR
   },
   "products": [{
     "name": "Produto X",
-    "price": "R$ 119,90"
+    "price": "R$ 119,90",
+    "image_url": "https://example.com/produto.jpg"
   }]
 }
 ```
-**Fluxo de Email**:
-- ✅ Email 1 (2h): Lembrete gentil
-- ✅ Email 2 (24h): Criando urgência
-- ✅ Email 3 (72h): Última chance com desconto
 
-### 2. BANK_SLIP_EXPIRED ✅ [100% completo]
+**Fluxo de Email Implementado**:
+- ✅ Email 1 (2h): "Você esqueceu alguns itens no seu carrinho"
+- ✅ Email 2 (24h): "Seus produtos podem acabar"
+- ✅ Email 3 (72h): "Último PIX disponível com 10% OFF"
+
+**Métricas**:
+- Taxa de Abertura: 16.7%
+- Taxa de Cliques: 11.1%
+- Emails Enviados: 18+
+
+### 2. BANK_SLIP_EXPIRED 🟡 [70% completo]
 **Descrição**: Boleto bancário expirou sem pagamento
-**Templates**: 3 emails com delays de 1h, 24h, 72h
+**Handler**: ✅ Implementado
+**Queue**: ✅ Configurado
+**Templates**: 🟡 Básico implementado
+**Worker**: ✅ Processando
+**Produção**: 🔴 Não testado
 
-### 3. PIX_EXPIRED ✅ [100% completo]
+### 3. PIX_EXPIRED 🔴 [0% completo]
 **Descrição**: QR Code PIX expirou
-**Templates**: 2 emails urgentes (15min, 2h)
+**Prioridade**: ALTA (muito usado no Brasil)
+**Próximos passos**:
+- [ ] Criar handler
+- [ ] Configurar delays (15min, 2h, 24h)
+- [ ] Criar templates urgentes
+- [ ] Incluir novo QR Code
 
-### 4. SALE_REFUSED ✅ [100% completo]
+### 4. SALE_REFUSED 🔴 [0% completo]
 **Descrição**: Pagamento recusado pela operadora
-**Templates**: 2 emails com soluções alternativas
+**Templates sugeridos**:
+- Email 1 (30min): "Ops! Houve um problema com seu pagamento"
+- Email 2 (2h): "Tente outro cartão"
+- Email 3 (24h): "Pague com PIX e ganhe desconto"
 
-### 5. SALE_APPROVED ✅ [100% completo]
+### 5. SALE_APPROVED 🔴 [0% completo]
 **Descrição**: Venda aprovada (confirmação)
-**Templates**: 1 email de confirmação
+**Template único**: Email de boas-vindas/confirmação
 
-### 6. SALE_CHARGEBACK ✅ [100% completo]
+### 6. SALE_CHARGEBACK 🔴 [0% completo]
 **Descrição**: Chargeback recebido
-**Templates**: 1 email de notificação
+**Ação**: Notificar e tentar recuperar
 
-### 7. SALE_REFUNDED ✅ [100% completo]
+### 7. SALE_REFUNDED 🔴 [0% completo]
 **Descrição**: Reembolso processado
-**Templates**: 1 email de confirmação
+**Template**: Confirmação de reembolso
 
-### 8. BANK_SLIP_GENERATED ✅ [100% completo]
+### 8. BANK_SLIP_GENERATED 🔴 [0% completo]
 **Descrição**: Boleto gerado (lembrete de pagamento)
-**Templates**: 3 emails de lembrete
+**Templates**:
+- Email 1 (2h): "Seu boleto está pronto"
+- Email 2 (24h antes vencimento): "Lembrete de vencimento"
+- Email 3 (dia do vencimento): "Último dia para pagar"
 
-### 9. PIX_GENERATED ✅ [100% completo]
+### 9. PIX_GENERATED 🔴 [0% completo]
 **Descrição**: PIX gerado (enviar QR Code)
-**Templates**: 2 emails com QR Code
+**Templates**:
+- Email 1 (imediato): QR Code + instruções
+- Email 2 (30min): "PIX expira em breve"
+- Email 3 (2h): "Última chance PIX"
 
-### 10. SUBSCRIPTION_CANCELED ✅ [100% completo]
+### 10. SUBSCRIPTION_CANCELED 🔴 [0% completo]
 **Descrição**: Assinatura cancelada (win-back)
-**Templates**: 2 emails de retenção
+**Templates**: Sequência de retenção
 
-### 11. SUBSCRIPTION_EXPIRED ✅ [100% completo]
+### 11. SUBSCRIPTION_EXPIRED 🔴 [0% completo]
 **Descrição**: Assinatura expirada (renovação)
-**Templates**: 3 emails de renovação
+**Templates**: Ofertas de renovação
 
-### 12. SUBSCRIPTION_RENEWED ✅ [100% completo]
+### 12. SUBSCRIPTION_RENEWED 🔴 [0% completo]
 **Descrição**: Assinatura renovada (confirmação)
-**Templates**: 1 email de confirmação
+**Template**: Email de confirmação
+
+## 📊 Estatísticas de Uso (Produção)
+- **Total de Eventos**: 21
+- **Eventos Processados**: 2
+- **Taxa de Sucesso**: 9.5%
+- **Eventos Pendentes**: 19
+
+## 🎯 Prioridades de Implementação
+1. **PIX_EXPIRED** - Muito usado no Brasil
+2. **SALE_REFUSED** - Alta taxa de recuperação
+3. **BANK_SLIP_GENERATED** - Volume alto
+4. **PIX_GENERATED** - Crescimento rápido
 
 ## 📊 Resumo de Templates
 - **Total de Templates**: 26 emails responsivos

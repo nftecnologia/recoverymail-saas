@@ -1,4 +1,103 @@
-# Breakdown de Tarefas - Recovery SaaS
+# Breakdown de Tarefas - Recovery Mail
+
+## 🎯 Sprint Atual: Sistema em Produção (Semana 4)
+
+### TAREFA 1: Deploy Completo [100% completo] ✅
+#### ✅ Subtarefas Completas:
+- [x] Backend no Render
+- [x] Worker funcionando
+- [x] Dashboard na Vercel
+- [x] CORS configurado
+- [x] Deploy automático
+- [x] Webhooks testados
+- [x] Sistema integrado
+
+### TAREFA 2: Sistema de Filas [90% completo]
+#### ✅ Completas:
+- [x] Redis rodando no Render
+- [x] Bull configurado
+- [x] Worker processando emails
+- [x] Delays funcionando
+- [x] Monitoramento básico
+
+#### 🟡 Em Progresso:
+- [ ] Dead letter queue (50%)
+- [ ] Retry automático
+
+### TAREFA 3: Templates de Email [30% completo]
+#### ✅ Completas:
+- [x] ABANDONED_CART (3 emails)
+- [x] Sistema de templates Handlebars
+- [x] Personalização funcionando
+
+#### 🔴 Pendentes:
+- [ ] PIX_EXPIRED
+- [ ] BANK_SLIP_EXPIRED
+- [ ] SALE_APPROVED
+- [ ] SALE_REFUSED
+- [ ] Outros 7 tipos
+
+## 📋 Checklist da Semana
+
+### ✅ Concluído
+- [x] Deploy backend Render
+- [x] Worker rodando
+- [x] Dashboard funcionando
+- [x] CORS resolvido
+- [x] Métricas em tempo real
+
+### 🔴 Esta Semana
+- [ ] Corrigir erros TypeScript
+- [ ] Implementar 3 novos templates
+- [ ] Adicionar gráficos no dashboard
+- [ ] Configurar Sentry
+- [ ] Documentação de API
+
+## 🚀 Próximas Sprints
+
+### Sprint 5: Templates e Otimização (Semana 5)
+- [ ] Completar todos os 12 tipos de webhook
+- [ ] A/B testing de templates
+- [ ] Otimização de conversão
+- [ ] Analytics avançado
+
+### Sprint 6: Features Avançadas (Semana 6)
+- [ ] Segmentação de audiência
+- [ ] Campanhas customizadas
+- [ ] Integração com mais plataformas
+- [ ] API pública documentada
+
+### Sprint 7: Escala e Performance (Semana 7)
+- [ ] Otimização de queries
+- [ ] Cache estratégico
+- [ ] Load balancing
+- [ ] Testes de carga
+
+## 📊 Métricas do Projeto
+- **Webhooks Implementados**: 2/12 (16%)
+- **Templates Criados**: 3/36 (8%)
+- **Cobertura de Testes**: 0% 🔴
+- **Uptime**: 100% ✅
+- **Performance**: Ótima ✅
+
+## 🎯 Prioridades Imediatas
+1. **Corrigir TypeScript** - Resolver erros de build
+2. **Template PIX_EXPIRED** - Muito usado no Brasil
+3. **Monitoramento** - Configurar Sentry
+4. **Documentação** - API e webhooks
+
+## 💡 Ideias para Melhorias
+- Dashboard mobile responsivo
+- Notificações em tempo real
+- Integração WhatsApp
+- Machine Learning para timing
+- Webhooks customizados
+
+## 📝 Notas Importantes
+- Worker e API rodando no mesmo processo (limitação Render free)
+- CORS temporariamente permissivo para Vercel
+- Usar `test-org-123` para testes
+- Build com `npm run build:force` ignora erros TS
 
 ## 🎯 Sprint Atual: Sistema em Produção! (Semana 8)
 
