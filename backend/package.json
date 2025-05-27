@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon",
     "build": "tsc && npm run postbuild",
-    "postbuild": "cp tsconfig.json dist/tsconfig.json && echo 'tsconfig.json copied to dist'",
+    "postbuild": "cp tsconfig.json dist/tsconfig.json && cp -r src/templates dist/templates && echo 'Templates and tsconfig.json copied to dist'",
     "build:force": "bash build-force.sh",
     "build:strict": "tsc",
     "build:clean": "tsc -p tsconfig.build.json",

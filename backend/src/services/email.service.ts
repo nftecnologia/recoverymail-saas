@@ -70,10 +70,14 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
     */
 
     // Carregar do arquivo
+    // Em produção, os templates estão em dist/templates
+    // Em desenvolvimento, estão em src/templates
+    const baseDir = __dirname.includes('dist') ? 
+      path.join(__dirname, '..', 'templates') : 
+      path.join(process.cwd(), 'src', 'templates');
+      
     const templatePath = path.join(
-      process.cwd(),
-      'src',
-      'templates',
+      baseDir,
       'emails',
       `${templateName}.hbs`
     );
