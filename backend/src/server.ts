@@ -14,6 +14,11 @@ import apiRoutes from '@/routes/api.routes';
 import { cleanOldJobs } from '@/services/queue.service';
 import setupRoutes from '@/routes/setup.routes';
 
+// LOG PARA VERIFICAR DEPLOY
+console.log('🚀 STARTING SERVER - BUILD TIME:', new Date().toISOString());
+console.log('🔧 Environment:', process.env['NODE_ENV']);
+console.log('📦 Redis URL configured:', !!process.env['REDIS_URL']);
+
 // Criar app Express
 const app = express();
 

@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: inbox-recovery-backend
+    runtime: node
+    repo: https://github.com/nicolasferoli/recoverymail
+    branch: main
+    rootDir: backend
+    buildCommand: npm install && npm run build:force
+    startCommand: node dist/bootstrap.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+    healthCheckPath: /health
+    autoDeploy: true 
