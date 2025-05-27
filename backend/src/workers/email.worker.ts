@@ -6,6 +6,7 @@ import { prisma } from '../config/database';
 import { sendEmail } from '../services/email.service';
 import { getEmailTemplate } from '../utils/email.templates';
 import { getRedisConfig } from '../config/env';
+import { aiEmail } from '../services/ai-email.service';
 
 // LOG DE DEBUG
 logger.info('📧 Email worker module loading...');
@@ -68,17 +69,60 @@ try {
         const customerData = payloadData.customer || {};
         customerEmail = customerData.email || 'unknown';
         
-        // Preparar dados base do email
-        let emailData: any = {
+        // Preparar dados do email
+        let subject = template.subject;
+        let previewText = '';
+        let ctaText = 'Finalizar Compra';
+
+        // Otimizar com IA se habilitado
+        if (process.env.AI_EMAIL_ENABLED === 'true') {
+          try {
+            const aiData = {
+              eventType: event.eventType,
+              customerName: event.payload.customer?.name || 'Cliente',
+              products: event.payload.products || [],
+              totalPrice: event.payload.total_price || 'R$ 0,00',
+              attemptNumber: job.data.attemptNumber || 1
+            };
+
+            // Gerar subject e preview com IA
+            const [aiSubject, aiPreview, aiCTA] = await Promise.all([
+              aiEmail.generateSubjectLine(aiData),
+              aiEmail.generatePreviewText(aiData),
+              aiEmail.optimizeCTA(aiData)
+            ]);
+
+            subject = aiSubject || subject;
+            previewText = aiPreview;
+            ctaText = aiCTA;
+
+            logger.info('AI optimization applied', { 
+              eventId: event.id,
+              original: template.subject,
+              optimized: subject 
+            });
+          } catch (aiError) {
+            logger.warn('AI optimization failed, using defaults', { error: aiError });
+          }
+        }
+
+        const emailData: EmailData = {
           to: customerEmail,
-          subject: template.subject.replace('{customerName}', customerData.name || 'Cliente'),
+          subject,
           template: template.templateName,
           data: {
+            ...payloadData,
             customerName: customerData.name || 'Cliente',
             customerEmail: customerEmail,
             organizationName: event.organization.name,
             domain: event.organization.domain || 'example.com',
             attemptNumber,
+            checkoutUrl: payloadData.checkout_url || '#',
+            totalPrice: payloadData.total_price || 'R$ 0,00',
+            productName: payloadData.product?.name || 'Produto',
+            products: payloadData.products || [],
+            productPrice: payloadData.products && payloadData.products[0] ? payloadData.products[0].price || 'R$ 0,00' : 'R$ 0,00',
+            discountPercent: 0,
             // Valores padrão para evitar erros
             checkoutUrl: '#',
             totalPrice: 'R$ 0,00',
