@@ -687,14 +687,24 @@ router.post('/test-immediate-email', async (req, res) => {
       }
     });
     
-    // Enviar email imediatamente (sem passar pelo worker)
-    const emailResult = await sendEmail({
-      eventId: testEvent.id,
+    // Preparar dados do email (primeiro email de carrinho abandonado)
+    const emailData = {
+      to: testEvent.payload.customer.email,
+      subject: '🛒 Você esqueceu alguns itens no seu carrinho',
+      template: 'abandoned-cart-reminder',
+      data: {
+        customerName: testEvent.payload.customer.name,
+        checkoutUrl: testEvent.payload.checkout_url,
+        totalPrice: testEvent.payload.total_price,
+        products: testEvent.payload.products
+      },
       organizationId: testEvent.organizationId,
-      eventType: testEvent.eventType,
-      payload: testEvent.payload,
+      eventId: testEvent.id,
       attemptNumber: 1
-    });
+    };
+    
+    // Enviar email imediatamente
+    const emailId = await sendEmail(emailData);
     
     // Atualizar status do evento
     await prisma.webhookEvent.update({
@@ -709,8 +719,9 @@ router.post('/test-immediate-email', async (req, res) => {
       success: true,
       message: 'Email enviado imediatamente!',
       eventId: testEvent.id,
-      emailId: emailResult.emailId,
-      resendId: emailResult.resendId,
+      emailId: emailId,
+      to: emailData.to,
+      subject: emailData.subject,
       checkEmail: 'Verifique seu email nicolas.fer.oli@gmail.com'
     });
     
@@ -719,7 +730,7 @@ router.post('/test-immediate-email', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message,
-      details: error.stack
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });
