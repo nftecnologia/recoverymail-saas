@@ -58,16 +58,16 @@ const emailWorker = new Worker<EmailJobData>(
 
       // Extrair dados do payload de forma segura
       const payloadData = (payload as any).data || payload || {};
-      const customer = payloadData.customer || {};
-      customerEmail = customer.email || 'unknown';
+      const customerData = payloadData.customer || {};
+      customerEmail = customerData.email || 'unknown';
       
       // Preparar dados base do email
       let emailData: any = {
         to: customerEmail,
-        subject: template.subject.replace('{customerName}', customer.name || 'Cliente'),
+        subject: template.subject.replace('{customerName}', customerData.name || 'Cliente'),
         template: template.templateName,
         data: {
-          customerName: customer.name || 'Cliente',
+          customerName: customerData.name || 'Cliente',
           customerEmail: customerEmail,
           organizationName: event.organization.name,
           domain: event.organization.domain || 'example.com',
@@ -167,15 +167,63 @@ const emailWorker = new Worker<EmailJobData>(
 
       // Sobrescrever com dados específicos do evento se existirem
       switch (eventType) {
+        case 'SALE_CHARGEBACK':
+          emailData.data.chargebackId = payloadData.chargeback_id || eventId;
+          emailData.data.daysRemaining = payloadData.days_to_resolve || 7;
+          emailData.data.billingDescriptor = payloadData.payment_details?.descriptor || event.organization.name;
+          emailData.data.cardLastDigits = payloadData.payment_details?.last_digits || '****';
+          emailData.data.transactionId = payloadData.transaction_id || eventId;
+          emailData.data.cancelChargebackUrl = payloadData.resolution_url || `https://${event.organization.domain}/resolver-chargeback`;
+          emailData.data.resolveChargebackUrl = payloadData.resolution_url || `https://${event.organization.domain}/resolver-chargeback`;
+          emailData.data.phoneNumber = (event.organization.emailSettings as any)?.phoneNumber || '0800-123-4567';
+          emailData.data.financeEmail = (event.organization.emailSettings as any)?.financeEmail || 'financeiro@example.com';
+          break;
+
+        case 'SALE_REFUNDED':
+          emailData.data.productName = payloadData.product?.name || 'Produto';
+          emailData.data.refundAmount = payloadData.refund_amount || 'R$ 0,00';
+          emailData.data.refundMethod = payloadData.refund_method || 'Cartão de Crédito';
+          emailData.data.refundDate = payloadData.refund_date || new Date().toISOString();
+          emailData.data.refundProtocol = payloadData.refund_id || eventId;
+          emailData.data.feedbackUrl = payloadData.feedback_url || `https://${event.organization.domain}/feedback`;
+          emailData.data.specialCode = eventId.slice(-4).toUpperCase();
+          emailData.data.organizationCNPJ = (event.organization.emailSettings as any)?.cnpj || '00.000.000/0001-00';
+          emailData.data.financeEmail = (event.organization.emailSettings as any)?.financeEmail || 'financeiro@example.com';
+          emailData.data.refundReceiptUrl = `https://${event.organization.domain}/comprovante/${payloadData.refund_id || eventId}`;
+          break;
+
+        case 'SUBSCRIPTION_RENEWED':
+          emailData.data.productName = payloadData.product?.name || 'Assinatura';
+          emailData.data.planName = payloadData.plan?.name || 'Plano';
+          emailData.data.billingPeriod = payloadData.plan?.billing_period || 'Mensal';
+          emailData.data.renewalAmount = payloadData.plan?.price || 'R$ 97,00';
+          emailData.data.nextRenewalDate = payloadData.plan?.next_renewal_date || payloadData.next_renewal_date || new Date().toISOString();
+          emailData.data.renewalProtocol = payloadData.renewal_id || eventId;
+          emailData.data.productName = payloadData.product?.name || 'Assinatura';
+          emailData.data.completedLessons = payloadData.stats?.completed_lessons || 0;
+          emailData.data.certificatesEarned = payloadData.stats?.certificates_earned || 0;
+          emailData.data.hoursWatched = payloadData.stats?.hours_watched || 0;
+          emailData.data.membershipMonths = payloadData.stats?.membership_months || 1;
+          emailData.data.monthlyUpdates = payloadData.benefits?.monthly_updates || [];
+          emailData.data.loyaltyDiscount = payloadData.benefits?.loyalty_discount || false;
+          emailData.data.loyaltyDiscountPercent = payloadData.benefits?.loyalty_discount_percent || 0;
+          emailData.data.hasExclusiveBonus = payloadData.benefits?.has_exclusive_bonus || false;
+          emailData.data.exclusiveBonusName = payloadData.benefits?.exclusive_bonus_name || '';
+          emailData.data.communityMembers = payloadData.community?.total_members || 5000;
+          emailData.data.postsCreated = payloadData.community?.posts || 0;
+          emailData.data.comments = payloadData.community?.comments || 0;
+          emailData.data.connectionsMade = payloadData.community?.connections || 0;
+          emailData.data.subscriptionManagementUrl = `https://${event.organization.domain}/assinatura`;
+          emailData.data.organizationCNPJ = (event.organization.emailSettings as any)?.cnpj || '00.000.000/0001-00';
+          break;
+
         case 'ABANDONED_CART':
-          if (payloadData.checkout_url) emailData.data.checkoutUrl = payloadData.checkout_url;
-          if (payloadData.total_price) emailData.data.totalPrice = payloadData.total_price;
-          if (payloadData.items) {
-            emailData.data.products = payloadData.items;
-            if (payloadData.items[0]) {
-              emailData.data.productName = payloadData.items[0].name || 'Produto';
-              emailData.data.productPrice = payloadData.items[0].price || 'R$ 0,00';
-            }
+          emailData.data.checkoutUrl = payloadData.checkout_url || '#';
+          emailData.data.totalPrice = payloadData.total_price || payloadData.amount || 'R$ 0,00';
+          emailData.data.products = payloadData.products || [];
+          emailData.data.productName = payloadData.product?.name || payloadData.products?.[0]?.name || 'Produto';
+          if (payloadData.products && payloadData.products[0]) {
+            emailData.data.productPrice = payloadData.products[0].price || 'R$ 0,00';
           }
           if (attemptNumber === 3) emailData.data.discountPercent = 10;
           break;
@@ -193,15 +241,6 @@ const emailWorker = new Worker<EmailJobData>(
           if (payloadData.items && payloadData.items[0]) {
             emailData.data.productName = payloadData.items[0].name || 'Produto';
           }
-          break;
-
-        case 'SUBSCRIPTION_RENEWED':
-          if (payloadData.plan) {
-            emailData.data.planName = payloadData.plan.name || 'Plano';
-            emailData.data.renewalAmount = payloadData.plan.price || 'R$ 97,00';
-          }
-          if (payloadData.next_renewal_date) emailData.data.nextRenewalDate = payloadData.next_renewal_date;
-          if (payloadData.renewal_id) emailData.data.renewalProtocol = payloadData.renewal_id;
           break;
 
         // Adicionar outros casos conforme necessário
