@@ -468,4 +468,40 @@ router.post('/test-process-now', async (_req, res) => {
   }
 });
 
+// TEMPORÁRIO: Verificar se worker está rodando
+router.get('/test-worker-status', async (_req, res) => {
+  try {
+    const { getQueue } = await import('../services/queue.service');
+    const queue = getQueue();
+    
+    // Verificar workers
+    const workers = await queue.getWorkers();
+    
+    // Pegar informações da queue
+    const jobCounts = await queue.getJobCounts();
+    const isPaused = await queue.isPaused();
+    
+    res.json({
+      queue: {
+        name: queue.name,
+        isPaused,
+        jobCounts
+      },
+      workers: {
+        count: workers.length,
+        details: workers.map(w => ({
+          id: w.id,
+          name: w.name
+        }))
+      },
+      workerStatus: workers.length > 0 ? 'running' : 'not running'
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message,
+      workerStatus: 'error'
+    });
+  }
+});
+
 export default router; 
