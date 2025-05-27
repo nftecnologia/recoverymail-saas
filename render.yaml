@@ -14,5 +14,7 @@ services:
         value: production
       - key: PORT
         value: 4000
+      - key: API_URL
+        value: https://api.inboxrecovery.com
     healthCheckPath: /health
     autoDeploy: true 

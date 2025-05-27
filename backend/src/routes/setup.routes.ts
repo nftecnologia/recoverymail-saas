@@ -12,8 +12,8 @@ router.post('/setup/create-test-org', async (_req, res) => {
         id: 'test-org',
         name: 'Organização de Teste',
         domain: 'teste.recoverymail.com',
-        webhookSecret: 'test-webhook-secret-123',
-        apiKey: 'test-api-key-123',
+        webhookSecret: 'test-webhook-secret',
+        apiKey: 'test-api-key',
         emailSettings: {
           replyTo: 'suporte@teste.com',
           includeUnsubscribe: true,
@@ -29,7 +29,9 @@ router.post('/setup/create-test-org', async (_req, res) => {
       organization: {
         id: org.id,
         name: org.name,
-        webhookUrl: `https://recoverymail.onrender.com/webhook/${org.id}`
+        apiKey: 'test-api-key',
+        webhookSecret: 'test-webhook-secret',
+        webhookUrl: `${process.env['API_URL'] || 'https://api.inboxrecovery.com'}/webhook/${org.id}`
       }
     });
   } catch (error: any) {
@@ -40,7 +42,9 @@ router.post('/setup/create-test-org', async (_req, res) => {
         organization: {
           id: 'test-org',
           name: 'Organização de Teste',
-          webhookUrl: 'https://recoverymail.onrender.com/webhook/test-org'
+          apiKey: 'test-api-key',
+          webhookSecret: 'test-webhook-secret',
+          webhookUrl: `${process.env['API_URL'] || 'https://api.inboxrecovery.com'}/webhook/test-org`
         }
       });
     } else {

@@ -305,7 +305,7 @@ router.get('/settings', validateOrgId, async (req, res) => {
     res.json({
       organization: {
         ...organization,
-        webhookUrl: `${process.env['API_URL'] || 'http://localhost:4000'}/webhook/${organization.id}`
+        webhookUrl: `${process.env['API_URL'] || 'https://api.inboxrecovery.com'}/webhook/${organization.id}`
       },
       emailsToday
     });
