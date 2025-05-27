@@ -14,6 +14,7 @@
     "start": "node dist/bootstrap.js",
     "start:prod": "node -r tsconfig-paths/register dist/server.js",
     "start:pm2": "pm2 start ecosystem.config.js",
+    "start:all": "node dist/start-all.js",
     "worker": "node dist/workers/worker-standalone.js",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",

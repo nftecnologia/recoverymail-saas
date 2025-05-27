@@ -6,7 +6,7 @@ services:
     branch: main
     rootDir: backend
     buildCommand: npm ci && npm run build:force
-    startCommand: npm run start:pm2
+    startCommand: npm run start:all
     envVars:
       - key: NODE_VERSION
         value: "20"
