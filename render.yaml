@@ -5,11 +5,11 @@ services:
     repo: https://github.com/nicolasferoli/recoverymail
     branch: main
     rootDir: backend
-    buildCommand: npm install && npm run build:force
-    startCommand: node dist/bootstrap.js
+    buildCommand: npm ci && npm run build:force
+    startCommand: npm start
     envVars:
       - key: NODE_VERSION
-        value: 18
+        value: "20"
       - key: NODE_ENV
         value: production
       - key: PORT

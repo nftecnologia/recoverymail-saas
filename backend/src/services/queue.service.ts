@@ -181,6 +181,11 @@ export async function getQueueStats() {
   };
 }
 
+// Função para obter a fila (usado pelo endpoint de teste)
+export function getQueue() {
+  return emailQueue;
+}
+
 // Fechar conexão ao encerrar
 process.on('SIGTERM', async () => {
   await emailQueue.close();
