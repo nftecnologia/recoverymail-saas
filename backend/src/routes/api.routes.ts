@@ -652,4 +652,35 @@ router.post('/test-clear-all-jobs', async (_req, res) => {
   }
 });
 
+// Worker status endpoint
+router.get('/worker-status', async (req, res) => {
+  try {
+    const { getQueue } = await import('../services/queue.service');
+    const queue = getQueue();
+    const workers = await queue.getWorkers();
+    const workerCount = await queue.getWorkerCount();
+    const activeCount = await queue.getActiveCount();
+    const waitingCount = await queue.getWaitingCount();
+    
+    res.json({
+      status: 'ok',
+      workers: {
+        count: workerCount,
+        active: activeCount,
+        waiting: waitingCount,
+        details: workers.map(w => ({
+          id: w.id,
+          state: w.state
+        }))
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 export default router; 
