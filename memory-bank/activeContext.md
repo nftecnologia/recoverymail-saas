@@ -1,86 +1,112 @@
 # Contexto Ativo - Sessão Atual
 
-## 📅 Data: 27/05/2025
+## 📅 Data: 26/01/2025
 
 ## 🎯 Foco da Sessão Atual
-Deploy completo do sistema Recovery Mail com domínio customizado e todos os componentes funcionando.
+Resolução de problemas de deploy e configuração do sistema Recovery Mail em produção.
 
 ## 💻 Último Código Trabalhado
 
-### Sistema Completo Operacional
+### Sistema em Produção
 
 #### URLs em Produção:
-- **API Backend**: https://api.inboxrecovery.com
+- **API Backend**: https://recoverymail.onrender.com
 - **Dashboard**: https://recoverymail.vercel.app
-- **Webhook Resend**: https://api.inboxrecovery.com/resend-webhook
+- **Database**: PostgreSQL no Neon
+- **Redis**: Upstash
 
-#### Arquitetura Final:
-- **Web Service (Render)**: Executa API + Worker no mesmo processo usando `start-all.js`
-- **Background Worker**: Suspenso (não mais necessário)
-- **Dashboard (Vercel)**: Interface para visualização de métricas e eventos
+#### Status dos Componentes:
+- **API**: ✅ Rodando no Render com auto-deploy
+- **Worker**: ✅ Processando emails (1 worker ativo)
+- **Dashboard**: ✅ Exibindo dados em tempo real
+- **Database**: ✅ Conectado e operacional
+- **Redis**: ✅ Gerenciando filas (43 delayed, 3 failed)
+- **Webhooks**: ✅ Recebendo e processando eventos
 
 ## ✅ Conquistas da Sessão
 
-1. **Domínio Customizado Configurado**
-   - API rodando em api.inboxrecovery.com
-   - CORS configurado para aceitar requisições do dashboard
+1. **Worker Funcionando**
+   - **Problema**: Render configurado como "Background Worker" mas worker não processava
+   - **Solução**: Criado `start-all.ts` para rodar API + Worker no mesmo processo
+   - **Alternativa**: Configuração PM2 adicionada como backup
 
-2. **Worker Unificado**
-   - Mudança de `bootstrap.js` para `start-all.js` no comando start
-   - Worker e API rodando no mesmo processo
-   - 3 instâncias de worker ativas processando emails
+2. **CORS Desbloqueado**
+   - **Problema**: API rejeitando requisições do dashboard Vercel
+   - **Solução**: Temporariamente permitir qualquer origem com 'vercel.app'
+   - **TODO**: Configurar CORS mais restritivo em produção
 
-3. **Sistema de Emails Funcionando**
-   - Templates carregados corretamente em `/dist/templates/emails`
-   - Resend configurado e enviando emails
-   - Tracking de abertura e cliques ativo
-
-4. **Endpoints de Teste Criados**
-   - `/api/worker-status` - Status do worker
-   - `/api/test-immediate-email` - Envio imediato para testes
-
-## 🐛 Problemas Resolvidos
-
-1. **Worker não processava eventos**
-   - **Causa**: Dois serviços competindo (Web Service e Background Worker)
-   - **Solução**: Suspender Background Worker, usar apenas Web Service com start-all.js
-
-2. **Templates não encontrados**
-   - **Causa**: Path incorreto em produção
-   - **Solução**: Ajustar para `/opt/render/project/src/backend/dist/templates/emails`
-
-3. **CORS bloqueando Vercel**
-   - **Causa**: Origem não permitida
-   - **Solução**: Adicionar pattern matching para domínios Vercel
+3. **TypeScript Build**
+   - 7 erros de tipo ainda presentes
+   - Usando `build:force` para ignorar temporariamente
+   - Sistema operacional apesar dos erros
 
 ## 📊 Métricas Atuais
-- Total de eventos: 27
-- Emails enviados com sucesso: 3
-- Taxa de abertura: 40%
-- Taxa de cliques: 20%
-- Workers ativos: 3
+- Total de eventos: 21
+- Emails enviados: 18
+- Taxa de abertura: 16.7%
+- Taxa de cliques: 11.1%
+- Webhooks implementados: 2/12 (16%)
+
+## 🐛 Problemas Conhecidos
+
+1. **TypeScript Errors** (7 erros)
+   - Index signatures incompatíveis
+   - Tipos de payload não definidos corretamente
+   - Usando `npm run build:force` como workaround
+
+2. **Limitações do Free Tier**
+   - Render: Worker e API no mesmo processo
+   - Upstash: Limites de requisições Redis
+
+## 📝 Decisões Técnicas
+
+1. **Arquitetura Unificada**
+   - Worker e API no mesmo processo (limitação Render free tier)
+   - PM2 como alternativa para gerenciamento de processos
+
+2. **CORS Permissivo**
+   - Temporariamente aceitando domínios Vercel
+   - Usar `test-org-123` como organização padrão
+
+3. **Build com Erros**
+   - `npm run build:force` ignora erros TypeScript
+   - Priorizar funcionalidade sobre tipos perfeitos
 
 ## 🔧 Comandos Úteis
 ```bash
-# Testar API
-curl https://api.inboxrecovery.com/health
+# Deploy no Render
+git push origin main
 
-# Enviar webhook de teste
-./test-api-domain.sh
+# Testar webhook
+node test-bank-slip-expired.js
 
-# Enviar email imediato
-curl -X POST https://api.inboxrecovery.com/api/test-immediate-email \
-  -H "Content-Type: application/json"
+# Ver logs do Render
+render logs recoverymail --tail
 
-# Ver status do worker
-curl https://api.inboxrecovery.com/api/test-worker-status
+# Build forçado
+npm run build:force
+
+# Rodar localmente
+docker-compose up -d
+cd backend && npm run dev
 ```
 
-## ⏭️ Próximos Passos
-1. Configurar webhook do Resend com signing secret
-2. Implementar mais tipos de webhook (PIX_EXPIRED, etc)
-3. Adicionar autenticação ao dashboard
-4. Configurar domínio customizado para o dashboard
+## ⏭️ Próximos Passos Imediatos
+
+1. **ALTA PRIORIDADE**
+   - [ ] Corrigir erros TypeScript
+   - [ ] Implementar PIX_EXPIRED (alta demanda no Brasil)
+   - [ ] Configurar Sentry para monitoramento
+
+2. **MÉDIA PRIORIDADE**
+   - [ ] Completar templates de email faltantes
+   - [ ] Adicionar autenticação ao dashboard
+   - [ ] Implementar rate limiting por organização
+
+3. **BAIXA PRIORIDADE**
+   - [ ] Migrar para plano pago do Render
+   - [ ] Adicionar testes automatizados
+   - [ ] Documentação da API
 
 ## 🔗 Contexto para o Cursor
-"Recovery Mail está 100% funcional em produção. API em api.inboxrecovery.com, worker processando emails com delays configurados, dashboard mostrando métricas em tempo real." 
+"Recovery Mail está em produção com worker funcionando. Foco agora é corrigir erros TypeScript e implementar PIX_EXPIRED webhook que é crítico para o mercado brasileiro." 

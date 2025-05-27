@@ -35,297 +35,172 @@ graph LR
 
 ### 1. ABANDONED_CART ✅ [100% completo]
 **Descrição**: Carrinho abandonado pelo cliente
+**Payload Recebido**:
+```json
+{
+  "event": "ABANDONED_CART",
+  "checkout_id": "Q8J1N6K3",
+  "checkout_url": "http://example.com/recovery/xxx",
+  "total_price": "R$ 169,80",
+  "customer": {
+    "name": "João da Silva",
+    "email": "joao@email.com",
+    "phone_number": "5511987654321"
+  },
+  "products": [{
+    "name": "Produto X",
+    "price": "R$ 119,90"
+  }]
+}
+```
+**Fluxo de Email Implementado**:
+- ✅ Email 1 (2h): Lembrete gentil - "Você esqueceu algo especial"
+- ✅ Email 2 (24h): Criando urgência - "Seus produtos podem acabar"
+- ✅ Email 3 (72h): Última chance - "10% de desconto exclusivo"
+
+**Código**: `/backend/src/handlers/abandonedCart.handler.ts`
+**Templates**: `/backend/src/templates/emails/abandoned-cart-*.hbs`
 **Status**: ✅ Em produção e funcionando
-**Emails Configurados**:
-- Email 1 (2h delay): "🛒 Você esqueceu alguns itens no seu carrinho"
-- Email 2 (24h delay): "⏰ Seus produtos podem acabar em breve"
-- Email 3 (72h delay): "🎁 Oferta especial: 10% de desconto"
 
-**Templates**:
-- `abandoned-cart-reminder.hbs` ✅
-- `abandoned-cart-urgency.hbs` ✅
-- `abandoned-cart-discount.hbs` ✅
-
-**Métricas**:
-- Eventos recebidos: 15+
-- Taxa de conversão: ~25%
-
-### 2. BANK_SLIP_EXPIRED 🟡 [60% completo]
+### 2. BANK_SLIP_EXPIRED 🟡 [70% completo]
 **Descrição**: Boleto bancário expirou sem pagamento
-**Handler**: ✅ Implementado
-**Queue**: ✅ Configurado
-**Templates**: ✅ Criados (4 templates)
-- `bank-slip-expired-renewal.hbs`
-- `bank-slip-expired-urgency.hbs`
-- `bank-slip-expired-scarcity.hbs`
-- `bank-slip-expired-lastchance.hbs`
-**Worker**: ✅ Funcionando
-**Status**: Aguardando testes em produção
+**Handler**: ✅ Implementado (`bankSlipExpired.handler.ts`)
+**Queue**: ✅ Configurado com delays (30min, 24h, 48h)
+**Templates**: ✅ Básicos criados (renewal, urgency, lastchance)
+**Worker**: ✅ Processando
+**Status**: Falta melhorar copy dos templates e testar conversão
 
-### 3. PIX_EXPIRED 🔴 [30% completo]
+### 3. PIX_EXPIRED 🟡 [30% completo]
 **Descrição**: QR Code PIX expirou
-**Handler**: ✅ Criado
-**Templates**: ✅ Criados (2 templates)
-- `pix-expired-renewal.hbs`
-- `pix-expired-lastchance.hbs`
+**Handler**: ✅ Criado (`pixExpired.handler.ts`)
+**Templates**: 🔴 Não criados
 **Próximos passos**:
-- [ ] Testar em produção
-- [ ] Ajustar delays (15min, 2h)
+- [ ] Criar templates urgentes (PIX expira rápido)
+- [ ] Configurar delays curtos (15min, 2h)
+- [ ] Testar com webhook real
 
-### 4. SALE_REFUSED 🔴 [10% completo]
+### 4. SALE_REFUSED 🔴 [0% completo]
 **Descrição**: Pagamento recusado pela operadora
-**Templates**: ✅ Criados
-- `sale-refused-retry.hbs`
-- `sale-refused-support.hbs`
+**Prioridade**: Alta (recuperação imediata aumenta conversão)
 
-### 5. SALE_APPROVED 🔴 [10% completo]
+### 5. SALE_APPROVED 🔴 [0% completo]
 **Descrição**: Venda aprovada (confirmação)
-**Template**: ✅ Criado
-- `sale-approved-confirmation.hbs`
+**Prioridade**: Média (importante para experiência)
 
-### 6. SALE_CHARGEBACK 🔴 [10% completo]
+### 6. SALE_CHARGEBACK 🔴 [0% completo]
 **Descrição**: Chargeback recebido
-**Template**: ✅ Criado
-- `sale-chargeback-notice.hbs`
+**Prioridade**: Baixa (volume menor)
 
-### 7. SALE_REFUNDED 🔴 [10% completo]
+### 7. SALE_REFUNDED 🔴 [0% completo]
 **Descrição**: Reembolso processado
-**Template**: ✅ Criado
-- `sale-refunded-confirmation.hbs`
+**Prioridade**: Média
 
-### 8. BANK_SLIP_GENERATED 🔴 [10% completo]
+### 8. BANK_SLIP_GENERATED 🔴 [0% completo]
 **Descrição**: Boleto gerado (lembrete de pagamento)
-**Template**: ✅ Criado
-- `bank-slip-generated-reminder.hbs`
+**Prioridade**: Alta (previne expiração)
 
-### 9. PIX_GENERATED 🔴 [10% completo]
+### 9. PIX_GENERATED 🔴 [0% completo]
 **Descrição**: PIX gerado (enviar QR Code)
-**Template**: ✅ Criado
-- `pix-generated-qrcode.hbs`
+**Prioridade**: Alta (facilita pagamento)
 
-### 10. SUBSCRIPTION_CANCELED 🔴 [10% completo]
+### 10. SUBSCRIPTION_CANCELED 🔴 [0% completo]
 **Descrição**: Assinatura cancelada (win-back)
-**Template**: ✅ Criado
-- `subscription-canceled-winback.hbs`
+**Prioridade**: Média
 
-### 11. SUBSCRIPTION_EXPIRED 🔴 [10% completo]
+### 11. SUBSCRIPTION_EXPIRED 🔴 [0% completo]
 **Descrição**: Assinatura expirada (renovação)
-**Template**: ✅ Criado
-- `subscription-expired-renewal.hbs`
+**Prioridade**: Média
 
-### 12. SUBSCRIPTION_RENEWED 🔴 [10% completo]
+### 12. SUBSCRIPTION_RENEWED 🔴 [0% completo]
 **Descrição**: Assinatura renovada (confirmação)
-**Template**: ✅ Criado
-- `subscription-renewed-confirmation.hbs`
+**Prioridade**: Baixa
 
-## 📊 Estatísticas de Uso (Produção)
-- **Total de Eventos**: 21
-- **Eventos Processados**: 2
-- **Taxa de Sucesso**: 9.5%
-- **Eventos Pendentes**: 19
+## 📊 Métricas de Produção
 
-## 🎯 Prioridades de Implementação
-1. **PIX_EXPIRED** - Muito usado no Brasil
-2. **SALE_REFUSED** - Alta taxa de recuperação
-3. **BANK_SLIP_GENERATED** - Volume alto
-4. **PIX_GENERATED** - Crescimento rápido
+### Sistema Geral
+- **Total de Eventos Recebidos**: 21
+- **Eventos Processados**: 18
+- **Taxa de Processamento**: 85.7%
+- **Emails Enviados**: 18
+- **Taxa de Abertura**: 16.7%
+- **Taxa de Cliques**: 11.1%
 
-## 📊 Resumo de Templates
-- **Total de Templates**: 26 emails responsivos
-- **Todos com**: Preview text, call-to-action, design mobile-first
-- **Personalizáveis**: Via dashboard (em breve)
+### Por Tipo de Webhook
+- **ABANDONED_CART**: 15 eventos, 45 emails enviados
+- **BANK_SLIP_EXPIRED**: 6 eventos, 3 emails enviados
+- **Outros**: 0 eventos (não implementados)
 
-## 📊 Estatísticas Gerais
-
-### Templates
-- **Total**: 26 templates HTML responsivos
-- **Linguagem**: Português BR
-- **Personalização**: 100% automática via dados do webhook
-- **Otimização**: Copy focado em infoprodutos
-
-### Performance
-- **Tempo médio de processamento**: < 100ms
-- **Taxa de entrega**: 98.5%
-- **Tracking**: Abertura e cliques funcionando
-
-### Integrações
-- **Email Provider**: Resend (domínio inboxrecovery.com)
-- **Queue System**: BullMQ + Upstash Redis
-- **Database**: PostgreSQL (Neon)
-
-## 🎯 Configuração de Delays
+## 🔧 Configuração de Delays Atual
 
 ```javascript
-const delays = {
-  ABANDONED_CART: [2, 24, 72], // horas
-  PIX_EXPIRED: [0.25, 2], // horas
-  BANK_SLIP_EXPIRED: [24, 72, 168], // horas
-  SALE_REFUSED: [0.5, 6], // horas
-  SALE_APPROVED: [0], // imediato
-  SALE_CHARGEBACK: [0], // imediato
-  SALE_REFUNDED: [0.0014], // 5 segundos
-  BANK_SLIP_GENERATED: [0, 24], // horas
-  PIX_GENERATED: [0], // imediato
-  SUBSCRIPTION_CANCELED: [0, 168, 720], // horas
-  SUBSCRIPTION_EXPIRED: [-72, 24], // horas (negativo = antes)
-  SUBSCRIPTION_RENEWED: [0] // imediato
-};
-```
-
-## 🔧 Como Testar
-
-```bash
-# Testar webhook específico
-node test-full-flow.js
-
-# Verificar status das filas
-node backend/check-queue-status.js
-
-# Ver logs em tempo real
-cd backend && npm run dev
-```
-
-## ✅ Checklist de Implementação
-
-- [x] Todos os handlers criados
-- [x] Todos os templates HTML criados
-- [x] Sistema de filas configurado
-- [x] Delays otimizados por evento
-- [x] Tracking de email funcionando
-- [x] Multi-tenancy implementado
-- [x] Logs estruturados
-- [x] Tratamento de erros
-- [x] Testes end-to-end
-- [x] Documentação atualizada
-
-## 📊 Métricas de Implementação
-
-### Por Categoria
-- **Carrinho**: 1/1 (100%) ✅
-- **Pagamento**: 4/4 (100%) ✅
-- **Venda**: 3/3 (100%) ✅
-- **Assinatura**: 3/3 (100%) ✅
-
-### Por Complexidade
-- **Simples** (1 email): 3/3 (100%) ✅
-- **Médio** (2-3 emails): 7/7 (100%) ✅
-- **Complexo** (3+ emails): 2/2 (100%) ✅
-
-## 🔧 Configuração Técnica
-
-### Delays Configurados
-```typescript
 const EVENT_DELAYS = {
-  ABANDONED_CART: [2 * 60 * 60 * 1000, 24 * 60 * 60 * 1000, 72 * 60 * 60 * 1000],
-  PIX_EXPIRED: [15 * 60 * 1000, 2 * 60 * 60 * 1000],
-  BANK_SLIP_EXPIRED: [30 * 60 * 1000, 24 * 60 * 60 * 1000, 48 * 60 * 60 * 1000],
-  SALE_REFUSED: [30 * 60 * 1000, 6 * 60 * 60 * 1000],
-  SALE_APPROVED: [1000], // 1 segundo
-  SALE_CHARGEBACK: [0], // Imediato
-  SALE_REFUNDED: [5000], // 5 segundos
-  BANK_SLIP_GENERATED: [30 * 60 * 1000, 24 * 60 * 60 * 1000],
-  PIX_GENERATED: [5000], // 5 segundos
-  SUBSCRIPTION_CANCELED: [60 * 60 * 1000, 7 * 24 * 60 * 60 * 1000, 30 * 24 * 60 * 60 * 1000],
-  SUBSCRIPTION_EXPIRED: [7 * 24 * 60 * 60 * 1000, 24 * 60 * 60 * 1000],
-  SUBSCRIPTION_RENEWED: [2000] // 2 segundos
+  ABANDONED_CART: [
+    2 * 60 * 60 * 1000,    // 2 horas
+    24 * 60 * 60 * 1000,   // 24 horas
+    72 * 60 * 60 * 1000    // 72 horas
+  ],
+  BANK_SLIP_EXPIRED: [
+    30 * 60 * 1000,        // 30 minutos
+    24 * 60 * 60 * 1000,   // 24 horas
+    48 * 60 * 60 * 1000    // 48 horas
+  ],
+  PIX_EXPIRED: [
+    15 * 60 * 1000,        // 15 minutos (planejado)
+    2 * 60 * 60 * 1000     // 2 horas (planejado)
+  ]
 };
 ```
 
-### Sistema de Tracking
-```typescript
-// Todos os emails incluem:
-headers: {
-  'X-Track-Clicks': 'true',
-  'X-Track-Opens': 'true',
-}
+## 🎯 Prioridades de Implementação
 
-// Status possíveis:
-enum EmailStatus {
-  PENDING = 'PENDING',
-  SENT = 'SENT',
-  DELIVERED = 'DELIVERED',
-  OPENED = 'OPENED',
-  CLICKED = 'CLICKED',
-  BOUNCED = 'BOUNCED',
-  FAILED = 'FAILED'
-}
-```
+### Semana 1 (27-31/01)
+1. **PIX_EXPIRED** - Crítico no Brasil, PIX tem prazo curto
+2. **SALE_REFUSED** - Alta taxa de recuperação se agir rápido
+3. **BANK_SLIP_GENERATED** - Previne boletos expirados
+
+### Semana 2 (03-07/02)
+4. **PIX_GENERATED** - Facilita pagamento instantâneo
+5. **SALE_APPROVED** - Melhora experiência do cliente
+6. **SUBSCRIPTION_EXPIRED** - Recupera receita recorrente
+
+### Semana 3 (10-14/02)
+7. **SUBSCRIPTION_CANCELED** - Win-back campaigns
+8. **SALE_REFUNDED** - Comunicação importante
+9. **SUBSCRIPTION_RENEWED** - Fidelização
+
+### Baixa Prioridade
+10. **SALE_CHARGEBACK** - Volume baixo, processo manual
 
 ## 📝 Padrão de Implementação
 
-Para implementar um novo webhook:
+Para cada webhook novo:
+1. Criar handler em `/backend/src/handlers/`
+2. Adicionar ao mapeamento em `email.worker.ts`
+3. Criar templates em `/backend/src/templates/emails/`
+4. Configurar delays em `queue.service.ts`
+5. Criar script de teste em `/test-{webhook-type}.js`
+6. Testar fluxo completo antes de marcar como completo
 
-1. **Adicionar tipo ao schema**:
-```typescript
-// src/utils/webhook.validator.ts
-eventType: z.enum([...existentes, 'NOVO_EVENTO'])
-```
+## 🚀 URLs de Produção
 
-2. **Criar handler**:
-```typescript
-// src/handlers/novoEvento.handler.ts
-export async function handleNovoEvento(payload, eventId, organizationId) {
-  // Validar payload
-  // Agendar emails
-}
-```
+- **API**: https://recoverymail.onrender.com
+- **Dashboard**: https://recoverymail.vercel.app
+- **Webhook URL**: https://recoverymail.onrender.com/webhook/{ORG_ID}
 
-3. **Criar templates**:
-```bash
-touch backend/src/templates/emails/novo-evento-template.hbs
-```
+### Organizações de Teste
+- `test-org-123`: Organização padrão para testes
 
-4. **Adicionar ao mapeamento**:
-```typescript
-// src/utils/email.templates.ts
-NOVO_EVENTO: {
-  delays: [delay1, delay2],
-  templates: [
-    { templateName: 'novo-evento-1', subject: 'Assunto 1' },
-    { templateName: 'novo-evento-2', subject: 'Assunto 2' }
-  ]
-}
-```
+## ✅ Checklist de Qualidade
 
-5. **Testar**:
-```bash
-node test-webhook.js NOVO_EVENTO
-```
-
-## 🔧 Configurações por Organização
-
-```typescript
-interface OrganizationWebhookConfig {
-  organization_id: string;
-  webhook_secret: string; // Para HMAC
-  enabled_events: EventType[];
-  email_delays: {
-    [event: string]: number[]; // delays em minutos
-  };
-  custom_templates: boolean;
-  ai_personalization: boolean;
-  test_mode: boolean;
-}
-```
-
-## 📊 Métricas de Performance
-
-- **Taxa de Entrega**: 100% ✅
-- **Taxa de Abertura**: Tracking funcionando ✅
-- **Taxa de Clique**: Tracking funcionando ✅
-- **Taxa de Conversão**: A medir
-- **Tempo de Processamento**: < 100ms por webhook ✅
-- **Uptime**: 100% ✅
-
-## 🚀 Status Final
-
-✅ **TODOS OS 12 TIPOS DE WEBHOOK ESTÃO 100% IMPLEMENTADOS!**
-
-- Handlers criados e testados
-- Templates responsivos com copy focado em conversão
-- Sistema de filas com delays otimizados
-- Tracking completo de abertura e cliques
-- Pronto para produção
+Para considerar um webhook 100% completo:
+- [ ] Handler implementado e testado
+- [ ] Templates responsivos criados
+- [ ] Copy otimizado para conversão
+- [ ] Delays configurados e testados
+- [ ] Tracking de abertura/cliques funcionando
+- [ ] Documentação atualizada
+- [ ] Script de teste criado
+- [ ] Testado em produção com sucesso
 
 ## 🎯 Próximos Passos
 
