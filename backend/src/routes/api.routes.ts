@@ -504,4 +504,30 @@ router.get('/test-worker-status', async (_req, res) => {
   }
 });
 
+// TEMPORÁRIO: Limpar filas para teste
+router.post('/test-clear-queues', async (_req, res) => {
+  try {
+    const { getQueue } = await import('../services/queue.service');
+    const queue = getQueue();
+    
+    // Limpar failed jobs
+    await queue.clean(0, 'failed');
+    
+    // Limpar delayed jobs
+    await queue.clean(0, 'delayed');
+    
+    // Pegar novo status
+    const jobCounts = await queue.getJobCounts();
+    
+    res.json({
+      message: 'Queues cleared',
+      jobCounts
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
 export default router; 
