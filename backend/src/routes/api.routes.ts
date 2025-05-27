@@ -433,4 +433,39 @@ router.get('/test-failed-jobs', async (_req, res) => {
   }
 });
 
+// TEMPORÁRIO: Processar job imediatamente
+router.post('/test-process-now', async (req, res) => {
+  try {
+    const { enqueueEmailJob } = await import('../services/queue.service');
+    const { prisma } = await import('../config/database');
+    
+    // Pegar o último evento
+    const lastEvent = await prisma.webhookEvent.findFirst({
+      where: { 
+        organizationId: 'test-org-123',
+        status: 'PENDING'
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    
+    if (!lastEvent) {
+      res.status(404).json({ error: 'No pending events found' });
+      return;
+    }
+    
+    // Enfileirar com forceImmediate = true
+    await enqueueEmailJob(lastEvent, true);
+    
+    res.json({
+      message: 'Job enqueued for immediate processing',
+      eventId: lastEvent.id,
+      eventType: lastEvent.eventType
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
 export default router; 
