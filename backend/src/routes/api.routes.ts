@@ -434,7 +434,7 @@ router.get('/test-failed-jobs', async (_req, res) => {
 });
 
 // TEMPORÁRIO: Processar job imediatamente
-router.post('/test-process-now', async (req, res) => {
+router.post('/test-process-now', async (_req, res) => {
   try {
     const { enqueueEmailJob } = await import('../services/queue.service');
     const { prisma } = await import('../config/database');

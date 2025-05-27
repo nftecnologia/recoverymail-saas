@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Backend do Inbox Recovery - Sistema de recuperação de vendas",
   "main": "dist/server.js",
+  "packageManager": "npm@9.0.0",
   "scripts": {
     "dev": "nodemon",
     "build": "tsc && npm run postbuild",
