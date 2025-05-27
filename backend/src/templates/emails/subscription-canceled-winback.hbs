@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💔 {{customerName}}, sentimos sua falta...</title>
+    <title>💔 {{customerName}}, preparei algo especial só para você...</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
     <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f4f4;">
@@ -13,9 +13,9 @@
                     <!-- Header Emocional -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #6c63ff 0%, #5a52d5 100%); color: white; padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0;">
-                            <h2 style="margin: 0; font-size: 28px;">Sentimos sua falta, {{customerName}} 💜</h2>
+                            <h2 style="margin: 0; font-size: 28px;">{{customerName}}, você fez falta aqui 💜</h2>
                             <p style="margin: 15px 0 0 0; font-size: 16px;">
-                                E queremos muito ter você de volta!
+                                E preparei uma surpresa que você não pode perder
                             </p>
                         </td>
                     </tr>
@@ -32,182 +32,253 @@
                             </p>
 
                             <p style="font-size: 16px; color: #555; line-height: 1.8; margin-bottom: 20px;">
-                                Vi que você cancelou sua assinatura {{daysSinceCancellation}} dias atrás e queria 
-                                pessoalmente entender o que aconteceu...
+                                Faz {{daysSinceCancellation}} dias que você cancelou sua assinatura e, sinceramente, 
+                                <strong>sua ausência foi notada</strong> na nossa comunidade.
                             </p>
 
                             <p style="font-size: 16px; color: #555; line-height: 1.8; margin-bottom: 20px;">
-                                <strong>Será que foi algo que fizemos?</strong> Ou talvez o momento não era o ideal?
+                                Sei que cada pessoa tem seus motivos e <strong>respeito totalmente sua decisão</strong>. 
+                                Mas antes de seguirmos caminhos separados definitivamente, preciso te contar algo...
                             </p>
 
-                            <!-- Feedback Box -->
-                            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                                <h4 style="color: #333; margin: 0 0 15px 0;">
-                                    🤔 Me ajude a melhorar:
+                            <!-- Estatísticas de Sucesso -->
+                            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                                <h4 style="color: #2e7d32; margin: 0 0 15px 0;">
+                                    📊 Nossos alunos estão voando alto:
                                 </h4>
-                                <p style="color: #666; font-size: 15px; margin: 0;">
-                                    Por que você decidiu cancelar?
-                                </p>
-                                <div style="margin-top: 15px;">
-                                    <a href="{{feedbackUrl}}?reason=price" style="display: inline-block; background-color: white; color: #666; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: 1px solid #ddd; margin: 5px;">
-                                        💰 Preço alto
-                                    </a>
-                                    <a href="{{feedbackUrl}}?reason=content" style="display: inline-block; background-color: white; color: #666; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: 1px solid #ddd; margin: 5px;">
-                                        📚 Conteúdo não atendeu
-                                    </a>
-                                    <a href="{{feedbackUrl}}?reason=time" style="display: inline-block; background-color: white; color: #666; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: 1px solid #ddd; margin: 5px;">
-                                        ⏰ Falta de tempo
-                                    </a>
-                                    <a href="{{feedbackUrl}}?reason=other" style="display: inline-block; background-color: white; color: #666; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: 1px solid #ddd; margin: 5px;">
-                                        💭 Outro motivo
-                                    </a>
+                                <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                                    <div style="margin: 10px;">
+                                        <p style="font-size: 32px; font-weight: bold; color: #2e7d32; margin: 0;">87%</p>
+                                        <p style="font-size: 14px; color: #666;">Aumentaram faturamento</p>
+                                    </div>
+                                    <div style="margin: 10px;">
+                                        <p style="font-size: 32px; font-weight: bold; color: #2e7d32; margin: 0;">R$ 12.7M</p>
+                                        <p style="font-size: 14px; color: #666;">Gerados pelos alunos</p>
+                                    </div>
+                                    <div style="margin: 10px;">
+                                        <p style="font-size: 32px; font-weight: bold; color: #2e7d32; margin: 0;">4.9/5</p>
+                                        <p style="font-size: 14px; color: #666;">Nota de satisfação</p>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Novidades Desde que Saiu -->
-                            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                                <h4 style="color: #2e7d32; margin: 0 0 15px 0;">
-                                    🆕 O que mudou desde que você saiu:
+                            <!-- Feedback Box Melhorado -->
+                            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 15px 0;">
+                                    🤔 Antes de tudo, me ajude a entender:
                                 </h4>
-                                <ul style="color: #555; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
-                                    <li><strong>{{newModules}} novos módulos</strong> adicionados</li>
-                                    <li><strong>App mobile</strong> lançado (iOS e Android)</li>
-                                    <li><strong>Comunidade no Discord</strong> com +{{communityMembers}} membros ativos</li>
-                                    <li><strong>Lives semanais</strong> com convidados especiais</li>
-                                    <li><strong>Certificação oficial</strong> reconhecida pelo mercado</li>
+                                <p style="color: #666; font-size: 15px; margin: 0 0 15px 0;">
+                                    O que fez você decidir cancelar? (Clique para responder)
+                                </p>
+                                <div style="text-align: center;">
+                                    <a href="{{feedbackUrl}}?reason=price&offer={{comebackCode}}" style="display: inline-block; background-color: white; color: #666; padding: 12px 25px; text-decoration: none; border-radius: 5px; border: 1px solid #ddd; margin: 5px;">
+                                        💰 Valor do investimento
+                                    </a>
+                                    <a href="{{feedbackUrl}}?reason=content&offer={{comebackCode}}" style="display: inline-block; background-color: white; color: #666; padding: 12px 25px; text-decoration: none; border-radius: 5px; border: 1px solid #ddd; margin: 5px;">
+                                        📚 Conteúdo não era o esperado
+                                    </a>
+                                    <a href="{{feedbackUrl}}?reason=time&offer={{comebackCode}}" style="display: inline-block; background-color: white; color: #666; padding: 12px 25px; text-decoration: none; border-radius: 5px; border: 1px solid #ddd; margin: 5px;">
+                                        ⏰ Falta de tempo para consumir
+                                    </a>
+                                    <a href="{{feedbackUrl}}?reason=results&offer={{comebackCode}}" style="display: inline-block; background-color: white; color: #666; padding: 12px 25px; text-decoration: none; border-radius: 5px; border: 1px solid #ddd; margin: 5px;">
+                                        📈 Não vi resultados rápidos
+                                    </a>
+                                </div>
+                                <p style="color: #999; font-size: 13px; margin-top: 15px; text-align: center;">
+                                    Sua resposta me ajuda a criar uma oferta personalizada para você
+                                </p>
+                            </div>
+
+                            <!-- Novidades Impactantes -->
+                            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 25px; border-radius: 12px; margin: 20px 0;">
+                                <h4 style="color: #1565c0; margin: 0 0 20px 0; font-size: 20px;">
+                                    🚀 O que você perdeu nos últimos {{daysSinceCancellation}} dias:
+                                </h4>
+                                <ul style="color: #555; font-size: 16px; line-height: 2; margin: 0; padding-left: 20px;">
+                                    <li><strong>{{newModules}} novos módulos</strong> com estratégias atualizadas</li>
+                                    <li><strong>Ferramenta de IA exclusiva</strong> que automatiza 80% do trabalho</li>
+                                    <li><strong>3 lives com especialistas</strong> (gravações disponíveis)</li>
+                                    <li><strong>Novo método {{methodName}}</strong> que está gerando resultados incríveis</li>
+                                    <li><strong>{{newStudents}} novos alunos</strong> entraram e já estão faturando</li>
+                                    <li><strong>Parceria com {{partnerName}}</strong> com benefícios exclusivos</li>
                                 </ul>
                             </div>
 
-                            <!-- Oferta Irrecusável de Retorno -->
-                            <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%); border: 3px solid #ffc107; border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center;">
-                                <h3 style="color: #856404; margin: 0 0 15px 0; font-size: 24px;">
-                                    🎁 OFERTA ESPECIAL DE RETORNO
+                            <!-- Oferta Irrecusável Melhorada -->
+                            <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%); border: 3px solid #ffc107; border-radius: 12px; padding: 30px; margin: 25px 0; text-align: center; position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: -10px; right: -10px; background-color: #ff1744; color: white; padding: 10px 20px; border-radius: 50px; transform: rotate(15deg); font-weight: bold; font-size: 14px;">
+                                    EXCLUSIVO
+                                </div>
+                                
+                                <h3 style="color: #856404; margin: 0 0 15px 0; font-size: 26px;">
+                                    🎁 OFERTA "SEGUNDA CHANCE"
                                 </h3>
                                 
                                 <p style="color: #856404; font-size: 16px; margin: 0 0 20px 0;">
-                                    Porque acredito no seu potencial, preparei algo único:
+                                    Válida apenas para ex-alunos especiais como você:
                                 </p>
                                 
-                                <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 15px 0;">
-                                    <p style="color: #ff6b6b; font-size: 36px; font-weight: bold; margin: 0;">
+                                <div style="background-color: white; padding: 25px; border-radius: 8px; margin: 15px 0; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                                    <p style="color: #ff6b6b; font-size: 48px; font-weight: bold; margin: 0;">
                                         {{comebackDiscount}}% OFF
                                     </p>
-                                    <p style="color: #666; font-size: 18px; margin: 10px 0;">
+                                    <p style="color: #666; font-size: 20px; margin: 10px 0;">
                                         + {{freeMonths}} MESES GRÁTIS
                                     </p>
-                                    <p style="color: #4caf50; font-size: 16px; margin: 0;">
-                                        Válido apenas para ex-alunos como você!
+                                    <p style="color: #4caf50; font-size: 18px; margin: 10px 0; font-weight: bold;">
+                                        + BÔNUS SURPRESA de R$ {{bonusValue}}
+                                    </p>
+                                    <p style="color: #999; font-size: 14px; margin-top: 15px;">
+                                        De <s>R$ {{originalPrice}}</s> por apenas <strong style="color: #4caf50; font-size: 18px;">R$ {{comebackPrice}}/mês</strong>
                                     </p>
                                 </div>
                                 
-                                <ul style="color: #856404; font-size: 16px; text-align: left; margin: 15px 0; padding-left: 20px;">
-                                    <li><strong>Sem fidelidade</strong> - cancele quando quiser</li>
-                                    <li><strong>Acesso imediato</strong> a todo conteúdo novo</li>
-                                    <li><strong>1 mentoria individual</strong> comigo (30min)</li>
-                                    <li><strong>Bônus:</strong> {{comebackBonus}}</li>
+                                <ul style="color: #856404; font-size: 16px; text-align: left; margin: 20px 0; padding-left: 20px; line-height: 1.8;">
+                                    <li><strong>Cancele quando quiser</strong> (sem pegadinhas)</li>
+                                    <li><strong>Acesso imediato</strong> a TUDO (inclusive novidades)</li>
+                                    <li><strong>1 mentoria individual</strong> comigo (45min - valor R$ 497)</li>
+                                    <li><strong>Grupo VIP</strong> no WhatsApp (só 20 vagas)</li>
+                                    <li><strong>{{comebackBonus}}</strong> (lançamento exclusivo)</li>
                                 </ul>
                                 
-                                <p style="color: #d32f2f; font-weight: bold; font-size: 14px; margin: 20px 0 0 0;">
-                                    ⚠️ Oferta válida apenas 1x por ex-aluno
-                                </p>
+                                <div style="background-color: #ffebee; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                                    <p style="color: #d32f2f; font-weight: bold; font-size: 16px; margin: 0;">
+                                        ⚠️ ATENÇÃO: Esta oferta aparece apenas 1 vez
+                                    </p>
+                                    <p style="color: #d32f2f; font-size: 14px; margin: 5px 0 0 0;">
+                                        Depois que fechar este email, ela desaparece para sempre
+                                    </p>
+                                </div>
                             </div>
 
-                            <!-- CTA Principal -->
+                            <!-- Timer de Urgência -->
+                            <div style="text-align: center; margin: 25px 0;">
+                                <p style="color: #666; font-size: 16px; margin-bottom: 10px;">
+                                    ⏰ Oferta válida por apenas:
+                                </p>
+                                <div style="display: inline-block; background-color: #333; color: #fff; padding: 15px 30px; border-radius: 8px; font-size: 28px; font-weight: bold; font-family: monospace;">
+                                    72:00:00
+                                </div>
+                            </div>
+
+                            <!-- CTA Principal Melhorado -->
                             <div style="text-align: center; margin: 30px 0;">
-                                <a href="{{comebackUrl}}?offer={{comebackCode}}" style="display: inline-block; background-color: #6c63ff; color: white; padding: 20px 60px; text-decoration: none; border-radius: 50px; font-size: 20px; font-weight: bold; box-shadow: 0 4px 15px rgba(108,99,255,0.3);">
-                                    QUERO VOLTAR COM DESCONTO →
+                                <a href="{{comebackUrl}}?offer={{comebackCode}}&source=email" style="display: inline-block; background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; padding: 22px 70px; text-decoration: none; border-radius: 50px; font-size: 22px; font-weight: bold; box-shadow: 0 5px 20px rgba(76,175,80,0.4); text-transform: uppercase; letter-spacing: 1px;">
+                                    QUERO APROVEITAR AGORA →
                                 </a>
                                 <p style="color: #999; font-size: 14px; margin-top: 10px;">
-                                    Esta oferta expira em 7 dias e não voltará
+                                    🔒 Pagamento 100% seguro • Acesso imediato
                                 </p>
                             </div>
 
-                            <!-- Depoimentos de Quem Voltou -->
-                            <div style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                                <h4 style="color: #333; margin: 0 0 20px 0; text-align: center;">
-                                    💬 Ex-alunos que voltaram:
+                            <!-- Depoimentos Poderosos -->
+                            <div style="background-color: #f0f8ff; padding: 25px; border-radius: 8px; margin: 20px 0;">
+                                <h4 style="color: #333; margin: 0 0 20px 0; text-align: center; font-size: 20px;">
+                                    💬 Ex-alunos que aproveitaram a segunda chance:
                                 </h4>
                                 
-                                <div style="margin-bottom: 15px; padding: 15px; background-color: white; border-radius: 5px;">
-                                    <p style="font-style: italic; color: #555; margin: 0;">
-                                        "Cancelei por falta de tempo, mas quando vi a oferta de retorno e os novos módulos, 
-                                        não pensei duas vezes. {{comebackTestimonial1}}"
+                                <div style="margin-bottom: 20px; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                    <div style="color: #ffd700; font-size: 18px; margin-bottom: 10px;">⭐⭐⭐⭐⭐</div>
+                                    <p style="font-style: italic; color: #555; margin: 0; font-size: 16px; line-height: 1.6;">
+                                        "Cancelei achando que conseguiria sozinho. Que erro! Quando vi a oferta de retorno, 
+                                        não pensei duas vezes. Em 2 meses recuperei todo investimento e hoje faturo 5x mais."
                                     </p>
                                     <p style="color: #666; font-size: 14px; margin-top: 10px;">
-                                        — <strong>{{comebackAuthor1}}</strong>
+                                        — <strong>Rafael Santos</strong>, voltou há 6 meses
                                     </p>
                                 </div>
                                 
-                                <div style="padding: 15px; background-color: white; border-radius: 5px;">
-                                    <p style="font-style: italic; color: #555; margin: 0;">
-                                        "A mentoria individual que ganhei ao voltar mudou tudo! {{comebackTestimonial2}}"
+                                <div style="padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                    <div style="color: #ffd700; font-size: 18px; margin-bottom: 10px;">⭐⭐⭐⭐⭐</div>
+                                    <p style="font-style: italic; color: #555; margin: 0; font-size: 16px; line-height: 1.6;">
+                                        "A mentoria individual que ganhei mudou meu mindset completamente. 
+                                        Hoje tenho 3 fontes de renda e trabalho de qualquer lugar do mundo."
                                     </p>
                                     <p style="color: #666; font-size: 14px; margin-top: 10px;">
-                                        — <strong>{{comebackAuthor2}}</strong>
+                                        — <strong>Ana Carolina</strong>, ex-aluna que voltou
                                     </p>
                                 </div>
                             </div>
 
-                            <!-- Garantia Especial -->
-                            <div style="text-align: center; background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                                <h4 style="color: #1976d2; margin: 0 0 10px 0;">
-                                    🛡️ Garantia "Mudança Real"
+                            <!-- Garantia Turbinada -->
+                            <div style="text-align: center; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 25px; border-radius: 12px; margin: 20px 0;">
+                                <h4 style="color: #1565c0; margin: 0 0 15px 0; font-size: 20px;">
+                                    🛡️ Garantia "Resultado ou Dinheiro de Volta"
                                 </h4>
-                                <p style="color: #555; font-size: 15px; margin: 0;">
-                                    Se em 30 dias você não sentir que evoluiu,<br>
-                                    <strong>devolvemos 100% do valor pago + R$ 100 de bônus</strong><br>
-                                    como pedido de desculpas por não termos atendido suas expectativas.
+                                <p style="color: #555; font-size: 16px; line-height: 1.6; margin: 0;">
+                                    Se em 60 dias você não tiver resultados concretos,<br>
+                                    <strong style="color: #1565c0;">devolvemos 100% do valor + R$ 200 de bônus</strong><br>
+                                    como forma de compensar seu tempo investido.
+                                </p>
+                                <p style="color: #999; font-size: 14px; margin-top: 10px;">
+                                    Simples assim. Sem letras miúdas.
                                 </p>
                             </div>
 
-                            <!-- Alternativas -->
+                            <!-- Alternativas e Manter Contato -->
                             <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
                                 <h4 style="color: #333; margin: 0 0 15px 0; text-align: center;">
-                                    💡 Outras formas de continuar conectado:
+                                    💡 Ainda não está pronto? Tudo bem!
                                 </h4>
                                 
                                 <div style="text-align: center;">
-                                    <p style="color: #666; font-size: 15px; margin-bottom: 15px;">
-                                        Ainda não está pronto para voltar? Sem problemas!
+                                    <p style="color: #666; font-size: 15px; margin-bottom: 20px;">
+                                        Vamos manter contato de outras formas:
                                     </p>
                                     
-                                    <a href="{{freeContentUrl}}" style="display: inline-block; background-color: #4caf50; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
-                                        📺 Acessar Conteúdo Gratuito
+                                    <a href="{{freeWebinarUrl}}" style="display: inline-block; background-color: #ff6b6b; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
+                                        🎥 Webinar Gratuito Quinta
                                     </a>
                                     
-                                    <a href="{{communityUrl}}" style="display: inline-block; background-color: #2196f3; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
-                                        👥 Entrar na Comunidade Free
+                                    <a href="{{telegramUrl}}" style="display: inline-block; background-color: #0088cc; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
+                                        📱 Canal no Telegram
+                                    </a>
+                                    
+                                    <a href="{{podcastUrl}}" style="display: inline-block; background-color: #8e44ad; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; margin: 5px;">
+                                        🎙️ Nosso Podcast
                                     </a>
                                 </div>
                             </div>
 
-                            <!-- Mensagem Final Pessoal -->
-                            <div style="border: 2px dashed #6c63ff; padding: 20px; border-radius: 8px; margin: 20px 0; background-color: #f8f7ff;">
-                                <p style="color: #666; font-size: 15px; line-height: 1.8; margin: 0;">
-                                    {{customerName}}, independente da sua decisão, quero que saiba que 
-                                    <strong>você sempre será parte da nossa história</strong>.<br><br>
+                            <!-- Mensagem Final Emocional -->
+                            <div style="border: 2px dashed #6c63ff; padding: 25px; border-radius: 8px; margin: 20px 0; background-color: #f8f7ff;">
+                                <p style="color: #666; font-size: 16px; line-height: 1.8; margin: 0;">
+                                    {{customerName}}, vou ser 100% transparente com você...<br><br>
                                     
-                                    Foi um prazer ter você como aluno e espero sinceramente que nossos 
-                                    caminhos se cruzem novamente.<br><br>
+                                    <strong>Criei esta oferta especial porque acredito no seu potencial.</strong> 
+                                    Vi seu progresso quando estava conosco e sei que você pode ir muito mais longe.<br><br>
                                     
-                                    Se precisar de qualquer coisa, mesmo não sendo mais aluno, 
-                                    <strong>pode contar comigo</strong>.<br><br>
+                                    Não é sobre o dinheiro. É sobre ver você alcançar o sucesso que merece. 
+                                    Por isso fiz questão de criar condições irrecusáveis.<br><br>
+                                    
+                                    <strong>Esta é minha forma de dizer: "Volta, vamos fazer acontecer juntos!"</strong><br><br>
                                     
                                     Um forte abraço,<br>
-                                    <strong>{{organizationOwner}}</strong>
+                                    <strong style="color: #6c63ff; font-size: 18px;">{{organizationOwner}}</strong><br>
+                                    <em style="font-size: 14px;">Criador do {{productName}}</em>
                                 </p>
                             </div>
 
-                            <!-- WhatsApp Direto -->
-                            <div style="text-align: center; margin: 30px 0;">
-                                <p style="color: #666; font-size: 16px;">
-                                    Quer conversar sobre a oferta?<br>
-                                    <a href="https://wa.me/{{whatsappNumber}}?text=Oi,%20vi%20a%20oferta%20de%20retorno%20e%20quero%20saber%20mais" style="color: #25d366; font-weight: bold; text-decoration: none; font-size: 18px;">
-                                        📱 Me Chame no WhatsApp
-                                    </a>
+                            <!-- WhatsApp Direto com Urgência -->
+                            <div style="text-align: center; margin: 30px 0; background-color: #e8f5e9; padding: 25px; border-radius: 12px;">
+                                <p style="color: #2e7d32; font-size: 18px; font-weight: bold; margin-bottom: 15px;">
+                                    Prefere conversar diretamente comigo?
                                 </p>
-                                <p style="color: #999; font-size: 14px; margin-top: 10px;">
-                                    Respondo pessoalmente em até 2 horas
+                                <a href="https://wa.me/{{whatsappNumber}}?text=Oi%20{{organizationOwner}},%20vi%20a%20oferta%20de%20retorno%20e%20quero%20aproveitar!" style="display: inline-block; background-color: #25d366; color: white; padding: 15px 40px; text-decoration: none; border-radius: 50px; font-size: 18px; font-weight: bold;">
+                                    💬 Chamar no WhatsApp Agora
+                                </a>
+                                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                                    Respondo pessoalmente em minutos (não é bot!)
+                                </p>
+                            </div>
+
+                            <!-- P.S. Poderoso -->
+                            <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 30px;">
+                                <p style="color: #856404; font-size: 14px; margin: 0;">
+                                    <strong>P.S.:</strong> {{customerName}}, lembra quando você entrou e estava cheio de sonhos? 
+                                    Eles ainda são possíveis. Na verdade, estão mais próximos do que nunca. 
+                                    <strong>Não deixe o medo ou o orgulho te impedir de voltar.</strong> 
+                                    Esta oferta existe porque quero genuinamente te ver vencer. 🚀
                                 </p>
                             </div>
                         </td>
@@ -217,9 +288,9 @@
                     <tr>
                         <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 8px 8px;">
                             <p style="color: #999; font-size: 12px; margin: 0;">
-                                Este é um email especial para ex-alunos • Oferta não transferível<br>
-                                {{organizationName}} • {{domain}}<br>
-                                <a href="#" style="color: #999;">Não quero mais receber ofertas</a>
+                                Este é um email exclusivo para ex-alunos VIP • Oferta intransferível<br>
+                                {{organizationName}} • Transformando vidas desde {{foundedYear}}<br>
+                                <a href="{{unsubscribeUrl}}" style="color: #999;">Não quero mais receber ofertas especiais</a>
                             </p>
                         </td>
                     </tr>

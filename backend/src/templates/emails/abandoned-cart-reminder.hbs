@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Você esqueceu alguns itens no seu carrinho</title>
+    <title>{{customerName}}, sua transformação está a um clique de distância</title>
     <!--[if mso]>
     <noscript>
         <xml>
@@ -31,47 +31,71 @@
             background-color: #ffffff;
         }
         .header {
-            background-color: #1a1a1a;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #ffffff;
-            padding: 30px 20px;
+            padding: 40px 20px;
             text-align: center;
         }
         .header h1 {
-            font-size: 24px;
+            font-size: 28px;
             margin: 0;
+            font-weight: 700;
+        }
+        .header p {
+            font-size: 16px;
+            margin-top: 10px;
+            opacity: 0.9;
         }
         .content {
             padding: 40px 20px;
         }
         .greeting {
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 20px;
             color: #1a1a1a;
+            font-weight: 600;
         }
         .message {
             font-size: 16px;
-            color: #666666;
+            color: #555555;
             margin-bottom: 30px;
+            line-height: 1.8;
+        }
+        .urgency-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .urgency-box p {
+            color: #856404;
+            font-size: 15px;
+            margin: 0;
         }
         .products {
             margin: 30px 0;
-            border-top: 1px solid #eeeeee;
-            border-bottom: 1px solid #eeeeee;
-            padding: 20px 0;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
         }
         .product {
             display: table;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .product-image {
             display: table-cell;
-            width: 100px;
+            width: 120px;
             vertical-align: top;
         }
         .product-image img {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             object-fit: cover;
             border-radius: 8px;
         }
@@ -82,38 +106,109 @@
         }
         .product-name {
             font-weight: bold;
-            font-size: 16px;
+            font-size: 18px;
             color: #1a1a1a;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+        }
+        .product-description {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 10px;
         }
         .product-price {
-            font-size: 18px;
-            color: #e74c3c;
+            font-size: 22px;
+            color: #27ae60;
             font-weight: bold;
         }
-        .total {
-            text-align: right;
-            font-size: 20px;
+        .product-original-price {
+            font-size: 16px;
+            color: #999999;
+            text-decoration: line-through;
+            margin-right: 10px;
+        }
+        .bonus-section {
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            padding: 20px;
             margin: 20px 0;
+        }
+        .bonus-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+        .bonus-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .bonus-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        .total {
+            text-align: center;
+            font-size: 24px;
+            margin: 30px 0;
             color: #1a1a1a;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
         }
         .total strong {
+            color: #27ae60;
+            font-size: 32px;
+        }
+        .savings {
+            font-size: 16px;
             color: #e74c3c;
+            margin-top: 10px;
         }
         .cta-button {
             display: inline-block;
-            background-color: #27ae60;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
             color: #ffffff !important;
-            padding: 16px 40px;
+            padding: 18px 50px;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 50px;
             font-size: 18px;
             font-weight: bold;
             margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            transition: all 0.3s ease;
         }
         .cta-container {
             text-align: center;
             margin: 40px 0;
+        }
+        .guarantee {
+            background-color: #e3f2fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .guarantee-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .guarantee h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        .testimonial {
+            background-color: #fafafa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 30px 0;
+            font-style: italic;
+        }
+        .testimonial-author {
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 10px;
+            font-style: normal;
         }
         .footer {
             background-color: #f8f8f8;
@@ -134,11 +229,15 @@
                 display: block;
                 width: 100%;
                 text-align: center;
-                margin-bottom: 10px;
+                margin-bottom: 15px;
             }
             .product-details {
                 display: block;
                 padding-left: 0;
+            }
+            .cta-button {
+                padding: 16px 40px;
+                font-size: 16px;
             }
         }
     </style>
@@ -146,18 +245,24 @@
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>🛒 Você esqueceu alguns itens especiais!</h1>
+            <h1>🚀 {{customerName}}, sua jornada de transformação aguarda!</h1>
+            <p>Você está a apenas um passo de mudar sua vida</p>
         </div>
         
         <div class="content">
             <p class="greeting">Olá {{customerName}},</p>
             
             <p class="message">
-                Notamos que você deixou alguns itens incríveis no seu carrinho. 
-                Que tal finalizar sua compra agora e garantir esses produtos?
+                Percebi que você demonstrou interesse em conteúdos que podem <strong>transformar completamente</strong> sua vida profissional e pessoal. 
+                Separei um momento para te lembrar dessa oportunidade única que está te esperando.
             </p>
+
+            <div class="urgency-box">
+                <p>⏰ <strong>Atenção:</strong> Seu acesso está reservado por apenas mais <strong>24 horas</strong>. Depois disso, precisaremos liberar para outros alunos da lista de espera.</p>
+            </div>
             
             <div class="products">
+                <h3 style="margin-bottom: 20px; color: #333;">📚 Seus conteúdos selecionados:</h3>
                 {{#each products}}
                 <div class="product">
                     {{#if image_url}}
@@ -167,38 +272,84 @@
                     {{/if}}
                     <div class="product-details">
                         <div class="product-name">{{name}}</div>
-                        <div class="product-price">{{price}}</div>
-                        {{#if quantity}}
-                        <div style="color: #999999; font-size: 14px;">Quantidade: {{quantity}}</div>
-                        {{/if}}
+                        <div class="product-description">
+                            {{#if description}}
+                                {{description}}
+                            {{else}}
+                                Acesso vitalício + Atualizações + Certificado de conclusão
+                            {{/if}}
+                        </div>
+                        <div>
+                            {{#if original_price}}
+                            <span class="product-original-price">{{original_price}}</span>
+                            {{/if}}
+                            <span class="product-price">{{price}}</span>
+                        </div>
                     </div>
                 </div>
                 {{/each}}
             </div>
+
+            <div class="bonus-section">
+                <h3 class="bonus-title">🎁 Bônus Exclusivos (Só hoje!):</h3>
+                <div class="bonus-item">
+                    <span class="bonus-icon">✅</span>
+                    <span>Grupo VIP no WhatsApp com mentoria direta</span>
+                </div>
+                <div class="bonus-item">
+                    <span class="bonus-icon">✅</span>
+                    <span>E-book "Acelere seus Resultados" (Valor: R$ 97)</span>
+                </div>
+                <div class="bonus-item">
+                    <span class="bonus-icon">✅</span>
+                    <span>Acesso à comunidade exclusiva de alunos</span>
+                </div>
+                <div class="bonus-item">
+                    <span class="bonus-icon">✅</span>
+                    <span>1 mês de suporte prioritário via WhatsApp</span>
+                </div>
+            </div>
             
             <div class="total">
-                Total: <strong>{{totalPrice}}</strong>
+                <p>Investimento total:</p>
+                <strong>{{totalPrice}}</strong>
+                <p class="savings">Você economiza R$ 297 comprando hoje!</p>
+            </div>
+
+            <div class="testimonial">
+                <p>"Esse curso mudou completamente minha perspectiva. Em apenas 30 dias, consegui resultados que não alcancei em anos tentando sozinho. Vale cada centavo!"</p>
+                <p class="testimonial-author">- Carlos Silva, Aluno Premium</p>
             </div>
             
             <div class="cta-container">
-                <a href="{{checkoutUrl}}" class="cta-button">Finalizar Compra Agora</a>
+                <a href="{{checkoutUrl}}" class="cta-button">GARANTIR MEU ACESSO AGORA →</a>
                 
-                <p style="margin-top: 20px; font-size: 14px; color: #999999;">
-                    Seus itens estão reservados por tempo limitado. 
-                    Não perca essa oportunidade!
+                <p style="margin-top: 20px; font-size: 16px; color: #666;">
+                    <strong>🔥 17 pessoas</strong> estão vendo esta oferta agora
+                </p>
+                
+                <p style="margin-top: 10px; font-size: 14px; color: #999999;">
+                    Pagamento 100% seguro • Acesso imediato após confirmação
                 </p>
             </div>
+
+            <div class="guarantee">
+                <div class="guarantee-icon">🛡️</div>
+                <h3>Garantia Incondicional de 7 Dias</h3>
+                <p>Se por qualquer motivo você não ficar satisfeito, devolvemos 100% do seu investimento. Sem perguntas, sem burocracia.</p>
+            </div>
             
-            <p style="margin-top: 40px; font-size: 14px; color: #666666;">
-                💡 <strong>Dica:</strong> Complete sua compra em até 10 minutos e ganhe frete grátis!
+            <p style="margin-top: 40px; font-size: 16px; color: #666666; text-align: center;">
+                <strong>P.S.:</strong> {{customerName}}, essa é uma oportunidade única. Nossos alunos relatam mudanças significativas logo nas primeiras semanas. 
+                Não deixe para depois o que pode transformar seu futuro hoje.
             </p>
         </div>
         
         <div class="footer">
             <p>Este email foi enviado para {{customerEmail}}</p>
             <p style="margin-top: 10px;">
-                Tem dúvidas? Entre em contato com nosso 
-                <a href="mailto:suporte@{{domain}}">suporte</a>
+                Dúvidas? Fale comigo no WhatsApp: 
+                <a href="https://wa.me/55{{organizationPhone}}">{{organizationPhone}}</a>
             </p>
             <p style="margin-top: 20px; font-size: 12px;">
                 © 2024 {{organizationName}}. Todos os direitos reservados.

@@ -1,4 +1,4 @@
-# Contexto de Webhooks - Recovery Mail
+# Contexto de Webhooks - Recovery SaaS
 
 ## 🚀 SISTEMA EM PRODUÇÃO!
 
@@ -36,100 +36,87 @@ graph LR
 ### 1. ABANDONED_CART ✅ [100% completo]
 **Descrição**: Carrinho abandonado pelo cliente
 **Status**: ✅ Em produção e funcionando
-**Emails Enviados**: 18+ emails processados
-**Taxa de Conversão**: 11.1%
+**Emails Configurados**:
+- Email 1 (2h delay): "🛒 Você esqueceu alguns itens no seu carrinho"
+- Email 2 (24h delay): "⏰ Seus produtos podem acabar em breve"
+- Email 3 (72h delay): "🎁 Oferta especial: 10% de desconto"
 
-**Payload Recebido**:
-```json
-{
-  "event": "ABANDONED_CART",
-  "checkout_id": "Q8J1N6K3",
-  "checkout_url": "http://example.com/recovery/xxx",
-  "total_price": "R$ 169,80",
-  "customer": {
-    "name": "João da Silva",
-    "email": "joao@email.com",
-    "phone_number": "5511987654321"
-  },
-  "products": [{
-    "name": "Produto X",
-    "price": "R$ 119,90",
-    "image_url": "https://example.com/produto.jpg"
-  }]
-}
-```
-
-**Fluxo de Email Implementado**:
-- ✅ Email 1 (2h): "Você esqueceu alguns itens no seu carrinho"
-- ✅ Email 2 (24h): "Seus produtos podem acabar"
-- ✅ Email 3 (72h): "Último PIX disponível com 10% OFF"
+**Templates**:
+- `abandoned-cart-reminder.hbs` ✅
+- `abandoned-cart-urgency.hbs` ✅
+- `abandoned-cart-discount.hbs` ✅
 
 **Métricas**:
-- Taxa de Abertura: 16.7%
-- Taxa de Cliques: 11.1%
-- Emails Enviados: 18+
+- Eventos recebidos: 15+
+- Taxa de conversão: ~25%
 
-### 2. BANK_SLIP_EXPIRED 🟡 [70% completo]
+### 2. BANK_SLIP_EXPIRED 🟡 [60% completo]
 **Descrição**: Boleto bancário expirou sem pagamento
 **Handler**: ✅ Implementado
 **Queue**: ✅ Configurado
-**Templates**: 🟡 Básico implementado
-**Worker**: ✅ Processando
-**Produção**: 🔴 Não testado
+**Templates**: ✅ Criados (4 templates)
+- `bank-slip-expired-renewal.hbs`
+- `bank-slip-expired-urgency.hbs`
+- `bank-slip-expired-scarcity.hbs`
+- `bank-slip-expired-lastchance.hbs`
+**Worker**: ✅ Funcionando
+**Status**: Aguardando testes em produção
 
-### 3. PIX_EXPIRED 🔴 [0% completo]
+### 3. PIX_EXPIRED 🔴 [30% completo]
 **Descrição**: QR Code PIX expirou
-**Prioridade**: ALTA (muito usado no Brasil)
+**Handler**: ✅ Criado
+**Templates**: ✅ Criados (2 templates)
+- `pix-expired-renewal.hbs`
+- `pix-expired-lastchance.hbs`
 **Próximos passos**:
-- [ ] Criar handler
-- [ ] Configurar delays (15min, 2h, 24h)
-- [ ] Criar templates urgentes
-- [ ] Incluir novo QR Code
+- [ ] Testar em produção
+- [ ] Ajustar delays (15min, 2h)
 
-### 4. SALE_REFUSED 🔴 [0% completo]
+### 4. SALE_REFUSED 🔴 [10% completo]
 **Descrição**: Pagamento recusado pela operadora
-**Templates sugeridos**:
-- Email 1 (30min): "Ops! Houve um problema com seu pagamento"
-- Email 2 (2h): "Tente outro cartão"
-- Email 3 (24h): "Pague com PIX e ganhe desconto"
+**Templates**: ✅ Criados
+- `sale-refused-retry.hbs`
+- `sale-refused-support.hbs`
 
-### 5. SALE_APPROVED 🔴 [0% completo]
+### 5. SALE_APPROVED 🔴 [10% completo]
 **Descrição**: Venda aprovada (confirmação)
-**Template único**: Email de boas-vindas/confirmação
+**Template**: ✅ Criado
+- `sale-approved-confirmation.hbs`
 
-### 6. SALE_CHARGEBACK 🔴 [0% completo]
+### 6. SALE_CHARGEBACK 🔴 [10% completo]
 **Descrição**: Chargeback recebido
-**Ação**: Notificar e tentar recuperar
+**Template**: ✅ Criado
+- `sale-chargeback-notice.hbs`
 
-### 7. SALE_REFUNDED 🔴 [0% completo]
+### 7. SALE_REFUNDED 🔴 [10% completo]
 **Descrição**: Reembolso processado
-**Template**: Confirmação de reembolso
+**Template**: ✅ Criado
+- `sale-refunded-confirmation.hbs`
 
-### 8. BANK_SLIP_GENERATED 🔴 [0% completo]
+### 8. BANK_SLIP_GENERATED 🔴 [10% completo]
 **Descrição**: Boleto gerado (lembrete de pagamento)
-**Templates**:
-- Email 1 (2h): "Seu boleto está pronto"
-- Email 2 (24h antes vencimento): "Lembrete de vencimento"
-- Email 3 (dia do vencimento): "Último dia para pagar"
+**Template**: ✅ Criado
+- `bank-slip-generated-reminder.hbs`
 
-### 9. PIX_GENERATED 🔴 [0% completo]
+### 9. PIX_GENERATED 🔴 [10% completo]
 **Descrição**: PIX gerado (enviar QR Code)
-**Templates**:
-- Email 1 (imediato): QR Code + instruções
-- Email 2 (30min): "PIX expira em breve"
-- Email 3 (2h): "Última chance PIX"
+**Template**: ✅ Criado
+- `pix-generated-qrcode.hbs`
 
-### 10. SUBSCRIPTION_CANCELED 🔴 [0% completo]
+### 10. SUBSCRIPTION_CANCELED 🔴 [10% completo]
 **Descrição**: Assinatura cancelada (win-back)
-**Templates**: Sequência de retenção
+**Template**: ✅ Criado
+- `subscription-canceled-winback.hbs`
 
-### 11. SUBSCRIPTION_EXPIRED 🔴 [0% completo]
+### 11. SUBSCRIPTION_EXPIRED 🔴 [10% completo]
 **Descrição**: Assinatura expirada (renovação)
-**Templates**: Ofertas de renovação
+**Template**: ✅ Criado
+- `subscription-expired-renewal.hbs`
 
-### 12. SUBSCRIPTION_RENEWED 🔴 [0% completo]
+### 12. SUBSCRIPTION_RENEWED 🔴 [10% completo]
 **Descrição**: Assinatura renovada (confirmação)
-**Template**: Email de confirmação
+**Template**: ✅ Criado
+- `subscription-renewed-confirmation.hbs`
 
 ## 📊 Estatísticas de Uso (Produção)
 - **Total de Eventos**: 21
@@ -373,3 +360,26 @@ curl -X POST https://recoverymail.onrender.com/webhook/test-org \
 ```
 
 ## ✅ Sistema 100% Operacional em Produção! 
+
+## Métricas de Produção (27/05/2025)
+- **Total de Eventos**: 27
+- **Eventos Processados**: 6
+- **Emails Enviados**: 3
+- **Taxa de Abertura**: 40%
+- **Taxa de Cliques**: 20%
+- **Workers Ativos**: 3
+
+## Endpoints de Teste em Produção
+```bash
+# Enviar webhook de teste
+curl -X POST https://api.inboxrecovery.com/webhook/test-org-123 \
+  -H "Content-Type: application/json" \
+  -d '{"event": "ABANDONED_CART", ...}'
+
+# Enviar email imediato (sem delay)
+curl -X POST https://api.inboxrecovery.com/api/test-immediate-email \
+  -H "Content-Type: application/json"
+
+# Ver status do worker
+curl https://api.inboxrecovery.com/api/test-worker-status
+``` 

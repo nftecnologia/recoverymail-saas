@@ -3,91 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seu PIX expirou - Gere um novo código</title>
+    <title>⚡ {{customerName}}, seu acesso está a 1 PIX de distância!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #32BCAD 0%, #26a69a 100%);
+            color: #ffffff;
+            padding: 50px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 34px;
+            margin: 0;
+            font-weight: 700;
+        }
+        .header p {
+            font-size: 18px;
+            margin-top: 10px;
+            opacity: 0.95;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .message {
+            font-size: 17px;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        .urgency-banner {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .urgency-banner::before {
+            content: "⏰";
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 80px;
+            opacity: 0.1;
+        }
+        .urgency-banner h3 {
+            color: #856404;
+            font-size: 22px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        .urgency-banner p {
+            color: #856404;
+            font-size: 16px;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+        .pix-benefits {
+            background-color: #e3f2fd;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .pix-benefits h3 {
+            color: #1976d2;
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .benefit-item {
+            text-align: center;
+            padding: 15px;
+        }
+        .benefit-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .benefit-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .benefit-desc {
+            color: #666;
+            font-size: 14px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #32BCAD 0%, #26a69a 100%);
+            color: #ffffff !important;
+            padding: 22px 70px;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(50, 188, 173, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .cta-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .instant-access {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .instant-access h3 {
+            color: #2e7d32;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .instant-access p {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .access-timeline {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .timeline-item {
+            text-align: center;
+        }
+        .timeline-icon {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+        .timeline-text {
+            font-size: 14px;
+            color: #666;
+        }
+        .timeline-arrow {
+            font-size: 24px;
+            color: #4caf50;
+        }
+        .testimonial-box {
+            background-color: #fafafa;
+            border-left: 4px solid #32BCAD;
+            padding: 20px;
+            margin: 30px 0;
+            font-style: italic;
+        }
+        .testimonial-text {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .testimonial-author {
+            font-weight: bold;
+            color: #32BCAD;
+            text-align: right;
+            font-style: normal;
+        }
+        .payment-info {
+            background-color: #f5f5f5;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .payment-info h4 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #666;
+        }
+        .info-value {
+            font-weight: bold;
+            color: #333;
+        }
+        .price-value {
+            color: #32BCAD;
+            font-size: 20px;
+        }
+        .footer {
+            background-color: #f8f8f8;
+            padding: 30px;
+            text-align: center;
+        }
+        .footer p {
+            color: #999;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        @media only screen and (max-width: 600px) {
+            .benefit-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .access-timeline {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .timeline-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f4;">
-        <tr>
-            <td align="center">
-                <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; margin-top: 20px; border-radius: 8px; overflow: hidden;">
-                    <!-- Header -->
-                    <tr>
-                        <td style="background-color: #32BCAD; padding: 40px 30px; text-align: center;">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 28px;">⏱️ Tempo esgotado!</h1>
-                            <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 16px;">Seu código PIX expirou, mas você pode gerar um novo agora mesmo</p>
-                        </td>
-                    </tr>
-                    
-                    <!-- Content -->
-                    <tr>
-                        <td style="padding: 40px 30px;">
-                            <p style="font-size: 18px; color: #333; margin: 0 0 20px 0;">
-                                Olá {{customerName}},
-                            </p>
-                            
-                            <p style="font-size: 16px; color: #666; line-height: 1.6; margin: 0 0 30px 0;">
-                                O código PIX para pagamento de <strong style="color: #32BCAD;">{{total_price}}</strong> expirou após {{#if pix_expiry_minutes}}{{pix_expiry_minutes}} minutos{{else}}30 minutos{{/if}}.
-                            </p>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>⚡ Seu PIX expirou, mas sua vaga continua reservada!</h1>
+            <p>Gere um novo código e comece a transformação em segundos</p>
+        </div>
+        
+        <div class="content">
+            <p class="greeting">Olá {{customerName}},</p>
+            
+            <p class="message">
+                Vi que você estava <strong>prestes a garantir seu acesso</strong> ao nosso conteúdo transformador, mas o tempo do PIX acabou expirando. 
+                <strong>A boa notícia:</strong> consegui manter sua vaga reservada e você pode gerar um novo código agora mesmo!
+            </p>
 
-                            <!-- Urgency Message -->
-                            <div style="background-color: #E3F2FD; padding: 20px; border-radius: 8px; border-left: 4px solid #2196F3; margin: 0 0 30px 0;">
-                                <p style="margin: 0; color: #1565C0;">
-                                    <strong>⚡ PIX é instantâneo!</strong> Gere um novo código e finalize sua compra em segundos.
-                                </p>
-                            </div>
+            <div class="payment-info">
+                <h4>💰 Detalhes do seu investimento:</h4>
+                <div class="info-item">
+                    <span class="info-label">Conteúdo:</span>
+                    <span class="info-value">{{product_name}}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Valor total:</span>
+                    <span class="info-value price-value">{{total_price}}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tempo do novo PIX:</span>
+                    <span class="info-value">{{#if pix_expiry_minutes}}{{pix_expiry_minutes}} minutos{{else}}30 minutos{{/if}}</span>
+                </div>
+            </div>
 
-                            <!-- CTA Button -->
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                <tr>
-                                    <td align="center" style="padding: 30px 0;">
-                                        <a href="{{checkout_url}}" style="display: inline-block; padding: 16px 40px; background-color: #32BCAD; color: #ffffff; text-decoration: none; font-size: 18px; font-weight: bold; border-radius: 50px;">
-                                            📱 Gerar Novo PIX
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+            <div class="urgency-banner">
+                <h3>Sua vaga está garantida por mais 2 horas!</h3>
+                <p>Depois disso, precisaremos liberar para a lista de espera</p>
+            </div>
 
-                            <!-- Benefits -->
-                            <div style="text-align: center; margin: 30px 0;">
-                                <h3 style="color: #333; margin: 0 0 20px 0;">Por que pagar com PIX?</h3>
-                                <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                    <tr>
-                                        <td align="center" width="33%" style="padding: 10px;">
-                                            <p style="margin: 0; font-size: 24px;">⚡</p>
-                                            <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Pagamento<br>Instantâneo</p>
-                                        </td>
-                                        <td align="center" width="33%" style="padding: 10px;">
-                                            <p style="margin: 0; font-size: 24px;">🔒</p>
-                                            <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">100%<br>Seguro</p>
-                                        </td>
-                                        <td align="center" width="33%" style="padding: 10px;">
-                                            <p style="margin: 0; font-size: 24px;">📱</p>
-                                            <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Pague pelo<br>Celular</p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
+            <div class="cta-container">
+                <a href="{{checkout_url}}" class="cta-button">
+                    📱 GERAR NOVO PIX AGORA
+                </a>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                    Clique e receba o QR Code instantaneamente
+                </p>
+            </div>
 
-                            <p style="font-size: 14px; color: #999; text-align: center; margin: 30px 0 0 0;">
-                                O novo código ficará disponível por mais {{#if pix_expiry_minutes}}{{pix_expiry_minutes}} minutos{{else}}30 minutos{{/if}}.
-                            </p>
-                        </td>
-                    </tr>
-                    
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color: #f8f8f8; padding: 30px; text-align: center;">
-                            <p style="margin: 0 0 10px 0; color: #999; font-size: 12px;">
-                                Este email foi enviado por {{organizationName}}
-                            </p>
-                            <p style="margin: 0; color: #999; font-size: 12px;">
-                                Você está recebendo este email porque iniciou um pagamento via PIX.
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+            <div class="instant-access">
+                <h3>🚀 Como funciona o acesso imediato:</h3>
+                <div class="access-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-icon">📱</div>
+                        <div class="timeline-text">Gere o PIX</div>
+                    </div>
+                    <div class="timeline-arrow">→</div>
+                    <div class="timeline-item">
+                        <div class="timeline-icon">💳</div>
+                        <div class="timeline-text">Pague pelo app</div>
+                    </div>
+                    <div class="timeline-arrow">→</div>
+                    <div class="timeline-item">
+                        <div class="timeline-icon">✅</div>
+                        <div class="timeline-text">Acesso liberado!</div>
+                    </div>
+                </div>
+                <p style="margin-top: 20px; font-weight: bold; color: #2e7d32;">
+                    Em menos de 1 minuto você já estará dentro da plataforma!
+                </p>
+            </div>
+
+            <div class="pix-benefits">
+                <h3>Por que o PIX é perfeito para você começar agora:</h3>
+                <div class="benefit-grid">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">⚡</div>
+                        <div class="benefit-title">Instantâneo</div>
+                        <div class="benefit-desc">Acesso liberado na hora</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🔒</div>
+                        <div class="benefit-title">100% Seguro</div>
+                        <div class="benefit-desc">Garantido pelo Banco Central</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">📱</div>
+                        <div class="benefit-title">Super Fácil</div>
+                        <div class="benefit-desc">Pague pelo celular</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-box">
+                <p class="testimonial-text">
+                    "Paguei por PIX e em menos de 2 minutos já estava assistindo a primeira aula. 
+                    A facilidade de começar imediatamente fez toda diferença!"
+                </p>
+                <p class="testimonial-author">- Fernanda Lima, Aluna</p>
+            </div>
+
+            <p style="text-align: center; font-size: 18px; color: #333; margin-top: 40px; font-weight: 600;">
+                {{customerName}}, você está a apenas 1 PIX de distância da sua transformação!
+            </p>
+            
+            <p style="text-align: center; font-style: italic; color: #666; margin-top: 20px;">
+                "O melhor momento para começar foi ontem. O segundo melhor é agora."
+            </p>
+
+            <div style="background-color: #e8f5e9; border-radius: 8px; padding: 20px; margin-top: 30px; text-align: center;">
+                <p style="color: #2e7d32; font-weight: bold; margin: 0;">
+                    🎁 Bônus: Quem paga por PIX ganha acesso ao grupo VIP no WhatsApp!
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Dúvidas sobre o pagamento?</strong></p>
+            <p>WhatsApp: <a href="https://wa.me/55{{organizationPhone}}" style="color: #32BCAD;">{{organizationPhone}}</a></p>
+            <p style="margin-top: 15px;">Este email foi enviado por {{organizationName}}</p>
+            <p>Você está recebendo porque iniciou um pagamento via PIX</p>
+        </div>
+    </div>
 </body>
 </html> 

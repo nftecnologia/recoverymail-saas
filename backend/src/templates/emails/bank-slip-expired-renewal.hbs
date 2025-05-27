@@ -3,75 +3,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seu boleto expirou - Gere um novo agora</title>
+    <title>{{customerName}}, não perca sua vaga! Novo boleto disponível</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #FF6B6B 0%, #ee5a24 100%);
+            color: #ffffff;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin: 0;
+            font-weight: 700;
+        }
+        .header p {
+            font-size: 18px;
+            margin-top: 10px;
+            opacity: 0.95;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .message {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        .order-details {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #FF6B6B;
+        }
+        .order-details h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .detail-label {
+            color: #666;
+        }
+        .detail-value {
+            font-weight: bold;
+            color: #333;
+        }
+        .price-highlight {
+            font-size: 24px;
+            color: #FF6B6B;
+        }
+        .urgency-box {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .urgency-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        .urgency-box p {
+            color: #856404;
+            font-size: 16px;
+            margin: 0;
+        }
+        .benefits-box {
+            background-color: #e8f5e9;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .benefits-title {
+            color: #2e7d32;
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .benefit-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: #ffffff !important;
+            padding: 20px 60px;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .cta-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .alternative-payment {
+            background-color: #e3f2fd;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .alternative-payment h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .payment-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .payment-option {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #ffffff;
+            border: 2px solid #1976d2;
+            border-radius: 30px;
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .payment-option:hover {
+            background-color: #1976d2;
+            color: #ffffff;
+        }
+        .tips-section {
+            background-color: #fafafa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .tips-section h4 {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .tips-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        .tips-section li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #666;
+        }
+        .tips-section li:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+        .footer {
+            background-color: #f8f8f8;
+            padding: 30px;
+            text-align: center;
+        }
+        .footer p {
+            color: #999;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        @media only screen and (max-width: 600px) {
+            .payment-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            .payment-option {
+                width: 80%;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f4;">
-        <tr>
-            <td align="center">
-                <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; margin-top: 20px; border-radius: 8px; overflow: hidden;">
-                    <!-- Header -->
-                    <tr>
-                        <td style="background-color: #FF6B6B; padding: 40px 30px; text-align: center;">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 28px;">⚠️ Ops! Seu boleto expirou</h1>
-                            <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 16px;">Mas não se preocupe, é super fácil gerar um novo!</p>
-                        </td>
-                    </tr>
-                    
-                    <!-- Content -->
-                    <tr>
-                        <td style="padding: 40px 30px;">
-                            <p style="font-size: 18px; color: #333; margin: 0 0 20px 0;">
-                                Olá {{customerName}},
-                            </p>
-                            
-                            <p style="font-size: 16px; color: #666; line-height: 1.6; margin: 0 0 30px 0;">
-                                Notamos que seu boleto no valor de <strong style="color: #FF6B6B;">{{total_price}}</strong> expirou sem o pagamento.
-                            </p>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>⚠️ {{customerName}}, sua vaga está em risco!</h1>
+            <p>Mas ainda dá tempo de garantir seu acesso</p>
+        </div>
+        
+        <div class="content">
+            <p class="greeting">Olá {{customerName}},</p>
+            
+            <p class="message">
+                Percebi que seu boleto para acessar nosso <strong>conteúdo transformador</strong> expirou. 
+                Sei que imprevistos acontecem, por isso <strong>preparei uma nova oportunidade</strong> para você não perder essa chance única de evolução.
+            </p>
 
-                            <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px; margin: 0 0 30px 0;">
-                                <p style="margin: 0 0 10px 0; color: #333; font-weight: bold;">📋 Detalhes do pedido:</p>
-                                <p style="margin: 0; color: #666;">Pedido: #{{transaction_id}}</p>
-                                <p style="margin: 0; color: #666;">Data de vencimento: {{formatDate expiry_date}}</p>
-                            </div>
+            <div class="order-details">
+                <h3>📋 Detalhes do seu acesso:</h3>
+                <div class="detail-item">
+                    <span class="detail-label">Pedido:</span>
+                    <span class="detail-value">#{{transaction_id}}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Conteúdo:</span>
+                    <span class="detail-value">{{product_name}}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Investimento:</span>
+                    <span class="detail-value price-highlight">{{total_price}}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Boleto anterior venceu em:</span>
+                    <span class="detail-value">{{formatDate expiry_date}}</span>
+                </div>
+            </div>
 
-                            <!-- CTA Button -->
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                <tr>
-                                    <td align="center" style="padding: 30px 0;">
-                                        <a href="{{checkout_url}}" style="display: inline-block; padding: 16px 40px; background-color: #FF6B6B; color: #ffffff; text-decoration: none; font-size: 18px; font-weight: bold; border-radius: 50px;">
-                                            🔄 Gerar Novo Boleto
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+            <div class="urgency-box">
+                <h3>⏰ ATENÇÃO: Vaga reservada por apenas 48 horas!</h3>
+                <p>Após esse prazo, precisaremos liberar para outros interessados da lista de espera.</p>
+            </div>
 
-                            <div style="background-color: #FFF3CD; padding: 20px; border-radius: 8px; border-left: 4px solid #FFC107; margin: 30px 0;">
-                                <p style="margin: 0; color: #856404;">
-                                    <strong>💡 Dica:</strong> Após gerar o novo boleto, você pode pagá-lo em qualquer banco, lotérica ou pelo app do seu banco!
-                                </p>
-                            </div>
+            <div class="cta-container">
+                <a href="{{checkout_url}}" class="cta-button">
+                    🔄 GERAR NOVO BOLETO AGORA
+                </a>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                    Clique e receba seu novo boleto instantaneamente
+                </p>
+            </div>
 
-                            <p style="font-size: 14px; color: #999; text-align: center; margin: 30px 0 0 0;">
-                                Qualquer dúvida, estamos aqui para ajudar! 😊
-                            </p>
-                        </td>
-                    </tr>
-                    
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color: #f8f8f8; padding: 30px; text-align: center;">
-                            <p style="margin: 0 0 10px 0; color: #999; font-size: 12px;">
-                                Este email foi enviado por {{organizationName}}
-                            </p>
-                            <p style="margin: 0; color: #999; font-size: 12px;">
-                                Você recebeu este email porque tem uma compra pendente.
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+            <div class="alternative-payment">
+                <h3>💳 Prefere outras formas de pagamento?</h3>
+                <p style="color: #555; margin-bottom: 20px;">
+                    Facilitamos para você! Escolha a melhor opção:
+                </p>
+                <div class="payment-options">
+                    <a href="{{checkout_url}}?payment=pix" class="payment-option">
+                        PIX (Na hora!)
+                    </a>
+                    <a href="{{checkout_url}}?payment=card" class="payment-option">
+                        Cartão (12x)
+                    </a>
+                </div>
+            </div>
+
+            <div class="benefits-box">
+                <h3 class="benefits-title">🎯 Lembre-se do que você está prestes a acessar:</h3>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✅</span>
+                    <span>Acesso vitalício ao conteúdo completo</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✅</span>
+                    <span>Atualizações gratuitas para sempre</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✅</span>
+                    <span>Certificado de conclusão reconhecido</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✅</span>
+                    <span>Suporte direto comigo por 1 ano</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✅</span>
+                    <span>Comunidade exclusiva de alunos</span>
+                </div>
+            </div>
+
+            <div class="tips-section">
+                <h4>💡 Dicas para pagamento do boleto:</h4>
+                <ul>
+                    <li>Pague pelo app do seu banco (mais rápido)</li>
+                    <li>Use o código de barras ou linha digitável</li>
+                    <li>Pagamento é processado em até 2 horas</li>
+                    <li>Acesso liberado automaticamente após confirmação</li>
+                </ul>
+            </div>
+
+            <p style="text-align: center; font-size: 18px; color: #333; margin-top: 40px; font-weight: 600;">
+                {{customerName}}, não deixe essa oportunidade passar!
+            </p>
+            
+            <p style="text-align: center; font-style: italic; color: #666; margin-top: 20px;">
+                "A diferença entre o sucesso e o fracasso muitas vezes está em dar o próximo passo."
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Precisa de ajuda?</strong></p>
+            <p>WhatsApp: <a href="https://wa.me/55{{organizationPhone}}" style="color: #1976d2;">{{organizationPhone}}</a></p>
+            <p style="margin-top: 15px;">Este email foi enviado por {{organizationName}}</p>
+            <p>Você recebeu porque tem uma compra pendente</p>
+        </div>
+    </div>
 </body>
 </html> 
