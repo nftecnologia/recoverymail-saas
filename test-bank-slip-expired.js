@@ -22,26 +22,54 @@ function log(message, color = 'reset') {
   console.log(`${colors[color]}${message}${colors.reset}`);
 }
 
-// Gerar dados do PIX
-const pixData = {
-  event: 'PIX_EXPIRED',
+// Gerar dados do boleto
+const bankSlipData = {
+  event: 'BANK_SLIP_EXPIRED',
   transaction_id: `TRX-${Date.now()}`,
-  pix_qr_code: '00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-426614174000',
-  pix_copy_paste: '00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-426614174000',
-  total_price: 'R$ 197,90',
+  sale_id: `SALE-${Date.now()}`,
+  bank_slip_url: 'https://exemplo.com/boleto/123456789',
+  bank_slip_code: '34191.79001 01043.510047 91020.150008 1 91540000019990',
+  total_price: 'R$ 297,00',
   expired_at: new Date().toISOString(),
-  checkout_url: 'https://loja.exemplo.com/checkout/pix-expired-test',
+  checkout_url: 'https://loja.exemplo.com/checkout/boleto-vencido',
+  payment_method: 'BANK_SLIP',
+  type: 'ONE_TIME',
+  status: 'expired',
+  created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias atrás
   customer: {
-    name: 'Teste PIX Expirado',
+    name: 'Teste Boleto Vencido',
     email: TEST_EMAIL,
     phone_number: '5511999999999',
     document: '12345678900'
+  },
+  products: [
+    {
+      id: 'PROD-001',
+      name: 'Curso Completo de Marketing Digital',
+      price: 'R$ 297,00',
+      quantity: 1,
+      image_url: 'https://via.placeholder.com/200x200?text=Marketing',
+      offer_id: 'OFFER-MKT-001',
+      offer_name: 'Oferta Especial Black Friday'
+    }
+  ],
+  payment: {
+    method: 'BANK_SLIP',
+    link: 'https://exemplo.com/boleto/123456789',
+    digitable_line: '34191.79001 01043.510047 91020.150008 1 91540000019990',
+    barcode: '34191915400000199901790001043510047910201500',
+    expires_at: new Date().toISOString()
+  },
+  utm: {
+    utm_source: 'facebook',
+    utm_medium: 'cpc',
+    utm_campaign: 'black_friday_2024'
   }
 };
 
 // Função para fazer a requisição
 function sendWebhook() {
-  const data = JSON.stringify(pixData);
+  const data = JSON.stringify(bankSlipData);
   
   const options = {
     hostname: API_URL,
@@ -54,11 +82,11 @@ function sendWebhook() {
     }
   };
 
-  log('\n🚀 Enviando webhook PIX_EXPIRED...', 'bright');
+  log('\n🚀 Enviando webhook BANK_SLIP_EXPIRED...', 'bright');
   log(`📍 URL: https://${API_URL}/webhook/${ORG_ID}`, 'cyan');
   log(`📧 Email: ${TEST_EMAIL}`, 'cyan');
-  log(`💰 Valor: ${pixData.total_price}`, 'cyan');
-  log(`🆔 Transaction ID: ${pixData.transaction_id}`, 'cyan');
+  log(`💰 Valor: ${bankSlipData.total_price}`, 'cyan');
+  log(`📄 Código: ${bankSlipData.bank_slip_code.substring(0, 20)}...`, 'cyan');
 
   const req = https.request(options, (res) => {
     let body = '';
@@ -74,16 +102,17 @@ function sendWebhook() {
         try {
           const response = JSON.parse(body);
           log(`📝 Event ID: ${response.eventId}`, 'green');
-          log(`📊 Status: ${response.status}`, 'green');
+          log(`📊 Status: ${response.status || 'PENDING'}`, 'green');
           
           log('\n📧 Emails programados:', 'yellow');
-          log('  1️⃣  Em 15 minutos: "⏱️ Seu PIX expirou - Gere um novo código"', 'yellow');
-          log('  2️⃣  Em 2 horas: "⚡ Último PIX disponível com 10% OFF"', 'yellow');
+          log('  1️⃣  Em 30 minutos: "⚠️ Seu boleto expirou - Gere um novo agora"', 'yellow');
+          log('  2️⃣  Em 24 horas: "🔥 Ainda dá tempo! PIX com desconto exclusivo"', 'yellow');
+          log('  3️⃣  Em 48 horas: "😢 Última chance com oferta especial"', 'yellow');
           
           log('\n💡 Dicas:', 'blue');
-          log('  - Verifique seu email em 15 minutos', 'blue');
-          log('  - O segundo email chegará em 2 horas', 'blue');
-          log('  - Clique nos links para testar o tracking', 'blue');
+          log('  - Verifique seu email em 30 minutos', 'blue');
+          log('  - O segundo email oferece PIX como alternativa', 'blue');
+          log('  - O terceiro email tem 10% de desconto', 'blue');
           
           log('\n🔍 Para verificar o status:', 'cyan');
           log(`  curl https://${API_URL}/api/events?limit=1 -H "x-organization-id: ${ORG_ID}"`, 'cyan');
@@ -107,6 +136,6 @@ function sendWebhook() {
 }
 
 // Executar
-log('🧪 Teste de Webhook PIX_EXPIRED', 'bright');
-log('================================', 'bright');
+log('🧪 Teste de Webhook BANK_SLIP_EXPIRED', 'bright');
+log('=====================================', 'bright');
 sendWebhook(); 

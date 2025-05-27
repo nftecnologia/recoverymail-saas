@@ -66,7 +66,7 @@ export async function processPixExpired(job: Job<EmailJobData>): Promise<void> {
         supportUrl: payload.support_url || 'https://suporte.exemplo.com',
         // Dados da organização
         organizationName: event.organization.name,
-        organizationEmail: event.organization.emailSettings?.fromEmail || 'noreply@inboxrecovery.com',
+        organizationEmail: (event.organization.emailSettings as any)?.fromEmail || 'noreply@inboxrecovery.com',
         // Controle de tentativas
         isFirstAttempt: attemptNumber === 1,
         isLastAttempt: attemptNumber === 2, // PIX_EXPIRED tem 2 tentativas
@@ -94,11 +94,7 @@ export async function processPixExpired(job: Job<EmailJobData>): Promise<void> {
         data: {
           status: 'PROCESSED',
           processedAt: new Date(),
-          metadata: {
-            ...(event.metadata as any || {}),
-            lastEmailSentAt: new Date().toISOString(),
-            totalEmailsSent: attemptNumber
-          }
+
         }
       });
       

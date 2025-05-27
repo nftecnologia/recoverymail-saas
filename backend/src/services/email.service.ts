@@ -55,7 +55,7 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
     
     // No Render, o CWD é /opt/render/project/src/backend
     // e os templates estão em dist/templates/emails
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env['NODE_ENV'] === 'production') {
       templatePath = path.join(process.cwd(), 'dist', 'templates', 'emails', `${templateName}.hbs`);
     } else {
       // Em desenvolvimento
@@ -66,7 +66,7 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
       templateName,
       templatePath,
       cwd: process.cwd(),
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env['NODE_ENV']
     });
 
     const templateContent = await fs.readFile(templatePath, 'utf-8');
@@ -80,7 +80,7 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
     logger.error('Failed to load email template', {
       templateName,
       cwd: process.cwd(),
-      nodeEnv: process.env.NODE_ENV,
+      nodeEnv: process.env['NODE_ENV'],
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
     });

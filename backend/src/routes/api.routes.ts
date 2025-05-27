@@ -490,8 +490,8 @@ router.get('/test-worker-status', async (_req, res) => {
       workers: {
         count: workers.length,
         details: workers.map(w => ({
-          id: w.id,
-          name: w.name
+          id: (w as any)['id'],
+          name: (w as any)['name']
         }))
       },
       workerStatus: workers.length > 0 ? 'running' : 'not running'
@@ -511,10 +511,10 @@ router.post('/test-clear-queues', async (_req, res) => {
     const queue = getQueue();
     
     // Limpar failed jobs
-    await queue.clean(0, 'failed');
+    await queue.clean(0, 0, 'failed');
     
     // Limpar delayed jobs
-    await queue.clean(0, 'delayed');
+    await queue.clean(0, 0, 'delayed');
     
     // Pegar novo status
     const jobCounts = await queue.getJobCounts();
@@ -653,7 +653,7 @@ router.post('/test-clear-all-jobs', async (_req, res) => {
 });
 
 // TESTE IMEDIATO: Enviar email de carrinho abandonado sem delay
-router.post('/test-immediate-email', async (req, res) => {
+router.post('/test-immediate-email', async (_req, res) => {
   try {
     const { sendEmail } = await import('../services/email.service');
     const { prisma } = await import('../config/database');
@@ -688,15 +688,16 @@ router.post('/test-immediate-email', async (req, res) => {
     });
     
     // Preparar dados do email (primeiro email de carrinho abandonado)
+    const payload = testEvent.payload as any;
     const emailData = {
-      to: testEvent.payload.customer.email,
+      to: payload.customer.email,
       subject: '🛒 Você esqueceu alguns itens no seu carrinho',
       template: 'abandoned-cart-reminder',
       data: {
-        customerName: testEvent.payload.customer.name,
-        checkoutUrl: testEvent.payload.checkout_url,
-        totalPrice: testEvent.payload.total_price,
-        products: testEvent.payload.products
+        customerName: payload.customer.name,
+        checkoutUrl: payload.checkout_url,
+        totalPrice: payload.total_price,
+        products: payload.products
       },
       organizationId: testEvent.organizationId,
       eventId: testEvent.id,
@@ -730,18 +731,18 @@ router.post('/test-immediate-email', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message,
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      details: process.env['NODE_ENV'] === 'development' ? error.stack : undefined
     });
   }
 });
 
 // Worker status endpoint
-router.get('/worker-status', async (req, res) => {
+router.get('/worker-status', async (_req, res) => {
   try {
     const { getQueue } = await import('../services/queue.service');
     const queue = getQueue();
     const workers = await queue.getWorkers();
-    const workerCount = await queue.getWorkerCount();
+    const workerCount = await queue.getWorkersCount();
     const activeCount = await queue.getActiveCount();
     const waitingCount = await queue.getWaitingCount();
     
@@ -752,8 +753,8 @@ router.get('/worker-status', async (req, res) => {
         active: activeCount,
         waiting: waitingCount,
         details: workers.map(w => ({
-          id: w.id,
-          state: w.state
+          id: (w as any)['id'],
+          state: (w as any)['state']
         }))
       },
       timestamp: new Date().toISOString()
