@@ -1,12 +1,12 @@
 import { getSession } from "next-auth/react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.inboxrecovery.com';
 
 interface ApiOptions extends RequestInit {
   organizationId?: string;
 }
 
-class ApiClient {
+export class ApiClient {
   private baseUrl: string;
 
   constructor(baseUrl: string) {

@@ -28,8 +28,15 @@ app.use(helmet());
 // Configuração CORS mais explícita
 const corsOptions = {
   origin: (origin: any, callback: any) => {
-    // Temporariamente mais permissivo para Vercel
-    if (!origin || origin.includes('vercel.app') || origin.includes('localhost')) {
+    // Permitir domínios customizados e Vercel
+    const allowedPatterns = [
+      'vercel.app',
+      'localhost',
+      'recoverymail.com.br', // Domínio principal
+      'recoverymail.com'     // Variação sem .br
+    ];
+    
+    if (!origin || allowedPatterns.some(pattern => origin.includes(pattern))) {
       callback(null, true);
       return;
     }

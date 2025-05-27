@@ -41,6 +41,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const eventTypeLabels: Record<string, string> = {
   ABANDONED_CART: "Carrinho Abandonado",
@@ -75,6 +76,9 @@ const eventTypeColors: Record<string, string> = {
 export default function EventsPage() {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['events', page, selectedType],
@@ -87,6 +91,55 @@ export default function EventsPage() {
 
   const handleRefresh = () => {
     refetch();
+    toast.success("Lista de eventos atualizada!");
+  };
+
+  const handleExport = () => {
+    if (!data?.events || data.events.length === 0) {
+      toast.error("Não há eventos para exportar");
+      return;
+    }
+
+    // Criar CSV
+    const headers = ["Tipo", "ID Externo", "Status", "Data", "Cliente", "Email"];
+    const rows = data.events.map((event: any) => [
+      eventTypeLabels[event.eventType] || event.eventType,
+      event.externalId || '-',
+      event.status,
+      format(new Date(event.createdAt), "dd/MM/yyyy HH:mm:ss"),
+      event.payload?.customer?.name || '-',
+      event.payload?.customer?.email || '-'
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
+    ].join("\n");
+
+    // Download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `eventos-${format(new Date(), "yyyy-MM-dd-HHmmss")}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success("Eventos exportados com sucesso!");
+  };
+
+  const handleViewDetails = (event: any) => {
+    setSelectedEvent(event);
+    setIsDetailsOpen(true);
+  };
+
+  const handleCopy = (field: string, value: string) => {
+    navigator.clipboard.writeText(value);
+    setCopiedField(field);
+    toast.success("Copiado para a área de transferência!");
+    setTimeout(() => setCopiedField(null), 2000);
   };
 
   return (
@@ -218,6 +271,7 @@ export default function EventsPage() {
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={handleExport}
                   className="gap-2 border-gray-200 hover:bg-gray-50"
                 >
                   <Download className="h-4 w-4" />
@@ -318,6 +372,7 @@ export default function EventsPage() {
                           <Button 
                             variant="ghost" 
                             size="sm"
+                            onClick={() => handleViewDetails(event)}
                             className="opacity-0 transition-opacity group-hover:opacity-100"
                           >
                             Ver detalhes
@@ -358,6 +413,155 @@ export default function EventsPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Modal de detalhes */}
+        <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <div className={cn(
+                  "h-3 w-3 rounded-full bg-gradient-to-r",
+                  selectedEvent && eventTypeColors[selectedEvent.eventType] || "from-gray-400 to-gray-600"
+                )} />
+                Detalhes do Evento
+              </DialogTitle>
+              <DialogDescription>
+                {selectedEvent && (eventTypeLabels[selectedEvent.eventType] || selectedEvent.eventType)}
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedEvent && (
+              <div className="space-y-6">
+                {/* Informações básicas */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm text-gray-700">Informações Gerais</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-500">ID do Evento:</span>
+                      <div className="flex items-center gap-2 mt-1">
+                        <code className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                          {selectedEvent.id}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => handleCopy('id', selectedEvent.id)}
+                        >
+                          {copiedField === 'id' ? (
+                            <Check className="h-3 w-3 text-green-600" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">ID Externo:</span>
+                      <div className="flex items-center gap-2 mt-1">
+                        <code className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                          {selectedEvent.externalId || '-'}
+                        </code>
+                        {selectedEvent.externalId && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={() => handleCopy('externalId', selectedEvent.externalId)}
+                          >
+                            {copiedField === 'externalId' ? (
+                              <Check className="h-3 w-3 text-green-600" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Status:</span>
+                      <div className="mt-1">
+                        <Badge 
+                          variant="outline"
+                          className={cn(
+                            "transition-colors",
+                            selectedEvent.status === 'PROCESSED' && "border-green-500/20 bg-green-50 text-green-700",
+                            selectedEvent.status === 'PENDING' && "border-yellow-500/20 bg-yellow-50 text-yellow-700",
+                            selectedEvent.status === 'ERROR' && "border-red-500/20 bg-red-50 text-red-700"
+                          )}
+                        >
+                          {selectedEvent.status === 'PROCESSED' && <CheckCircle className="mr-1 h-3 w-3" />}
+                          {selectedEvent.status === 'PENDING' && <Clock className="mr-1 h-3 w-3" />}
+                          {selectedEvent.status === 'ERROR' && <XCircle className="mr-1 h-3 w-3" />}
+                          {selectedEvent.status === 'PROCESSED' ? 'Processado' : 
+                           selectedEvent.status === 'PENDING' ? 'Pendente' : 'Erro'}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Data:</span>
+                      <p className="mt-1 font-mono text-xs">
+                        {format(new Date(selectedEvent.createdAt), "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payload */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-sm text-gray-700">Payload do Webhook</h3>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs"
+                      onClick={() => handleCopy('payload', JSON.stringify(selectedEvent.payload, null, 2))}
+                    >
+                      {copiedField === 'payload' ? (
+                        <>
+                          <Check className="mr-1 h-3 w-3 text-green-600" />
+                          Copiado!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="mr-1 h-3 w-3" />
+                          Copiar JSON
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <pre className="bg-gray-50 border rounded-lg p-4 overflow-x-auto text-xs">
+                    <code>{JSON.stringify(selectedEvent.payload, null, 2)}</code>
+                  </pre>
+                </div>
+
+                {/* Emails enviados */}
+                {selectedEvent.emails && selectedEvent.emails.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-sm text-gray-700">
+                      Emails Enviados ({selectedEvent.emails.length})
+                    </h3>
+                    <div className="space-y-2">
+                      {selectedEvent.emails.map((email: any, index: number) => (
+                        <div key={email.id} className="bg-gray-50 rounded-lg p-3 text-sm">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">Email {index + 1}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {email.status}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Enviado em {format(new Date(email.sentAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
