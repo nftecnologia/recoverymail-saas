@@ -24,12 +24,29 @@ const app = express();
 
 // Middleware de segurança
 app.use(helmet());
-app.use(cors({
-  origin: env.NODE_ENV === 'production' 
-    ? ['https://recoverymail.vercel.app', env.FRONTEND_URL]
-    : ['http://localhost:3000', 'http://localhost:3001'],
+
+// Configuração CORS mais explícita
+const corsOptions = {
+  origin: (origin: any, callback: any) => {
+    const allowedOrigins = env.NODE_ENV === 'production' 
+      ? ['https://recoverymail.vercel.app', env.FRONTEND_URL]
+      : ['http://localhost:3000', 'http://localhost:3001'];
+    
+    // Permitir requisições sem origin (ex: Postman, curl)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Organization-Id'],
+  exposedHeaders: ['X-Total-Count'],
+  maxAge: 86400 // 24 horas
+};
+
+app.use(cors(corsOptions));
 
 // Middleware de parsing
 app.use(express.json({ limit: '10mb' }));
