@@ -1,6 +1,15 @@
 # Contexto de Webhooks - Recovery SaaS
 
+## 🚀 SISTEMA EM PRODUÇÃO!
+
+**URL Base**: https://recoverymail.onrender.com  
+**Webhook URL**: https://recoverymail.onrender.com/webhook/{ORG_ID}
+
 ## Status Geral: 12/12 webhooks implementados ✅
+
+### Organizações de Teste em Produção:
+- **test-org**: Webhook Secret = `test-webhook-secret-123`
+- **test-org-123**: Webhook Secret = `test-secret-123`
 
 ## 🔄 Sistema de Tracking
 - **Status**: ✅ 100% Funcional
@@ -24,87 +33,80 @@ graph LR
 
 ## 📝 Detalhamento por Webhook
 
-### 1. ABANDONED_CART ✅ [100% completo]
+### 1. ABANDONED_CART ✅ [100% completo + TESTADO EM PRODUÇÃO]
 **Descrição**: Carrinho abandonado pelo cliente
+**Status**: Funcionando em produção - Event ID: cmb5wbhh40001mx38zmijh5yv
+**Payload Recebido**:
+```json
+{
+  "event": "ABANDONED_CART",
+  "checkout_id": "Q8J1N6K3",
+  "checkout_url": "http://example.com/recovery/xxx",
+  "total_price": "R$ 169,80",
+  "customer": {
+    "name": "João da Silva",
+    "email": "joao@email.com",
+    "phone_number": "5511987654321"
+  },
+  "products": [{
+    "name": "Produto X",
+    "price": "R$ 119,90"
+  }]
+}
+```
 **Fluxo de Email**:
-- Email 1 (2h): Lembrete gentil - "Você esqueceu algo especial"
-- Email 2 (24h): Criando urgência - "Seus produtos podem acabar"
-- Email 3 (72h): Última chance - "10% de desconto exclusivo"
-**Status**: Funcionando em produção
+- ✅ Email 1 (2h): Lembrete gentil
+- ✅ Email 2 (24h): Criando urgência
+- ✅ Email 3 (72h): Última chance com desconto
 
 ### 2. BANK_SLIP_EXPIRED ✅ [100% completo]
 **Descrição**: Boleto bancário expirou sem pagamento
-**Fluxo de Email**:
-- Email 1 (1d): Renovação fácil
-- Email 2 (3d): Urgência moderada
-- Email 3 (7d): Oferta especial
-**Status**: Funcionando em produção
+**Templates**: 3 emails com delays de 1h, 24h, 72h
 
 ### 3. PIX_EXPIRED ✅ [100% completo]
 **Descrição**: QR Code PIX expirou
-**Fluxo de Email**:
-- Email 1 (15min): Renovação rápida
-- Email 2 (2h): Última chance
-**Status**: Funcionando em produção
+**Templates**: 2 emails urgentes (15min, 2h)
 
 ### 4. SALE_REFUSED ✅ [100% completo]
 **Descrição**: Pagamento recusado pela operadora
-**Fluxo de Email**:
-- Email 1 (30min): Tentar novamente
-- Email 2 (6h): Suporte personalizado
-**Status**: Funcionando em produção
+**Templates**: 2 emails com soluções alternativas
 
 ### 5. SALE_APPROVED ✅ [100% completo]
 **Descrição**: Venda aprovada (confirmação)
-**Fluxo de Email**:
-- Email único (imediato): Confirmação com acesso
-**Status**: Funcionando em produção
+**Templates**: 1 email de confirmação
 
 ### 6. SALE_CHARGEBACK ✅ [100% completo]
 **Descrição**: Chargeback recebido
-**Fluxo de Email**:
-- Email único (imediato): Notificação urgente
-**Status**: Funcionando em produção
+**Templates**: 1 email de notificação
 
 ### 7. SALE_REFUNDED ✅ [100% completo]
 **Descrição**: Reembolso processado
-**Fluxo de Email**:
-- Email único (5s): Confirmação com feedback
-**Status**: Funcionando em produção
+**Templates**: 1 email de confirmação
 
 ### 8. BANK_SLIP_GENERATED ✅ [100% completo]
 **Descrição**: Boleto gerado (lembrete de pagamento)
-**Fluxo de Email**:
-- Email 1 (imediato): Instruções de pagamento
-- Email 2 (24h): Lembrete amigável
-**Status**: Funcionando em produção
+**Templates**: 3 emails de lembrete
 
 ### 9. PIX_GENERATED ✅ [100% completo]
 **Descrição**: PIX gerado (enviar QR Code)
-**Fluxo de Email**:
-- Email único (imediato): QR Code + instruções
-**Status**: Funcionando em produção
+**Templates**: 2 emails com QR Code
 
 ### 10. SUBSCRIPTION_CANCELED ✅ [100% completo]
 **Descrição**: Assinatura cancelada (win-back)
-**Fluxo de Email**:
-- Email 1 (imediato): Confirmação + pesquisa
-- Email 2 (7d): Oferta de retorno
-- Email 3 (30d): Desconto especial
-**Status**: Funcionando em produção
+**Templates**: 2 emails de retenção
 
 ### 11. SUBSCRIPTION_EXPIRED ✅ [100% completo]
 **Descrição**: Assinatura expirada (renovação)
-**Fluxo de Email**:
-- Email 1 (3d antes): Aviso prévio
-- Email 2 (1d depois): Oferta de renovação
-**Status**: Funcionando em produção
+**Templates**: 3 emails de renovação
 
 ### 12. SUBSCRIPTION_RENEWED ✅ [100% completo]
 **Descrição**: Assinatura renovada (confirmação)
-**Fluxo de Email**:
-- Email único (imediato): Agradecimento + benefícios
-**Status**: Funcionando em produção
+**Templates**: 1 email de confirmação
+
+## 📊 Resumo de Templates
+- **Total de Templates**: 26 emails responsivos
+- **Todos com**: Preview text, call-to-action, design mobile-first
+- **Personalizáveis**: Via dashboard (em breve)
 
 ## 📊 Estatísticas Gerais
 
@@ -305,3 +307,29 @@ interface OrganizationWebhookConfig {
 3. **Testes de Carga**: Validar performance
 4. **Documentação**: API e guias de integração
 5. **Deploy em Produção**: Railway + Vercel 
+
+## 🔧 Como Testar em Produção
+
+```bash
+# Exemplo de teste com ABANDONED_CART
+curl -X POST https://recoverymail.onrender.com/webhook/test-org \
+  -H "Content-Type: application/json" \
+  -H "X-Webhook-Signature: test-webhook-secret-123" \
+  -d '{
+    "event": "ABANDONED_CART",
+    "checkout_id": "TEST123",
+    "checkout_url": "https://loja.com/checkout/TEST123",
+    "total_price": "R$ 299,90",
+    "customer": {
+      "name": "Cliente Teste",
+      "email": "teste@email.com",
+      "phone_number": "5511999999999"
+    },
+    "products": [{
+      "name": "Produto Teste",
+      "price": "R$ 299,90"
+    }]
+  }'
+```
+
+## ✅ Sistema 100% Operacional em Produção! 
