@@ -351,21 +351,44 @@ router.use('/domain', validateOrgId, domainRoutes);
 // TEMPORÁRIO: Testar Redis
 router.get('/test-redis', async (_req, res) => {
   try {
-    const { getQueue } = await import('../services/queue.service');
-    const queue = getQueue();
-    const jobCounts = await queue.getJobCounts();
+    // Verificar se REDIS_URL está configurado
+    const redisUrl = process.env['REDIS_URL'];
     
-    res.json({
-      redis: 'connected',
-      queue: queue.name,
-      jobs: jobCounts,
-      redisUrl: process.env['REDIS_URL'] ? 'configured' : 'NOT CONFIGURED'
-    });
+    if (!redisUrl) {
+      res.json({
+        redis: 'not configured',
+        error: 'REDIS_URL environment variable is not set',
+        redisUrl: 'NOT CONFIGURED'
+      });
+      return;
+    }
+    
+    // Tentar importar e conectar
+    try {
+      const { getQueue } = await import('../services/queue.service');
+      const queue = getQueue();
+      const jobCounts = await queue.getJobCounts();
+      
+      res.json({
+        redis: 'connected',
+        queue: queue.name,
+        jobs: jobCounts,
+        redisUrl: 'configured',
+        redisHost: redisUrl.split('@')[1]?.split(':')[0] || 'unknown'
+      });
+    } catch (queueError: any) {
+      res.json({
+        redis: 'connection failed',
+        error: queueError.message,
+        redisUrl: 'configured',
+        details: 'Failed to connect to Redis or get queue'
+      });
+    }
   } catch (error: any) {
     res.status(500).json({
-      redis: 'disconnected',
+      redis: 'error',
       error: error.message,
-      redisUrl: process.env['REDIS_URL'] ? 'configured' : 'NOT CONFIGURED'
+      stack: process.env['NODE_ENV'] === 'development' ? error.stack : undefined
     });
   }
 });
