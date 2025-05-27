@@ -652,6 +652,78 @@ router.post('/test-clear-all-jobs', async (_req, res) => {
   }
 });
 
+// TESTE IMEDIATO: Enviar email de carrinho abandonado sem delay
+router.post('/test-immediate-email', async (req, res) => {
+  try {
+    const { sendEmail } = await import('../services/email.service');
+    const { prisma } = await import('../config/database');
+    
+    // Criar evento de teste
+    const testEvent = await prisma.webhookEvent.create({
+      data: {
+        organizationId: 'test-org-123',
+        eventType: 'ABANDONED_CART',
+        payload: {
+          event: 'ABANDONED_CART',
+          checkout_id: `IMMEDIATE-TEST-${Date.now()}`,
+          checkout_url: 'https://example.com/checkout/test-immediate',
+          total_price: 'R$ 299,90',
+          customer: {
+            name: 'Teste Imediato',
+            email: 'nicolas.fer.oli@gmail.com',
+            phone_number: '5511999999999'
+          },
+          products: [
+            {
+              name: 'Produto Teste Imediato',
+              price: 'R$ 299,90',
+              quantity: 1,
+              image_url: 'https://via.placeholder.com/200'
+            }
+          ]
+        },
+        externalId: `IMMEDIATE-TEST-${Date.now()}`,
+        status: 'PENDING'
+      }
+    });
+    
+    // Enviar email imediatamente (sem passar pelo worker)
+    const emailResult = await sendEmail({
+      eventId: testEvent.id,
+      organizationId: testEvent.organizationId,
+      eventType: testEvent.eventType,
+      payload: testEvent.payload,
+      attemptNumber: 1
+    });
+    
+    // Atualizar status do evento
+    await prisma.webhookEvent.update({
+      where: { id: testEvent.id },
+      data: {
+        status: 'PROCESSED',
+        processedAt: new Date()
+      }
+    });
+    
+    res.json({
+      success: true,
+      message: 'Email enviado imediatamente!',
+      eventId: testEvent.id,
+      emailId: emailResult.emailId,
+      resendId: emailResult.resendId,
+      checkEmail: 'Verifique seu email nicolas.fer.oli@gmail.com'
+    });
+    
+  } catch (error: any) {
+    logger.error('Error sending immediate email', { error });
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      details: error.stack
+    });
+  }
+});
+
 // Worker status endpoint
 router.get('/worker-status', async (req, res) => {
   try {
