@@ -416,10 +416,10 @@ export default function EmailsPage() {
             )}
 
             {/* Paginação */}
-            {data && data.total > 20 && (
+            {data && data.pagination.total > 20 && (
               <div className="flex items-center justify-between border-t p-4">
                 <p className="text-sm text-gray-600">
-                  Mostrando {((page - 1) * 20) + 1} a {Math.min(page * 20, data.total)} de {data.total} emails
+                  Mostrando {((page - 1) * 20) + 1} a {Math.min(page * 20, data.pagination.total)} de {data.pagination.total} emails
                 </p>
                 <div className="flex gap-2">
                   <Button
@@ -434,7 +434,7 @@ export default function EmailsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => setPage(p => p + 1)}
-                    disabled={page * 20 >= data.total}
+                    disabled={page * 20 >= data.pagination.total}
                   >
                     Próximo
                   </Button>
