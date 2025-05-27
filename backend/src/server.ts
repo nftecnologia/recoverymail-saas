@@ -26,7 +26,7 @@ const app = express();
 app.use(helmet());
 app.use(cors({
   origin: env.NODE_ENV === 'production' 
-    ? env.FRONTEND_URL 
+    ? ['https://recoverymail.vercel.app', env.FRONTEND_URL]
     : ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
 }));
