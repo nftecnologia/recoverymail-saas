@@ -29,14 +29,17 @@ app.use(helmet());
 const corsOptions = {
   origin: (origin: any, callback: any) => {
     const allowedOrigins = env.NODE_ENV === 'production' 
-      ? ['https://recoverymail.vercel.app', env.FRONTEND_URL]
+      ? ['https://recoverymail.vercel.app', 'https://www.recoverymail.vercel.app', env.FRONTEND_URL].filter(Boolean)
       : ['http://localhost:3000', 'http://localhost:3001'];
+    
+    // Log para debug
+    console.log('CORS check - Origin:', origin, 'Allowed:', allowedOrigins);
     
     // Permitir requisições sem origin (ex: Postman, curl)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`Not allowed by CORS: ${origin}`));
     }
   },
   credentials: true,
