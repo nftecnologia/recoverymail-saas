@@ -72,7 +72,7 @@ export default function EventsPage() {
     queryFn: () => api.getEvents({ 
       page, 
       limit: 20,
-      eventType: selectedType || undefined 
+      type: selectedType || undefined 
     }),
   });
 
@@ -118,7 +118,7 @@ export default function EventsPage() {
                 {isLoading ? (
                   <Skeleton className="h-8 w-20" />
                 ) : (
-                  <span className="text-3xl font-bold text-gray-900">{data?.total || 0}</span>
+                  <span className="text-3xl font-bold text-gray-900">{data?.pagination?.total || 0}</span>
                 )}
               </div>
             </CardHeader>
@@ -322,10 +322,10 @@ export default function EventsPage() {
             )}
 
             {/* Paginação */}
-            {data && data.total > 20 && (
+            {data && data.pagination.total > 20 && (
               <div className="flex items-center justify-between border-t p-4">
                 <p className="text-sm text-gray-600">
-                  Mostrando {((page - 1) * 20) + 1} a {Math.min(page * 20, data.total)} de {data.total} eventos
+                  Mostrando {((page - 1) * 20) + 1} a {Math.min(page * 20, data.pagination.total)} de {data.pagination.total} eventos
                 </p>
                 <div className="flex gap-2">
                   <Button
@@ -340,7 +340,7 @@ export default function EventsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => setPage(p => p + 1)}
-                    disabled={page * 20 >= data.total}
+                    disabled={page * 20 >= data.pagination.total}
                   >
                     Próximo
                   </Button>
