@@ -115,7 +115,7 @@ async function processEmailJob(job: Job<EmailJobData>) {
 }
 
 // Função auxiliar para extrair dados específicos do evento
-function extractEventSpecificData(eventType: string, payloadData: any, event: any) {
+function extractEventSpecificData(eventType: string, payloadData: any, _event: any) {
   const data: any = {};
   
   switch (eventType) {
