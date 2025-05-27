@@ -123,4 +123,67 @@ Seu MVP está no ar! Agora você pode:
 
 Precisa de ajuda? Os logs estão em:
 - Railway: `railway logs`
-- Vercel: `vercel logs` 
+- Vercel: `vercel logs`
+
+# 🚀 Guia Rápido - Corrigir Deploy no Render
+
+## ⚠️ PROBLEMA ATUAL
+O Render está usando `yarn` ao invés de `npm` e o build está falhando.
+
+## 🔧 SOLUÇÃO RÁPIDA
+
+### 1. Acesse o Dashboard do Render
+https://dashboard.render.com
+
+### 2. Vá para seu serviço
+Clique em **inbox-recovery-backend**
+
+### 3. Atualize as Configurações
+
+#### Em "Settings" → "Build & Deploy":
+
+**Build Command**: 
+```bash
+cd backend && npm ci && npm run build:force
+```
+
+**Start Command**:
+```bash
+cd backend && npm start
+```
+
+**Root Directory**: 
+```
+./
+```
+(deixe vazio ou coloque ./)
+
+### 4. Limpar Cache e Fazer Deploy
+
+1. Clique em **"Clear build cache & deploy"**
+2. Aguarde o novo build
+
+## ✅ Verificação
+
+Após o deploy, execute:
+```bash
+./monitor-deploy.sh
+```
+
+## 🎯 Resultado Esperado
+
+1. Build usando npm ✅
+2. Templates copiados para dist ✅
+3. Worker processando emails ✅
+4. Métricas atualizando ✅
+
+## 💡 Dica Extra
+
+Se ainda falhar, tente **Manual Deploy**:
+1. Em "Manual Deploy"
+2. Selecione o último commit
+3. Clique "Deploy"
+
+---
+
+**Tempo estimado**: 3-5 minutos para o deploy completo 

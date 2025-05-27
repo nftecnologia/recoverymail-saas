@@ -264,21 +264,23 @@ const emailWorker = new Worker<EmailJobData>(
         stack: error instanceof Error ? error.stack : undefined,
       });
 
-      // Registrar falha no banco
-      await prisma.emailLog.create({
-        data: {
-          organizationId,
-          eventId,
-          to: customerEmail,
-          subject: template?.subject || 'Failed to send',
-          template: template?.templateName || 'unknown',
-          status: 'FAILED',
-          attemptNumber,
-          error: error instanceof Error ? error.message : 'Unknown error',
-        },
-      }).catch((err) => {
-        logger.error('Failed to log email failure', err);
-      });
+      // Registrar falha no banco apenas se tivermos informações suficientes
+      if (template && customerEmail && customerEmail !== 'unknown') {
+        await prisma.emailLog.create({
+          data: {
+            organizationId,
+            eventId,
+            to: customerEmail,
+            subject: template.subject || 'Failed to send',
+            template: template.templateName || 'unknown',
+            status: 'FAILED',
+            attemptNumber,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          },
+        }).catch((err) => {
+          logger.error('Failed to log email failure', err);
+        });
+      }
 
       throw error;
     }

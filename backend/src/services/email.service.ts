@@ -72,15 +72,23 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
     // Carregar do arquivo
     // Em produção, os templates estão em dist/templates
     // Em desenvolvimento, estão em src/templates
-    const baseDir = __dirname.includes('dist') ? 
-      path.join(__dirname, '..', 'templates') : 
-      path.join(process.cwd(), 'src', 'templates');
-      
-    const templatePath = path.join(
-      baseDir,
-      'emails',
-      `${templateName}.hbs`
-    );
+    let templatePath: string;
+    
+    if (process.env.NODE_ENV === 'production' || __dirname.includes('dist')) {
+      // Em produção, usar caminho absoluto a partir de process.cwd()
+      templatePath = path.join(process.cwd(), 'dist', 'templates', 'emails', `${templateName}.hbs`);
+    } else {
+      // Em desenvolvimento
+      templatePath = path.join(process.cwd(), 'src', 'templates', 'emails', `${templateName}.hbs`);
+    }
+
+    logger.debug('Loading template', {
+      templateName,
+      templatePath,
+      dirname: __dirname,
+      cwd: process.cwd(),
+      nodeEnv: process.env.NODE_ENV
+    });
 
     const templateContent = await fs.readFile(templatePath, 'utf-8');
     const compiled = handlebars.compile(templateContent);
@@ -91,6 +99,7 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
     logger.error('Failed to load email template', {
       templateName,
       error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
     });
     throw new AppError(`Template not found: ${templateName}`, 404);
   }
