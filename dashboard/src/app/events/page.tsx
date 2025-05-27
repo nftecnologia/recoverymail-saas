@@ -13,6 +13,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { 
@@ -26,7 +33,9 @@ import {
   TrendingUp,
   AlertCircle,
   Download,
-  Search
+  Search,
+  Copy,
+  Check
 } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
