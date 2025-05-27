@@ -530,4 +530,103 @@ router.post('/test-clear-queues', async (_req, res) => {
   }
 });
 
+// TEMPORÁRIO: Testar Resend diretamente
+router.post('/test-resend', async (_req, res) => {
+  try {
+    const { Resend } = await import('resend');
+    const resendApiKey = process.env['RESEND_API_KEY'];
+    
+    if (!resendApiKey) {
+      res.status(400).json({ error: 'RESEND_API_KEY not configured' });
+      return;
+    }
+    
+    const resend = new Resend(resendApiKey);
+    
+    // Tentar enviar email de teste
+    const { data, error } = await resend.emails.send({
+      from: `Recovery Mail <${process.env['RESEND_FROM_EMAIL'] || 'noreply@resend.dev'}>`,
+      to: 'nicolas.fer.oli@gmail.com',
+      subject: '🧪 Teste direto do Resend - Recovery Mail',
+      html: `
+        <h1>Teste do Resend</h1>
+        <p>Este é um teste direto da API do Resend.</p>
+        <p>Se você recebeu este email, o Resend está funcionando!</p>
+        <p>Timestamp: ${new Date().toISOString()}</p>
+      `,
+      text: 'Teste direto do Resend. Se você recebeu este email, está funcionando!'
+    });
+    
+    if (error) {
+      res.status(400).json({
+        error: 'Resend error',
+        details: error,
+        apiKeyConfigured: true,
+        fromEmail: process.env['RESEND_FROM_EMAIL'] || 'noreply@resend.dev'
+      });
+      return;
+    }
+    
+    res.json({
+      success: true,
+      emailId: data?.id,
+      message: 'Email de teste enviado',
+      fromEmail: process.env['RESEND_FROM_EMAIL'] || 'noreply@resend.dev'
+    });
+    
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message,
+      stack: process.env['NODE_ENV'] === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+// TEMPORÁRIO: Verificar templates
+router.get('/test-templates', async (_req, res) => {
+  try {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    
+    // Verificar onde estamos
+    const cwd = process.cwd();
+    const dirname = __dirname;
+    
+    // Tentar listar templates
+    const possiblePaths = [
+      path.join(cwd, 'dist', 'templates', 'emails'),
+      path.join(cwd, 'templates', 'emails'),
+      path.join(dirname, '..', 'templates', 'emails'),
+      path.join(dirname, '..', '..', 'templates', 'emails'),
+    ];
+    
+    const results: any = {
+      cwd,
+      dirname,
+      paths: {}
+    };
+    
+    for (const templatePath of possiblePaths) {
+      try {
+        const files = await fs.readdir(templatePath);
+        results.paths[templatePath] = {
+          exists: true,
+          files: files.filter(f => f.endsWith('.hbs'))
+        };
+      } catch (err) {
+        results.paths[templatePath] = {
+          exists: false,
+          error: 'Directory not found'
+        };
+      }
+    }
+    
+    res.json(results);
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
 export default router; 
