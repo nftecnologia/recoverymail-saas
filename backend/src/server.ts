@@ -112,8 +112,22 @@ async function startServer() {
     }, 60 * 60 * 1000);
 
     // Iniciar workers
-    await import('./workers');
-    logger.info('Workers initialized');
+    logger.info('Starting to load workers...');
+    try {
+      // Usar a nova função de inicialização
+      const { startWorkers } = await import('./workers/startWorkers');
+      await startWorkers();
+      
+      // Verificar se o worker está rodando
+      const { getQueue } = await import('./services/queue.service');
+      const queue = getQueue();
+      const workers = await queue.getWorkers();
+      logger.info(`Workers status: ${workers.length} workers running`);
+    } catch (workerError) {
+      logger.error('Failed to load workers', workerError);
+      // Não vamos falhar o servidor se os workers falharem
+      logger.error('Server will continue without workers - emails will not be processed!');
+    }
 
     // Iniciar servidor
     const server = app.listen(env.PORT, () => {
