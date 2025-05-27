@@ -12,6 +12,7 @@ import webhookRoutes from '@/routes/webhook.routes';
 import resendWebhookRoutes from '@/routes/resend-webhook.routes';
 import apiRoutes from '@/routes/api.routes';
 import { cleanOldJobs } from '@/services/queue.service';
+import setupRoutes from '@/routes/setup.routes';
 
 // Criar app Express
 const app = express();
@@ -77,6 +78,9 @@ app.use('/webhook', webhookRoutes);
 
 // Rotas de webhook do Resend (tracking de emails)
 app.use('/', resendWebhookRoutes);
+
+// Rotas de setup (temporário)
+app.use('/api', setupRoutes);
 
 // Rotas da API
 app.use('/api', apiRoutes);
