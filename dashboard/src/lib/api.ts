@@ -239,13 +239,13 @@ export interface DashboardMetrics {
 export const apiService = {
   // Eventos
   async getEvents(organizationId: string = "test-org-123") {
-    const response = await api.getEvents({ organizationId });
+    const response = await api.getEvents();
     return response.events;
   },
 
   // Emails
   async getEmails(organizationId: string = "test-org-123") {
-    const response = await api.getEmails({ organizationId });
+    const response = await api.getEmails();
     return response.emails;
   },
 
