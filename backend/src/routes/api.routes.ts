@@ -348,6 +348,15 @@ router.put('/settings/email', validateOrgId, async (req, res) => {
 // Rotas de domínio
 router.use('/domain', validateOrgId, domainRoutes);
 
+// TEMPORÁRIO: Teste simples
+router.get('/test', (_req, res) => {
+  res.json({
+    message: 'API is working',
+    timestamp: new Date().toISOString(),
+    redisConfigured: !!process.env['REDIS_URL']
+  });
+});
+
 // TEMPORÁRIO: Testar Redis
 router.get('/test-redis', async (_req, res) => {
   try {
