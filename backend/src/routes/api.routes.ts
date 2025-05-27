@@ -629,4 +629,27 @@ router.get('/test-templates', async (_req, res) => {
   }
 });
 
+// TEMPORÁRIO: Limpar TODOS os jobs
+router.post('/test-clear-all-jobs', async (_req, res) => {
+  try {
+    const { getQueue } = await import('../services/queue.service');
+    const queue = getQueue();
+    
+    // Limpar TODOS os jobs
+    await queue.obliterate({ force: true });
+    
+    // Pegar novo status
+    const jobCounts = await queue.getJobCounts();
+    
+    res.json({
+      message: 'All jobs cleared',
+      jobCounts
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
 export default router; 
