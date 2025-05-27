@@ -402,4 +402,35 @@ router.get('/test-redis', async (_req, res) => {
   }
 });
 
+// TEMPORÁRIO: Ver jobs failed
+router.get('/test-failed-jobs', async (_req, res) => {
+  try {
+    const { getQueue } = await import('../services/queue.service');
+    const queue = getQueue();
+    
+    // Pegar jobs failed
+    const failedJobs = await queue.getFailed(0, 10);
+    
+    const failedDetails = failedJobs.map(job => ({
+      id: job.id,
+      name: job.name,
+      data: job.data,
+      failedReason: job.failedReason,
+      attemptsMade: job.attemptsMade,
+      timestamp: job.timestamp,
+      processedOn: job.processedOn,
+      finishedOn: job.finishedOn
+    }));
+    
+    res.json({
+      totalFailed: failedJobs.length,
+      failedJobs: failedDetails
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
 export default router; 
