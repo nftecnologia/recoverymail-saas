@@ -5,7 +5,7 @@ import { logger } from '@/utils/logger';
 const router = Router();
 
 // Rota temporária para criar organização de teste
-router.post('/setup/create-test-org', async (req, res) => {
+router.post('/setup/create-test-org', async (_req, res) => {
   try {
     const org = await prisma.organization.create({
       data: {
