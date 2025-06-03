@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boleto Bancário Gerado</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; }
+        .content { padding: 40px 30px; }
+        .icon { font-size: 48px; margin-bottom: 20px; }
+        .title { font-size: 24px; font-weight: 700; color: #1a202c; margin-bottom: 16px; }
+        .subtitle { font-size: 16px; color: #4a5568; margin-bottom: 30px; line-height: 1.6; }
+        .boleto-info { background-color: #f7fafc; border-radius: 12px; padding: 25px; margin: 30px 0; border-left: 4px solid #3182ce; }
+        .boleto-details { margin: 20px 0; }
+        .boleto-details strong { color: #2d3748; }
+        .cta-button { display: inline-block; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; margin: 25px 0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: transform 0.2s; }
+        .cta-button:hover { transform: translateY(-2px); }
+        .products { margin: 30px 0; }
+        .product-item { background-color: #f8f9fa; border-radius: 8px; padding: 20px; margin: 15px 0; border-left: 3px solid #e2e8f0; }
+        .instructions { background-color: #ebf8ff; border-radius: 12px; padding: 25px; margin: 30px 0; border: 1px solid #bee3f8; }
+        .instructions h3 { color: #2b6cb0; margin-top: 0; }
+        .instructions ol { color: #2d3748; line-height: 1.8; }
+        .footer { background-color: #f7fafc; padding: 30px; text-align: center; color: #718096; font-size: 14px; }
+        .warning { background-color: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px; padding: 15px; margin: 20px 0; color: #c53030; }
+        @media (max-width: 600px) {
+            .container { margin: 0 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">📄</div>
+            <h1>Boleto Bancário Gerado</h1>
+        </div>
+        
+        <div class="content">
+            <div class="title">Olá, {{customerName}}! 👋</div>
+            <div class="subtitle">
+                Seu boleto bancário foi gerado com sucesso! Agora você pode efetuar o pagamento através de qualquer banco, 
+                aplicativo de banco ou casa lotérica.
+            </div>
+
+            <div class="boleto-info">
+                <h3 style="color: #2b6cb0; margin-top: 0;">📋 Detalhes do Boleto</h3>
+                <div class="boleto-details">
+                    <strong>Valor:</strong> {{totalPrice}}<br>
+                    <strong>Vencimento:</strong> {{formatDate dueDate}}<br>
+                    {{#if transactionId}}<strong>Código:</strong> {{transactionId}}<br>{{/if}}
+                    {{#if orderNumber}}<strong>Pedido:</strong> {{orderNumber}}<br>{{/if}}
+                </div>
+                
+                {{#if digitableLine}}
+                <div style="margin-top: 20px;">
+                    <strong>Linha Digitável:</strong><br>
+                    <code style="background: #e2e8f0; padding: 8px; border-radius: 4px; font-size: 14px; word-break: break-all;">{{digitableLine}}</code>
+                </div>
+                {{/if}}
+            </div>
+
+            <div style="text-align: center;">
+                <a href="{{bankSlipUrl}}" class="cta-button">
+                    💳 Visualizar e Pagar Boleto
+                </a>
+            </div>
+
+            {{#if products}}
+            <div class="products">
+                <h3 style="color: #2d3748;">📦 Resumo do Pedido</h3>
+                {{#each products}}
+                <div class="product-item">
+                    <strong>{{name}}</strong>
+                    {{#if offerName}}<br><small style="color: #718096;">{{offerName}}</small>{{/if}}
+                    <div style="text-align: right; font-weight: 600; color: #38a169;">{{price}}</div>
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+
+            <div class="instructions">
+                <h3>📝 Como Pagar seu Boleto</h3>
+                <ol>
+                    <li><strong>Internet Banking:</strong> Acesse o app do seu banco e procure por "Pagar Boleto"</li>
+                    <li><strong>Código de Barras:</strong> Use a linha digitável ou escaneie o código de barras</li>
+                    <li><strong>Lotérica/Banco:</strong> Leve o boleto impresso ou a linha digitável</li>
+                    <li><strong>PIX:</strong> Alguns bancos já permitem pagar boleto via PIX</li>
+                </ol>
+            </div>
+
+            <div class="warning">
+                ⚠️ <strong>Importante:</strong> O pagamento pode levar até 2 dias úteis para ser confirmado. 
+                Após a confirmação, você receberá acesso imediato ao produto.
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #e2e8f0; text-align: center; color: #718096;">
+                <p>Precisa de ajuda? Responda este email ou entre em contato conosco.</p>
+                <p>📧 Verifique sempre sua caixa de spam após o pagamento.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Este email foi enviado automaticamente pelo sistema de recuperação de vendas.</p>
+            <p>© {{currentYear}} {{companyName}}. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

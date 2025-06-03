@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⏰ ÚLTIMOS 5 MINUTOS - PIX Expirando!</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #d63031 0%, #74b9ff 100%); padding: 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; }
+        .content { padding: 40px 30px; }
+        .icon { font-size: 48px; margin-bottom: 20px; animation: urgentPulse 1s infinite; }
+        @keyframes urgentPulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        .title { font-size: 28px; font-weight: 700; color: #d63031; margin-bottom: 16px; text-align: center; }
+        .subtitle { font-size: 18px; color: #4a5568; margin-bottom: 30px; line-height: 1.6; text-align: center; }
+        .emergency-alert { background: linear-gradient(135deg, #d63031 0%, #e17055 100%); color: white; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center; animation: emergencyGlow 1.5s ease-in-out infinite alternate; border: 3px solid #ff7675; }
+        @keyframes emergencyGlow { from { box-shadow: 0 0 10px #d63031, 0 0 20px #d63031; } to { box-shadow: 0 0 20px #d63031, 0 0 40px #d63031, 0 0 60px #d63031; } }
+        .final-countdown { background: #2d3748; color: #ffffff; border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center; border: 3px solid #ff7675; }
+        .countdown-massive { font-size: 72px; font-weight: 900; color: #ff6b6b; margin: 15px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); animation: countdown 1s infinite; }
+        @keyframes countdown { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .pix-emergency { background: linear-gradient(135deg, #00b894 0%, #00a085 100%); color: white; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center; border: 3px solid #00b894; }
+        .qr-code-large { background: white; border-radius: 12px; padding: 20px; margin: 20px auto; max-width: 220px; border: 3px solid #00b894; }
+        .copy-paste-emergency { background: #2d3748; color: white; border-radius: 8px; padding: 20px; margin: 20px 0; font-family: monospace; font-size: 16px; word-break: break-all; border: 2px solid #74b9ff; animation: borderPulse 2s infinite; }
+        @keyframes borderPulse { 0%, 100% { border-color: #74b9ff; } 50% { border-color: #ff7675; } }
+        .mega-cta { display: inline-block; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: #ffffff; text-decoration: none; padding: 25px 50px; border-radius: 12px; font-weight: 900; font-size: 24px; margin: 30px 0; box-shadow: 0 10px 20px rgba(238, 90, 36, 0.5); animation: megaPulse 1.5s infinite; border: 3px solid #ffffff; }
+        @keyframes megaPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); box-shadow: 0 15px 30px rgba(238, 90, 36, 0.7); } }
+        .footer { background-color: #f7fafc; padding: 30px; text-align: center; color: #718096; font-size: 14px; }
+        .apocalypse-warning { background: #2d3748; color: white; border-radius: 12px; padding: 30px; margin: 30px 0; border: 3px solid #e74c3c; text-align: center; }
+        @media (max-width: 600px) {
+            .container { margin: 0 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 24px; }
+            .countdown-massive { font-size: 48px; }
+            .mega-cta { padding: 20px 30px; font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🚨</div>
+            <h1>ÚLTIMA CHANCE!</h1>
+        </div>
+        
+        <div class="content">
+            <div class="title">{{customerName}}, ÚLTIMOS 5 MINUTOS! 🚨</div>
+            <div class="subtitle">
+                <strong>ALERTA CRÍTICO:</strong> Seu código PIX expira em MENOS DE 5 MINUTOS!<br>
+                Esta é sua ÚLTIMA OPORTUNIDADE de pagar via PIX!
+            </div>
+
+            <div class="emergency-alert">
+                <h1 style="margin: 0; font-size: 32px; animation: textShake 0.5s infinite;">🚨 CÓDIGO PIX EXPIRANDO! 🚨</h1>
+                <p style="margin: 20px 0 0 0; font-size: 20px; font-weight: 700;">
+                    AÇÃO IMEDIATA NECESSÁRIA!
+                </p>
+            </div>
+            @keyframes textShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+
+            <div class="final-countdown">
+                <div style="font-size: 18px; margin-bottom: 10px; color: #ff7675;">⏰ TEMPO FINAL</div>
+                <div class="countdown-massive">~5min</div>
+                <div style="margin-top: 15px; font-size: 16px; color: #ff7675; font-weight: 700;">
+                    EXPIRA EM: {{formatDate expiresAt}}
+                </div>
+                <div style="margin-top: 10px; font-size: 14px; color: #ffffff;">
+                    ⚠️ Após expirar não será possível pagar!
+                </div>
+            </div>
+
+            <div class="pix-emergency">
+                <h2 style="margin-top: 0; font-size: 28px;">⚡ PAGUE AGORA OU PERCA! ⚡</h2>
+                <div style="font-size: 24px; font-weight: 700; margin: 15px 0;">
+                    PIX: {{totalPrice}}
+                </div>
+                
+                <div class="qr-code-large">
+                    <img src="{{pixQrCode}}" alt="QR Code PIX" style="max-width: 180px; width: 100%;">
+                    <div style="margin-top: 15px; font-size: 16px; color: #2d3748; font-weight: 700;">
+                        📱 ESCANEIE AGORA!
+                    </div>
+                </div>
+
+                <div style="margin: 25px 0;">
+                    <div style="font-size: 20px; font-weight: 700; margin-bottom: 10px;">
+                        OU COPIE E COLE URGENTE:
+                    </div>
+                    <div class="copy-paste-emergency" onclick="copyPixUrgent()">
+                        {{pixCopyPaste}}
+                        <div style="font-size: 14px; margin-top: 10px; color: #74b9ff; font-weight: 700;">
+                            👆 TOQUE PARA COPIAR AGORA!
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 20px; margin: 25px 0;">
+                    <h3 style="margin-top: 0; color: white; font-size: 20px;">⚡ PAGAMENTO EM 30 SEGUNDOS:</h3>
+                    <ol style="text-align: left; margin: 0; padding-left: 20px; font-size: 16px;">
+                        <li><strong>Abra o app do seu banco AGORA</strong></li>
+                        <li><strong>Escaneie o QR Code OU cole o código</strong></li>
+                        <li><strong>Confirme o pagamento de {{totalPrice}}</strong></li>
+                        <li><strong>PRONTO! Acesso liberado em 2 minutos</strong></li>
+                    </ol>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="#" onclick="copyPixUrgent(); return false;" class="mega-cta">
+                    🔥 COPIAR PIX E PAGAR AGORA!
+                </a>
+                <div style="font-size: 16px; color: #e74c3c; margin-top: 15px; font-weight: 700;">
+                    ⚠️ ESTE BOTÃO EXPIRA EM MINUTOS!
+                </div>
+            </div>
+
+            <div class="apocalypse-warning">
+                <h2 style="color: #ff7675; margin-top: 0; font-size: 24px;">💥 O QUE VOCÊ PERDE SE NÃO PAGAR AGORA:</h2>
+                <div style="font-size: 18px; line-height: 1.8; text-align: left; margin: 20px 0;">
+                    <div style="color: #ff7675; margin: 10px 0;">❌ <strong>TODO O ACESSO AO PRODUTO</strong></div>
+                    <div style="color: #ff7675; margin: 10px 0;">❌ <strong>BÔNUS EXCLUSIVOS (valor R$ XXX)</strong></div>
+                    <div style="color: #ff7675; margin: 10px 0;">❌ <strong>PREÇO PROMOCIONAL ATUAL</strong></div>
+                    <div style="color: #ff7675; margin: 10px 0;">❌ <strong>SUPORTE VIP INCLUÍDO</strong></div>
+                    <div style="color: #ff7675; margin: 10px 0;">❌ <strong>CERTIFICADO DE CONCLUSÃO</strong></div>
+                    <div style="color: #ff7675; margin: 10px 0;">❌ <strong>GARANTIA ESTENDIDA</strong></div>
+                </div>
+                <h3 style="color: #ffffff; margin: 25px 0 0 0; font-size: 20px;">
+                    🚨 VALOR TOTAL PERDIDO: MAIS DE R$ 2.000! 🚨
+                </h3>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center; border: 3px solid #ffffff;">
+                <h2 style="margin: 0; font-size: 26px;">⚡ NÃO DEIXE ISSO ACONTECER! ⚡</h2>
+                <p style="margin: 20px 0; font-size: 18px; line-height: 1.6;">
+                    Você já chegou até aqui...<br>
+                    Já pesquisou, já decidiu...<br>
+                    <strong>FALTA APENAS 1 CLIQUE!</strong>
+                </p>
+                <div style="font-size: 20px; font-weight: 700;">
+                    🎯 PAGUE AGORA E RECEBA ACESSO EM 2 MINUTOS!
+                </div>
+            </div>
+
+            <div style="background: #fff5f5; border: 3px solid #d63031; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                <h3 style="color: #d63031; margin-top: 0; font-size: 22px;">🆘 PROBLEMAS PARA PAGAR?</h3>
+                <div style="font-size: 16px; color: #2d3748; line-height: 1.6;">
+                    <p><strong>Responda este email COM URGÊNCIA!</strong></p>
+                    <p><strong>WhatsApp: [SEU NÚMERO]</strong></p>
+                    <p style="color: #d63031; font-weight: 700;">
+                        ⚡ Suporte IMEDIATO até o PIX expirar!
+                    </p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <div style="background: linear-gradient(135deg, #00b894 0%, #00a085 100%); color: white; border-radius: 12px; padding: 25px; border: 3px solid #ffffff;">
+                    <h3 style="margin-top: 0; font-size: 24px;">🎁 VOCÊ RECEBERÁ IMEDIATAMENTE:</h3>
+                    <ul style="text-align: left; font-size: 16px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                        <li>📧 <strong>Email de confirmação</strong></li>
+                        <li>🎯 <strong>Acesso completo ao produto</strong></li>
+                        <li>🎁 <strong>Todos os bônus incluídos</strong></li>
+                        <li>📞 <strong>Suporte VIP prioritário</strong></li>
+                        <li>📜 <strong>Certificado digital</strong></li>
+                        <li>🔄 <strong>Atualizações gratuitas</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 3px solid #e2e8f0; text-align: center; color: #718096;">
+                <div style="color: #d63031; font-weight: 700; font-size: 18px; margin-bottom: 15px;">
+                    ⏰ SEGUNDOS FINAIS... NÃO PERCA!
+                </div>
+                <p>Se não conseguir pagar a tempo, será necessário refazer todo o processo</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="color: #d63031; font-weight: 700; font-size: 16px;">🚨 ESTE É O ÚLTIMO EMAIL! PIX EXPIRA EM MINUTOS! 🚨</p>
+            <p>© {{currentYear}} {{companyName}}. Todos os direitos reservados.</p>
+        </div>
+    </div>
+
+    <script>
+        function copyPixUrgent() {
+            const pixCode = '{{pixCopyPaste}}';
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(pixCode).then(() => {
+                    alert('🔥 PIX COPIADO! COLE NO SEU APP DO BANCO AGORA!');
+                    // Tentar abrir o app do banco (funciona em alguns dispositivos)
+                    window.location.href = 'intent://pay#Intent;scheme=pix;package=com.android.chrome;end';
+                }).catch(() => {
+                    // Fallback para dispositivos que não suportam clipboard API
+                    prompt('⚡ COPIE ESTE CÓDIGO PIX URGENTE:', pixCode);
+                });
+            } else {
+                prompt('⚡ COPIE ESTE CÓDIGO PIX URGENTE:', pixCode);
+            }
+        }
+        
+        // Auto-focus no código PIX quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            // Adicionar evento de clique a todos os elementos de código PIX
+            const copyElements = document.querySelectorAll('.copy-paste-emergency');
+            copyElements.forEach(el => {
+                el.style.cursor = 'pointer';
+                el.addEventListener('click', copyPixUrgent);
+            });
+            
+            // Alert inicial urgente
+            setTimeout(() => {
+                if (confirm('🚨 PIX EXPIRANDO! Clique OK para copiar o código PIX agora!')) {
+                    copyPixUrgent();
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

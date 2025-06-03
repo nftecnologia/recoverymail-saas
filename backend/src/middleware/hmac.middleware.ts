@@ -7,6 +7,12 @@ import { prisma } from '../config/database';
 export interface WebhookRequest extends Request {
   organization?: {
     id: string;
+    name: string;
+    role: string;
+    permissions: string[];
+  };
+  webhookOrg?: {
+    id: string;
     webhookSecret: string;
   };
 }
@@ -80,7 +86,7 @@ export async function validateHMAC(
     }
 
     // Adicionar organização ao request para uso posterior
-    req.organization = {
+    req.webhookOrg = {
       id: organization.id,
       webhookSecret: organization.webhookSecret || ''
     };

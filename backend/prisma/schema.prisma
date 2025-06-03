@@ -7,6 +7,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Modelo de Usuário
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  name          String
+  password      String
+  avatar        String?
+  role          UserRole     @default(USER)
+  isActive      Boolean      @default(true)
+  isVerified    Boolean      @default(false)
+  verificationToken String?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  lastLoginAt   DateTime?
+  
+  // Timestamps
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  // Relações
+  organizations UserOrganization[]
+  sessions      Session[]
+}
+
+// Modelo de Sessão
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionToken String   @unique
+  accessToken  String?  @db.Text
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Modelo de relacionamento Usuário-Organização (many-to-many)
+model UserOrganization {
+  id             String       @id @default(cuid())
+  userId         String
+  organizationId String
+  role           OrgRole      @default(MEMBER)
+  permissions    String[]     // Array de permissões específicas
+  invitedBy      String?
+  joinedAt       DateTime     @default(now())
+  
+  // Relações
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Índices
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+}
+
 // Modelo de Organização (Multi-tenancy)
 model Organization {
   id            String          @id @default(cuid())
@@ -14,6 +69,7 @@ model Organization {
   domain        String?
   webhookSecret String?
   apiKey        String?         @unique
+  plan          String          @default("FREE") // FREE, BASIC, PRO, ENTERPRISE
   
   // Configurações
   emailSettings Json?
@@ -23,6 +79,7 @@ model Organization {
   updatedAt     DateTime        @updatedAt
   
   // Relações
+  users         UserOrganization[]
   webhookEvents WebhookEvent[]
   emailJobs     EmailJob[]
   emailTemplates EmailTemplate[]
@@ -131,6 +188,19 @@ model EmailLog {
 }
 
 // Enums
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
 enum EventStatus {
   PENDING
   PROCESSING

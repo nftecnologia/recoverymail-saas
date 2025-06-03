@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Última Chance - 50% OFF</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #e17055 0%, #d63031 100%); padding: 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; }
+        .content { padding: 40px 30px; }
+        .icon { font-size: 48px; margin-bottom: 20px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .title { font-size: 24px; font-weight: 700; color: #d63031; margin-bottom: 16px; text-align: center; }
+        .subtitle { font-size: 16px; color: #4a5568; margin-bottom: 30px; line-height: 1.6; text-align: center; }
+        .mega-offer { background: linear-gradient(135deg, #00b894 0%, #00a085 100%); color: white; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center; border: 3px solid #ffffff; animation: glow 2s ease-in-out infinite alternate; }
+        @keyframes glow { from { box-shadow: 0 0 5px #00b894; } to { box-shadow: 0 0 20px #00b894, 0 0 30px #00b894; } }
+        .discount-badge { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; border-radius: 50px; padding: 15px 30px; display: inline-block; font-size: 24px; font-weight: 900; margin: 20px 0; border: 3px solid #ffffff; transform: rotate(-5deg); animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: rotate(-5deg) translateY(0); } 50% { transform: rotate(-5deg) translateY(-10px); } }
+        .urgency-timer { background: #2d3748; color: white; border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center; border: 2px solid #e53e3e; }
+        .benefits-mega { background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white; border-radius: 12px; padding: 25px; margin: 30px 0; }
+        .cta-mega { display: inline-block; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: #ffffff; text-decoration: none; padding: 25px 50px; border-radius: 12px; font-weight: 900; font-size: 22px; margin: 30px 0; box-shadow: 0 10px 20px rgba(238, 90, 36, 0.5); animation: megaPulse 2s infinite; border: 3px solid #ffffff; }
+        @keyframes megaPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .footer { background-color: #f7fafc; padding: 30px; text-align: center; color: #718096; font-size: 14px; }
+        @media (max-width: 600px) {
+            .container { margin: 0 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 24px; }
+            .cta-mega { padding: 20px 30px; font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🎁</div>
+            <h1>ÚLTIMA CHANCE!</h1>
+        </div>
+        
+        <div class="content">
+            <div class="title">{{customerName}}, esta é sua ÚLTIMA oportunidade! 🚨</div>
+            <div class="subtitle">
+                Após 30 dias sem você, decidimos fazer uma oferta <strong>IRRECUSÁVEL</strong>.<br>
+                Esta é sua última chance de voltar com desconto máximo!
+            </div>
+
+            <div class="mega-offer">
+                <div class="discount-badge">50% OFF</div>
+                <h2 style="margin: 20px 0; font-size: 32px;">OFERTA EXCLUSIVA</h2>
+                <p style="font-size: 18px; margin: 20px 0; line-height: 1.6;">
+                    <strong>{{subscriptionPlan.name}}</strong><br>
+                    De {{subscriptionPlan.price}} por apenas<br>
+                    <span style="font-size: 36px; font-weight: 900;">{{winBackOffer.discount_amount}}</span>
+                </p>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 15px; margin: 20px 0;">
+                    <strong>🎯 ECONOMIA TOTAL: {{winBackOffer.discount_amount}}</strong>
+                </div>
+            </div>
+
+            <div class="urgency-timer">
+                <h3 style="color: #ff7675; margin-top: 0;">⏰ OFERTA EXPIRA EM BREVE!</h3>
+                <div style="font-size: 18px; margin: 15px 0;">
+                    Esta é uma oferta <strong>ÚNICA E EXCLUSIVA</strong><br>
+                    Válida apenas até: <strong style="color: #ff7675;">{{formatDate winBackOffer.valid_until}}</strong>
+                </div>
+                <div style="font-size: 14px; color: #cbd5e0;">
+                    ⚠️ Após esta data, você não receberá mais ofertas como esta
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="{{checkoutUrl}}" class="cta-mega">
+                    🔥 REATIVAR COM 50% OFF AGORA!
+                </a>
+                <div style="font-size: 14px; color: #e53e3e; margin-top: 10px; font-weight: 600;">
+                    ⚠️ Oferta válida por tempo limitado!
+                </div>
+            </div>
+
+            <div class="benefits-mega">
+                <h3 style="margin-top: 0; color: white; text-align: center;">🎁 TUDO QUE VOCÊ GANHA DE VOLTA:</h3>
+                {{#if benefitsLost}}
+                <ul style="margin: 20px 0; padding-left: 20px; font-size: 16px; line-height: 1.8;">
+                    {{#each benefitsLost}}
+                    <li>
+                        <strong>{{name}}</strong>
+                        {{#if description}}<br><small>{{description}}</small>{{/if}}
+                        {{#if value_estimate}}<br><em>Valor: {{value_estimate}}</em>{{/if}}
+                    </li>
+                    {{/each}}
+                </ul>
+                {{else}}
+                <ul style="margin: 20px 0; padding-left: 20px; font-size: 16px; line-height: 1.8;">
+                    <li><strong>Acesso completo ao curso/plataforma</strong></li>
+                    <li><strong>Suporte VIP prioritário</strong></li>
+                    <li><strong>Atualizações automáticas</strong></li>
+                    <li><strong>Certificado de conclusão</strong></li>
+                    <li><strong>Comunidade exclusiva</strong></li>
+                    <li><strong>Bônus e materiais extras</strong></li>
+                </ul>
+                {{/if}}
+                <div style="text-align: center; background: rgba(255,255,255,0.2); border-radius: 8px; padding: 15px; margin: 20px 0;">
+                    <strong style="font-size: 18px;">Valor total dos benefícios: MAIS DE R$ 2.000!</strong>
+                </div>
+            </div>
+
+            <div style="background: #2d3748; color: white; border-radius: 12px; padding: 30px; margin: 30px 0; border: 3px solid #e53e3e; text-align: center;">
+                <h2 style="color: #ff7675; margin-top: 0; font-size: 24px;">🚨 POR QUE ESTA É SUA ÚLTIMA CHANCE?</h2>
+                <div style="font-size: 16px; line-height: 1.8; text-align: left; margin: 20px 0;">
+                    <div style="margin: 15px 0;">✅ <strong>Desconto máximo:</strong> Nunca oferecemos mais que 50% OFF</div>
+                    <div style="margin: 15px 0;">✅ <strong>Oferta exclusiva:</strong> Apenas para ex-assinantes</div>
+                    <div style="margin: 15px 0;">✅ <strong>Sem repetição:</strong> Esta oferta não voltará mais</div>
+                    <div style="margin: 15px 0;">✅ <strong>Urgência real:</strong> Após expirar, preço volta ao normal</div>
+                </div>
+                <h3 style="color: #ffffff; margin: 25px 0 0 0; font-size: 18px;">
+                    🎯 NÃO DEIXE ESSA OPORTUNIDADE PASSAR!
+                </h3>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center; border: 3px solid #ffffff;">
+                <h2 style="margin: 0; font-size: 28px;">⚡ REATIVAR É SUPER FÁCIL! ⚡</h2>
+                <div style="font-size: 18px; margin: 20px 0; line-height: 1.6;">
+                    <div style="margin: 10px 0;">1️⃣ <strong>Clique no botão abaixo</strong></div>
+                    <div style="margin: 10px 0;">2️⃣ <strong>Confirme o pagamento com 50% OFF</strong></div>
+                    <div style="margin: 10px 0;">3️⃣ <strong>Acesso liberado em 2 minutos!</strong></div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 15px; margin: 20px 0;">
+                    <strong>💎 BÔNUS: Quem reativar hoje ganha 30 dias extras GRÁTIS!</strong>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="{{checkoutUrl}}" class="cta-mega">
+                    🎁 SIM, QUERO 50% OFF + 30 DIAS GRÁTIS!
+                </a>
+                <div style="margin-top: 20px; color: #718096; font-size: 14px;">
+                    💳 Pagamento 100% seguro | ⚡ Ativação instantânea | 🔒 Dados protegidos
+                </div>
+            </div>
+
+            <div style="background: #fff5f5; border: 2px solid #e53e3e; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                <h3 style="color: #e53e3e; margin-top: 0;">⚠️ AVISO IMPORTANTE</h3>
+                <p style="color: #2d3748; margin-bottom: 0; line-height: 1.6;">
+                    Esta é <strong>realmente</strong> sua última chance de voltar com desconto.<br>
+                    Após {{formatDate winBackOffer.valid_until}}, esta oferta expira <strong>PARA SEMPRE</strong>.<br>
+                    <span style="color: #e53e3e; font-weight: 700;">Não enviaremos mais ofertas como esta!</span>
+                </p>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #e2e8f0; text-align: center; color: #718096;">
+                <p style="color: #e53e3e; font-weight: 600;">🆘 Dúvidas sobre a oferta?</p>
+                <p>Responda este email ou chame no WhatsApp: <strong>(11) 9999-9999</strong></p>
+                <p>⚡ Suporte disponível até a oferta expirar!</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="color: #e53e3e; font-weight: 700;">🚨 ÚLTIMA CHANCE! Esta oferta não voltará mais! 🚨</p>
+            <p>© {{currentYear}} {{companyName}}. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

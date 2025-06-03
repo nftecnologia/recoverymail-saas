@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÚLTIMA CHANCE - Dados serão excluídos</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); padding: 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; }
+        .content { padding: 40px 30px; }
+        .icon { font-size: 48px; margin-bottom: 20px; animation: urgentShake 1s infinite; }
+        @keyframes urgentShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .title { font-size: 24px; font-weight: 700; color: #e53e3e; margin-bottom: 16px; text-align: center; }
+        .subtitle { font-size: 16px; color: #4a5568; margin-bottom: 30px; line-height: 1.6; text-align: center; }
+        .deletion-warning { background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%); color: white; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center; border: 3px solid #fed7d7; animation: criticalGlow 2s ease-in-out infinite alternate; }
+        @keyframes criticalGlow { from { box-shadow: 0 0 10px #e53e3e; } to { box-shadow: 0 0 30px #e53e3e, 0 0 40px #e53e3e; } }
+        .countdown-critical { background: #1a202c; color: white; border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center; border: 3px solid #e53e3e; }
+        .data-loss { background: #2d3748; color: white; border-radius: 12px; padding: 25px; margin: 30px 0; border: 2px solid #e53e3e; }
+        .final-offer { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center; border: 3px solid #ffffff; }
+        .cta-critical { display: inline-block; background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%); color: #ffffff; text-decoration: none; padding: 25px 50px; border-radius: 12px; font-weight: 900; font-size: 22px; margin: 30px 0; box-shadow: 0 10px 20px rgba(229, 62, 62, 0.5); animation: criticalPulse 1.5s infinite; border: 3px solid #ffffff; }
+        @keyframes criticalPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .footer { background-color: #f7fafc; padding: 30px; text-align: center; color: #718096; font-size: 14px; }
+        @media (max-width: 600px) {
+            .container { margin: 0 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 24px; }
+            .cta-critical { padding: 20px 30px; font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🚨</div>
+            <h1>ALERTA CRÍTICO</h1>
+        </div>
+        
+        <div class="content">
+            <div class="title">{{customerName}}, SEUS DADOS SERÃO EXCLUÍDOS! ⚠️</div>
+            <div class="subtitle">
+                <strong>AVISO URGENTE:</strong> Faz 7 dias que sua assinatura expirou.<br>
+                Seus dados e todo progresso serão <strong>PERMANENTEMENTE EXCLUÍDOS</strong> em breve!
+            </div>
+
+            <div class="deletion-warning">
+                <h1 style="margin: 0; font-size: 32px;">🗑️ EXCLUSÃO AUTOMÁTICA ATIVADA</h1>
+                <div style="font-size: 18px; margin: 20px 0; line-height: 1.6;">
+                    Todos os seus dados, progresso e conteúdos<br>
+                    serão <strong>IRREVERSIVELMENTE PERDIDOS</strong>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <strong style="font-size: 20px;">⚠️ ESTA É SUA ÚLTIMA OPORTUNIDADE ⚠️</strong>
+                </div>
+            </div>
+
+            <div class="countdown-critical">
+                <h3 style="color: #ff7675; margin-top: 0; font-size: 24px;">⏰ TEMPO RESTANTE PARA SALVAR SEUS DADOS</h3>
+                <div style="font-size: 48px; font-weight: 900; color: #e53e3e; margin: 20px 0;">
+                    HORAS FINAIS
+                </div>
+                <div style="font-size: 16px; color: #cbd5e0;">
+                    Após este prazo, não será possível recuperar nada!
+                </div>
+            </div>
+
+            <div class="data-loss">
+                <h2 style="color: #ff7675; margin-top: 0; text-align: center;">💥 O QUE SERÁ PERDIDO PARA SEMPRE:</h2>
+                <div style="font-size: 16px; line-height: 2; margin: 20px 0;">
+                    <div style="margin: 10px 0; color: #ff7675;">🗑️ <strong>TODO seu progresso nos cursos</strong></div>
+                    <div style="margin: 10px 0; color: #ff7675;">🗑️ <strong>Certificados conquistados</strong></div>
+                    <div style="margin: 10px 0; color: #ff7675;">🗑️ <strong>Anotações e marcações pessoais</strong></div>
+                    <div style="margin: 10px 0; color: #ff7675;">🗑️ <strong>Histórico de atividades</strong></div>
+                    <div style="margin: 10px 0; color: #ff7675;">🗑️ <strong>Conexões na comunidade</strong></div>
+                    <div style="margin: 10px 0; color: #ff7675;">🗑️ <strong>Materiais baixados</strong></div>
+                    <div style="margin: 10px 0; color: #ff7675;">🗑️ <strong>Configurações personalizadas</strong></div>
+                </div>
+                <div style="background: rgba(229, 62, 62, 0.2); border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+                    <strong style="color: #ffffff; font-size: 18px;">
+                        💸 VALOR TOTAL PERDIDO: {{customer.total_paid}} + TODO SEU TEMPO INVESTIDO
+                    </strong>
+                </div>
+            </div>
+
+            {{#if renewalOffer}}
+            <div class="final-offer">
+                <h2 style="margin-top: 0; color: white; font-size: 28px;">🛡️ SALVE TUDO AGORA!</h2>
+                <div style="font-size: 20px; margin: 20px 0;">
+                    <strong>OFERTA EMERGENCIAL DE SALVAMENTO</strong>
+                </div>
+                {{#if renewalOffer.discount_percent}}
+                <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <div style="font-size: 36px; font-weight: 900;">{{renewalOffer.discount_percent}}% OFF</div>
+                    <div style="font-size: 16px;">Desconto especial para recuperação</div>
+                </div>
+                {{/if}}
+                <div style="font-size: 18px; margin: 20px 0; line-height: 1.6;">
+                    ✅ <strong>Salva todos os seus dados</strong><br>
+                    ✅ <strong>Recupera todo seu progresso</strong><br>
+                    ✅ <strong>Mantém seus certificados</strong><br>
+                    ✅ <strong>Preserva suas conexões</strong>
+                </div>
+            </div>
+            {{/if}}
+
+            <div style="text-align: center;">
+                {{#if renewalOffer.payment_link}}
+                <a href="{{renewalOffer.payment_link}}" class="cta-critical">
+                    🛡️ SALVAR MEUS DADOS AGORA!
+                </a>
+                {{else if checkoutUrl}}
+                <a href="{{checkoutUrl}}" class="cta-critical">
+                    🚨 RENOVAR E SALVAR TUDO!
+                </a>
+                {{else}}
+                <a href="mailto:urgente@example.com?subject=URGENTE - Salvar dados da assinatura" class="cta-critical">
+                    🆘 CONTATO EMERGENCIAL!
+                </a>
+                {{/if}}
+                <div style="font-size: 14px; color: #e53e3e; margin-top: 15px; font-weight: 700;">
+                    ⚠️ Após a exclusão, não será possível recuperar!
+                </div>
+            </div>
+
+            <div style="background: #1a202c; color: white; border-radius: 12px; padding: 30px; margin: 30px 0; border: 3px solid #e53e3e;">
+                <h2 style="color: #ff7675; margin-top: 0; text-align: center; font-size: 24px;">🤔 POR QUE FAZEMOS ISSO?</h2>
+                <div style="font-size: 16px; line-height: 1.8; text-align: left;">
+                    <div style="margin: 15px 0;">📋 <strong>Lei LGPD:</strong> Somos obrigados a excluir dados inativos</div>
+                    <div style="margin: 15px 0;">💾 <strong>Proteção:</strong> Evita vazamentos de dados antigos</div>
+                    <div style="margin: 15px 0;">🚀 <strong>Performance:</strong> Mantém o sistema otimizado</div>
+                    <div style="margin: 15px 0;">⚡ <strong>Segurança:</strong> Reduz riscos de ataques</div>
+                </div>
+                <div style="background: rgba(229, 62, 62, 0.3); border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+                    <strong style="font-size: 18px;">
+                        🛡️ Renovando agora, você mantém tudo protegido e seguro!
+                    </strong>
+                </div>
+            </div>
+
+            {{#if contentBackup}}
+            <div style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); color: white; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                <h3 style="margin-top: 0; color: white;">📦 BACKUP DE EMERGÊNCIA</h3>
+                {{#if contentBackup.download_link}}
+                <p style="margin: 15px 0;">
+                    Preparamos um backup de emergência dos seus dados principais.<br>
+                    <strong>BAIXE AGORA antes que expire!</strong>
+                </p>
+                <a href="{{contentBackup.download_link}}" 
+                   style="display: inline-block; background: white; color: #6c5ce7; text-decoration: none; padding: 15px 30px; border-radius: 8px; font-weight: 700; margin: 10px 0;">
+                    💾 BAIXAR BACKUP AGORA
+                </a>
+                {{/if}}
+                {{#if contentBackup.available_until}}
+                <div style="font-size: 14px; margin-top: 15px; color: #ff7675;">
+                    ⚠️ Backup expira em: {{formatDate contentBackup.available_until}}
+                </div>
+                {{/if}}
+            </div>
+            {{/if}}
+
+            <div style="background: linear-gradient(135deg, #e17055 0%, #d63031 100%); color: white; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center;">
+                <h2 style="margin: 0; font-size: 26px;">⚡ RENOVAÇÃO EM 2 MINUTOS! ⚡</h2>
+                <div style="font-size: 18px; margin: 20px 0; line-height: 1.6;">
+                    <div style="margin: 15px 0;">1️⃣ <strong>Clique no botão de renovação</strong></div>
+                    <div style="margin: 15px 0;">2️⃣ <strong>Confirme o pagamento</strong></div>
+                    <div style="margin: 15px 0;">3️⃣ <strong>TODOS os seus dados são salvos!</strong></div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 15px; margin: 20px 0;">
+                    <strong>🎯 Acesso liberado imediatamente após pagamento!</strong>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                {{#if renewalOffer.payment_link}}
+                <a href="{{renewalOffer.payment_link}}" class="cta-critical">
+                    🛡️ RENOVAR E SALVAR AGORA - {{renewalOffer.discount_amount}}
+                </a>
+                {{else if checkoutUrl}}
+                <a href="{{checkoutUrl}}" class="cta-critical">
+                    🚨 SALVAR MEUS DADOS URGENTE!
+                </a>
+                {{/if}}
+                <div style="margin-top: 20px; color: #718096; font-size: 14px;">
+                    🔒 Pagamento seguro | ⚡ Ativação instantânea | 💾 Dados preservados
+                </div>
+            </div>
+
+            <div style="background: #fff5f5; border: 3px solid #e53e3e; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                <h3 style="color: #e53e3e; margin-top: 0; font-size: 20px;">🚨 AVISO FINAL</h3>
+                <p style="color: #2d3748; margin-bottom: 0; line-height: 1.6; font-size: 16px;">
+                    <strong>Este é literalmente o último email que você receberá.</strong><br>
+                    Após a exclusão dos dados, <span style="color: #e53e3e; font-weight: 700;">não será possível recuperá-los</span>.<br>
+                    <span style="color: #e53e3e; font-weight: 700;">Nem nós conseguiremos ajudar após a exclusão!</span>
+                </p>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 3px solid #e2e8f0; text-align: center; color: #718096;">
+                <div style="color: #e53e3e; font-weight: 700; font-size: 18px; margin-bottom: 15px;">
+                    🆘 SUPORTE DE EMERGÊNCIA 24H
+                </div>
+                <p><strong>WhatsApp:</strong> (11) 9999-9999</p>
+                <p><strong>Email urgente:</strong> urgente@example.com</p>
+                <p style="color: #e53e3e; font-weight: 600;">⚡ Equipe de plantão até a exclusão dos dados!</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="color: #e53e3e; font-weight: 700; font-size: 16px;">🚨 DADOS SERÃO EXCLUÍDOS EM BREVE! ÚLTIMA CHANCE! 🚨</p>
+            <p>© {{currentYear}} {{companyName}}. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

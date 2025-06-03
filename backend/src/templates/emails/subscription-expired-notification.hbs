@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assinatura Expirada - Renovar Agora</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #ff7675 0%, #d63031 100%); padding: 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; }
+        .content { padding: 40px 30px; }
+        .icon { font-size: 48px; margin-bottom: 20px; }
+        .title { font-size: 24px; font-weight: 700; color: #d63031; margin-bottom: 16px; }
+        .subtitle { font-size: 16px; color: #4a5568; margin-bottom: 30px; line-height: 1.6; }
+        .expiration-alert { background: linear-gradient(135deg, #ff7675 0%, #d63031 100%); color: white; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center; }
+        .grace-period { background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center; }
+        .subscription-summary { background-color: #f7fafc; border-radius: 12px; padding: 25px; margin: 30px 0; border-left: 4px solid #d63031; }
+        .renewal-offer { background: linear-gradient(135deg, #00b894 0%, #00a085 100%); color: white; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center; }
+        .cta-button { display: inline-block; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: #ffffff; text-decoration: none; padding: 18px 36px; border-radius: 8px; font-weight: 700; font-size: 18px; margin: 25px 0; box-shadow: 0 6px 12px rgba(72, 187, 120, 0.3); transition: transform 0.2s; }
+        .cta-button:hover { transform: translateY(-2px); }
+        .usage-stats { background-color: #ebf8ff; border: 1px solid #bee3f8; border-radius: 12px; padding: 25px; margin: 30px 0; }
+        .footer { background-color: #f7fafc; padding: 30px; text-align: center; color: #718096; font-size: 14px; }
+        @media (max-width: 600px) {
+            .container { margin: 0 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">⚠️</div>
+            <h1>Assinatura Expirada</h1>
+        </div>
+        
+        <div class="content">
+            <div class="title">{{customerName}}, sua assinatura expirou 📅</div>
+            <div class="subtitle">
+                Infelizmente sua assinatura do <strong>{{subscriptionPlan.name}}</strong> expirou em 
+                {{formatDate expiration.expired_at}}. Mas não se preocupe, você pode renovar agora mesmo!
+            </div>
+
+            <div class="expiration-alert">
+                <h2 style="margin-top: 0; color: white; font-size: 24px;">🚨 STATUS DA ASSINATURA</h2>
+                <div style="font-size: 18px; margin: 15px 0;">
+                    <strong>EXPIRADA</strong> desde {{formatDate expiration.expired_at}}
+                </div>
+                {{#if expiration.reason}}
+                <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 15px; margin: 15px 0;">
+                    <strong>Motivo:</strong> 
+                    {{#eq expiration.reason "PAYMENT_FAILED"}}Falha no pagamento{{/eq}}
+                    {{#eq expiration.reason "CARD_EXPIRED"}}Cartão expirado{{/eq}}
+                    {{#eq expiration.reason "INSUFFICIENT_FUNDS"}}Saldo insuficiente{{/eq}}
+                    {{#eq expiration.reason "CANCELED"}}Cancelamento solicitado{{/eq}}
+                    {{#eq expiration.reason "OTHER"}}Outros motivos{{/eq}}
+                </div>
+                {{/if}}
+            </div>
+
+            {{#if expiration.grace_period_until}}
+            <div class="grace-period">
+                <h3 style="margin-top: 0; color: #2d3748;">⏰ PERÍODO DE GRAÇA ATIVO!</h3>
+                <p style="color: #2d3748; margin-bottom: 0; font-size: 16px;">
+                    Você ainda tem acesso limitado até <strong>{{formatDate expiration.grace_period_until}}</strong><br>
+                    Renove agora para manter todos os seus benefícios!
+                </p>
+            </div>
+            {{/if}}
+
+            <div class="subscription-summary">
+                <h3 style="color: #2b6cb0; margin-top: 0;">📋 Detalhes da Assinatura</h3>
+                <div style="color: #2d3748; line-height: 1.6;">
+                    <strong>Plano:</strong> {{subscriptionPlan.name}}<br>
+                    <strong>Valor:</strong> {{subscriptionPlan.price}}<br>
+                    {{#if subscriptionPlan.billing_cycle}}
+                    <strong>Ciclo:</strong> 
+                    {{#eq subscriptionPlan.billing_cycle "MONTHLY"}}Mensal{{/eq}}
+                    {{#eq subscriptionPlan.billing_cycle "QUARTERLY"}}Trimestral{{/eq}}
+                    {{#eq subscriptionPlan.billing_cycle "YEARLY"}}Anual{{/eq}}<br>
+                    {{/if}}
+                    {{#if customer.last_payment_date}}
+                    <strong>Último Pagamento:</strong> {{formatDate customer.last_payment_date}}<br>
+                    {{/if}}
+                    {{#if customer.total_paid}}
+                    <strong>Total Investido:</strong> {{customer.total_paid}}<br>
+                    {{/if}}
+                </div>
+            </div>
+
+            {{#if customer.usage_stats}}
+            <div class="usage-stats">
+                <h3 style="color: #2b6cb0; margin-top: 0;">📊 Seu Progresso</h3>
+                <div style="color: #2d3748; line-height: 1.8;">
+                    {{#if customer.usage_stats.total_logins}}
+                    🔑 <strong>Total de acessos:</strong> {{customer.usage_stats.total_logins}}<br>
+                    {{/if}}
+                    {{#if customer.usage_stats.content_accessed}}
+                    📚 <strong>Conteúdos acessados:</strong> {{customer.usage_stats.content_accessed}}<br>
+                    {{/if}}
+                    {{#if customer.usage_stats.completion_rate}}
+                    🎯 <strong>Taxa de conclusão:</strong> {{customer.usage_stats.completion_rate}}<br>
+                    {{/if}}
+                </div>
+                <div style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white; border-radius: 8px; padding: 15px; margin-top: 20px; text-align: center;">
+                    <strong>💎 Não perca todo esse progresso! Renove agora e continue de onde parou.</strong>
+                </div>
+            </div>
+            {{/if}}
+
+            {{#if renewalOffer}}
+            <div class="renewal-offer">
+                <h2 style="margin-top: 0; color: white; font-size: 24px;">🎁 OFERTA ESPECIAL DE RENOVAÇÃO</h2>
+                {{#if renewalOffer.discount_percent}}
+                <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <div style="font-size: 32px; font-weight: 900; margin-bottom: 10px;">
+                        {{renewalOffer.discount_percent}}% OFF
+                    </div>
+                    <div style="font-size: 18px;">
+                        Renove agora com desconto exclusivo!
+                    </div>
+                </div>
+                {{/if}}
+                {{#if renewalOffer.discount_amount}}
+                <div style="font-size: 18px; margin: 15px 0;">
+                    <strong>Novo valor:</strong> {{renewalOffer.discount_amount}}
+                </div>
+                {{/if}}
+                {{#if renewalOffer.valid_until}}
+                <div style="font-size: 14px; margin-top: 15px;">
+                    ⏰ Oferta válida até: {{formatDate renewalOffer.valid_until}}
+                </div>
+                {{/if}}
+            </div>
+            {{/if}}
+
+            <div style="text-align: center;">
+                {{#if renewalOffer.payment_link}}
+                <a href="{{renewalOffer.payment_link}}" class="cta-button">
+                    🚀 Renovar com Desconto
+                </a>
+                {{else if checkoutUrl}}
+                <a href="{{checkoutUrl}}" class="cta-button">
+                    🔄 Renovar Assinatura
+                </a>
+                {{else}}
+                <a href="mailto:suporte@example.com?subject=Renovar assinatura" class="cta-button">
+                    💬 Renovar Agora
+                </a>
+                {{/if}}
+            </div>
+
+            {{#if renewalOffer.alternative_plans}}
+            <div style="background-color: #f0fff4; border: 1px solid #9ae6b4; border-radius: 12px; padding: 25px; margin: 30px 0;">
+                <h3 style="color: #2f855a; margin-top: 0; text-align: center;">💡 Ou escolha um plano alternativo:</h3>
+                {{#each renewalOffer.alternative_plans}}
+                <div style="background: white; border-radius: 8px; padding: 15px; margin: 15px 0; border-left: 3px solid #48bb78;">
+                    <strong>{{name}}</strong> - {{price}}
+                    {{#if discount}}<span style="color: #48bb78; font-weight: 600;"> ({{discount}} OFF)</span>{{/if}}
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+
+            <div style="background-color: #fff5f5; border: 1px solid #fed7d7; border-radius: 12px; padding: 25px; margin: 30px 0;">
+                <h3 style="color: #e53e3e; margin-top: 0; text-align: center;">⚠️ O que você perde sem renovar:</h3>
+                <ul style="color: #2d3748; margin: 0; padding-left: 20px; line-height: 1.8;">
+                    <li>❌ Acesso a todo conteúdo exclusivo</li>
+                    <li>❌ Suporte prioritário da equipe</li>
+                    <li>❌ Atualizações e novos materiais</li>
+                    <li>❌ Certificados de conclusão</li>
+                    <li>❌ Comunidade exclusiva de membros</li>
+                    <li>❌ Todo seu progresso e histórico</li>
+                </ul>
+            </div>
+
+            {{#if contentBackup}}
+            <div style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); color: white; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                <h3 style="margin-top: 0; color: white;">💾 BACKUP DOS SEUS DADOS</h3>
+                {{#if contentBackup.download_link}}
+                <p style="margin: 15px 0;">
+                    Preparamos um backup dos seus dados e progresso.<br>
+                    Faça o download antes que expire!
+                </p>
+                <a href="{{contentBackup.download_link}}" 
+                   style="display: inline-block; background: white; color: #6c5ce7; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin: 10px 0;">
+                    📥 Baixar Backup
+                </a>
+                {{/if}}
+                {{#if contentBackup.available_until}}
+                <div style="font-size: 14px; margin-top: 15px;">
+                    ⏰ Disponível até: {{formatDate contentBackup.available_until}}
+                </div>
+                {{/if}}
+            </div>
+            {{/if}}
+
+            <div style="background-color: #ebf8ff; border: 1px solid #bee3f8; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                <h3 style="color: #2b6cb0; margin-top: 0;">🤝 Precisa de Ajuda?</h3>
+                <p style="color: #2d3748; margin-bottom: 20px;">
+                    Nossa equipe está pronta para ajudar com a renovação da sua assinatura.<br>
+                    Entre em contato conosco!
+                </p>
+                <div>
+                    <a href="mailto:suporte@example.com?subject=Ajuda com renovação" 
+                       style="display: inline-block; background: #2b6cb0; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin: 0 10px 10px 0;">
+                        📧 Email
+                    </a>
+                    <a href="tel:+5511999999999" 
+                       style="display: inline-block; background: #25d366; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin: 0 10px 10px 0;">
+                        📞 WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #e2e8f0; text-align: center; color: #718096;">
+                <p><strong>Sentimos muito pela expiração da sua assinatura!</strong></p>
+                <p>Estamos aqui para ajudar você a renovar e continuar aproveitando todos os benefícios.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Este email foi enviado automaticamente pelo sistema de gerenciamento de assinaturas.</p>
+            <p>© {{currentYear}} {{companyName}}. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -3,28 +3,35 @@ import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
 import type { EmailJobData } from '../services/queue.service';
 
-// Schema específico para SALE_REFUSED
-const saleRefusedSchema = z.object({
-  event: z.literal('SALE_REFUSED'),
+// Schema específico para BANK_SLIP_GENERATED
+const bankSlipGeneratedSchema = z.object({
+  event: z.literal('BANK_SLIP_GENERATED'),
   transaction_id: z.string(),
-  order_number: z.string(),
-  payment_method: z.string(),
-  refusal_reason: z.string().optional(),
-  refusal_code: z.string().optional(),
-  amount: z.string(),
+  order_number: z.string().optional(),
+  bank_slip_url: z.string().url(),
+  digitable_line: z.string().optional(),
+  barcode: z.string().optional(),
+  total_price: z.string(),
+  due_date: z.string(), // Data de vencimento
   customer: z.object({
     name: z.string(),
     email: z.string().email(),
     phone_number: z.string().optional(),
     document: z.string().optional()
   }),
-  product: z.object({
-    id: z.string(),
+  products: z.array(z.object({
+    id: z.string().optional(),
     name: z.string(),
-    offer_id: z.string().optional(),
-    offer_name: z.string().optional()
-  }),
-  checkout_url: z.string().url(),
+    price: z.string(),
+    quantity: z.number().optional(),
+    offer_name: z.string().optional(),
+    description: z.string().optional()
+  })),
+  payment_details: z.object({
+    method: z.literal('BANK_SLIP'),
+    installments: z.number().optional()
+  }).optional(),
+  checkout_url: z.string().url().optional(),
   utm: z.object({
     utm_source: z.string().optional(),
     utm_medium: z.string().optional(),
@@ -33,28 +40,30 @@ const saleRefusedSchema = z.object({
   }).optional()
 });
 
-export type SaleRefusedPayload = z.infer<typeof saleRefusedSchema>;
+export type BankSlipGeneratedPayload = z.infer<typeof bankSlipGeneratedSchema>;
 
-export async function handleSaleRefused(
+export async function handleBankSlipGenerated(
   payload: unknown,
   eventId: string,
   organizationId: string,
   forceImmediate: boolean = false
 ) {
   // Valida o payload
-  const validatedPayload = saleRefusedSchema.parse(payload);
+  const validatedPayload = bankSlipGeneratedSchema.parse(payload);
   
-  logger.info('Processing SALE_REFUSED event', {
+  logger.info('Processing BANK_SLIP_GENERATED event', {
     eventId,
     organizationId,
     customerEmail: validatedPayload.customer.email,
-    refusalReason: validatedPayload.refusal_reason
+    transactionId: validatedPayload.transaction_id,
+    dueDate: validatedPayload.due_date
   });
 
   // Configuração dos delays para cada tentativa
   const delays = [
-    30 * 60 * 1000,        // 30 minutos - Primeira tentativa rápida
-    6 * 60 * 60 * 1000,    // 6 horas - Segunda tentativa com suporte
+    2 * 60 * 1000,         // 2 minutos - Confirmação imediata
+    24 * 60 * 60 * 1000,   // 24 horas - Lembrete do vencimento
+    48 * 60 * 60 * 1000,   // 48 horas - Lembrete final antes do vencimento
   ];
 
   // Agenda emails para cada tentativa
@@ -65,7 +74,7 @@ export async function handleSaleRefused(
     const jobData: EmailJobData = {
       eventId,
       organizationId,
-      eventType: 'SALE_REFUSED',
+      eventType: 'BANK_SLIP_GENERATED',
       attemptNumber,
       payload: validatedPayload as any
     };
@@ -91,10 +100,10 @@ export async function handleSaleRefused(
       }
     );
 
-    logger.info('Sale refused email job enqueued', {
+    logger.info('Bank slip generated email job enqueued', {
       jobId,
       eventId,
-      eventType: 'SALE_REFUSED',
+      eventType: 'BANK_SLIP_GENERATED',
       attemptNumber,
       delay,
       forceImmediate
@@ -103,25 +112,27 @@ export async function handleSaleRefused(
 }
 
 // Mapeamento de templates para cada tentativa
-export const saleRefusedTemplates = {
-  1: 'sale-refused-retry',          // Primeira tentativa - Soluções rápidas
-  2: 'sale-refused-support'         // Segunda tentativa - Suporte personalizado
+export const bankSlipGeneratedTemplates = {
+  1: 'bank-slip-generated-confirmation',  // Confirmação com instruções
+  2: 'bank-slip-generated-reminder',      // Lembrete 24h
+  3: 'bank-slip-generated-urgency'        // Urgência antes do vencimento
 };
 
 // Mapeamento de assuntos para cada tentativa
-export const saleRefusedSubjects = {
-  1: '❌ {customerName}, houve um problema com seu pagamento',
-  2: '💳 {customerName}, ainda está com problemas no pagamento?'
+export const bankSlipGeneratedSubjects = {
+  1: '📄 {customerName}, seu boleto foi gerado com sucesso',
+  2: '⏰ {customerName}, lembrete: seu boleto vence amanhã',
+  3: '🚨 {customerName}, últimas horas para pagar seu boleto'
 };
 
 // Função de processamento para o worker
-export async function processSaleRefused(job: any): Promise<void> {
+export async function processBankSlipGenerated(job: any): Promise<void> {
   const { eventId, attemptNumber, payload } = job.data;
   
   try {
-    const validatedPayload = saleRefusedSchema.parse(payload);
+    const validatedPayload = bankSlipGeneratedSchema.parse(payload);
     
-    logger.info('Processing SALE_REFUSED email', {
+    logger.info('Processing BANK_SLIP_GENERATED email', {
       eventId,
       attemptNumber,
       customerEmail: validatedPayload.customer.email
@@ -131,8 +142,8 @@ export async function processSaleRefused(job: any): Promise<void> {
     const { sendEmail } = await import('../services/email.service');
     
     // Preparar dados do email
-    const template = saleRefusedTemplates[attemptNumber as keyof typeof saleRefusedTemplates];
-    const subjectTemplate = saleRefusedSubjects[attemptNumber as keyof typeof saleRefusedSubjects];
+    const template = bankSlipGeneratedTemplates[attemptNumber as keyof typeof bankSlipGeneratedTemplates];
+    const subjectTemplate = bankSlipGeneratedSubjects[attemptNumber as keyof typeof bankSlipGeneratedSubjects];
     
     const emailData = {
       to: validatedPayload.customer.email,
@@ -142,12 +153,14 @@ export async function processSaleRefused(job: any): Promise<void> {
         customerName: validatedPayload.customer.name,
         transactionId: validatedPayload.transaction_id,
         orderNumber: validatedPayload.order_number,
-        amount: validatedPayload.amount,
-        paymentMethod: validatedPayload.payment_method,
-        refusalReason: validatedPayload.refusal_reason,
-        refusalCode: validatedPayload.refusal_code,
+        bankSlipUrl: validatedPayload.bank_slip_url,
+        digitableLine: validatedPayload.digitable_line,
+        barcode: validatedPayload.barcode,
+        totalPrice: validatedPayload.total_price,
+        dueDate: validatedPayload.due_date,
+        products: validatedPayload.products,
+        paymentDetails: validatedPayload.payment_details,
         checkoutUrl: validatedPayload.checkout_url,
-        product: validatedPayload.product,
         utm: validatedPayload.utm
       },
       organizationId: job.data.organizationId,
@@ -157,18 +170,18 @@ export async function processSaleRefused(job: any): Promise<void> {
 
     await sendEmail(emailData);
     
-    logger.info('SALE_REFUSED email sent successfully', {
+    logger.info('BANK_SLIP_GENERATED email sent successfully', {
       eventId,
       attemptNumber,
       template
     });
     
   } catch (error) {
-    logger.error('Error processing SALE_REFUSED email', {
+    logger.error('Error processing BANK_SLIP_GENERATED email', {
       eventId,
       attemptNumber,
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     throw error;
   }
-} 
+}

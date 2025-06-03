@@ -11,6 +11,7 @@ import { testDatabaseConnection } from '@/config/database';
 import webhookRoutes from '@/routes/webhook.routes';
 import resendWebhookRoutes from '@/routes/resend-webhook.routes';
 import apiRoutes from '@/routes/api.routes';
+import authRoutes from '@/routes/auth.routes';
 import { cleanOldJobs } from '@/services/queue.service';
 import setupRoutes from '@/routes/setup.routes';
 
@@ -115,6 +116,9 @@ app.use('/webhook', webhookRoutes);
 
 // Rotas de webhook do Resend (tracking de emails)
 app.use('/', resendWebhookRoutes);
+
+// Rotas de autenticação
+app.use('/auth', authRoutes);
 
 // Rotas de setup (temporário)
 app.use('/api', setupRoutes);

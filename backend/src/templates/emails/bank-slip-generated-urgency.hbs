@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URGENTE - Últimas Horas para Pagar</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #d63031 0%, #74b9ff 100%); padding: 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; }
+        .content { padding: 40px 30px; }
+        .icon { font-size: 48px; margin-bottom: 20px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .title { font-size: 24px; font-weight: 700; color: #d63031; margin-bottom: 16px; }
+        .subtitle { font-size: 16px; color: #4a5568; margin-bottom: 30px; line-height: 1.6; }
+        .urgent-alert { background: linear-gradient(135deg, #ff7675 0%, #d63031 100%); color: white; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center; border: 3px solid #d63031; animation: glow 2s ease-in-out infinite alternate; }
+        @keyframes glow { from { box-shadow: 0 0 5px #d63031; } to { box-shadow: 0 0 20px #d63031, 0 0 30px #d63031; } }
+        .countdown { background: #2d3748; color: #ffffff; border-radius: 12px; padding: 20px; margin: 25px 0; text-align: center; }
+        .countdown-item { display: inline-block; margin: 0 10px; text-align: center; }
+        .countdown-number { font-size: 32px; font-weight: 700; display: block; }
+        .countdown-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .boleto-info { background-color: #f7fafc; border-radius: 12px; padding: 25px; margin: 30px 0; border-left: 4px solid #d63031; }
+        .cta-button { display: inline-block; background: linear-gradient(135deg, #00b894 0%, #00a085 100%); color: #ffffff; text-decoration: none; padding: 20px 40px; border-radius: 8px; font-weight: 700; font-size: 20px; margin: 25px 0; box-shadow: 0 8px 16px rgba(0, 184, 148, 0.4); transition: all 0.3s; animation: buttonPulse 3s infinite; }
+        @keyframes buttonPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .cta-button:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0, 184, 148, 0.6); }
+        .benefits { background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white; border-radius: 12px; padding: 25px; margin: 30px 0; }
+        .benefits h3 { margin-top: 0; text-align: center; font-size: 20px; }
+        .benefits ul { margin: 0; padding-left: 20px; }
+        .benefits li { margin: 10px 0; font-size: 16px; }
+        .footer { background-color: #f7fafc; padding: 30px; text-align: center; color: #718096; font-size: 14px; }
+        .risk-alert { background: #2d3748; color: white; border-radius: 12px; padding: 25px; margin: 30px 0; border: 2px solid #e74c3c; }
+        @media (max-width: 600px) {
+            .container { margin: 0 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 24px; }
+            .countdown-item { margin: 0 5px; }
+            .countdown-number { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🚨</div>
+            <h1>ÚLTIMAS HORAS!</h1>
+        </div>
+        
+        <div class="content">
+            <div class="title">{{customerName}}, seu boleto vence HOJE! ⏰</div>
+            <div class="subtitle">
+                <strong>ATENÇÃO:</strong> Este é o último aviso antes do vencimento do seu boleto bancário. 
+                Após o vencimento, você perderá definitivamente o acesso ao produto.
+            </div>
+
+            <div class="urgent-alert">
+                <h2 style="margin: 0; font-size: 28px;">⚡ VENCE HOJE ÀS 23:59 ⚡</h2>
+                <p style="margin: 15px 0 0 0; font-size: 18px;">Não deixe para amanhã o que você pode fazer AGORA!</p>
+            </div>
+
+            <div class="countdown">
+                <h3 style="margin-top: 0; color: #ff7675;">⏰ TEMPO RESTANTE</h3>
+                <div style="font-size: 16px; margin-bottom: 10px;">Seu boleto vence em:</div>
+                <div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="hours">--</span>
+                        <span class="countdown-label">HORAS</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="minutes">--</span>
+                        <span class="countdown-label">MIN</span>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; font-size: 14px; color: #ff7675;">
+                    Data limite: {{formatDate dueDate}} às 23:59
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="{{bankSlipUrl}}" class="cta-button">
+                    🔥 PAGAR AGORA - {{totalPrice}}
+                </a>
+                <div style="font-size: 14px; color: #e74c3c; margin-top: 10px;">
+                    ⚠️ Link ativo apenas até às 23:59 de hoje!
+                </div>
+            </div>
+
+            <div class="benefits">
+                <h3>🎁 O que você PERDE se não pagar hoje:</h3>
+                <ul>
+                    <li>✗ Acesso completo ao curso/produto</li>
+                    <li>✗ Bônus exclusivos incluídos na compra</li>
+                    <li>✗ Suporte direto com especialistas</li>
+                    <li>✗ Atualizações gratuitas por 1 ano</li>
+                    <li>✗ Certificado de conclusão</li>
+                    <li>✗ Preço promocional atual</li>
+                </ul>
+            </div>
+
+            <div class="boleto-info">
+                <h3 style="color: #d63031; margin-top: 0;">📄 Dados do Seu Boleto</h3>
+                <div style="font-size: 18px;">
+                    <strong>💰 Valor:</strong> {{totalPrice}}<br>
+                    <strong>⏰ Vencimento:</strong> <span style="color: #d63031; font-weight: 700;">HOJE - {{formatDate dueDate}}</span><br>
+                    {{#if transactionId}}<strong>🔢 Código:</strong> {{transactionId}}<br>{{/if}}
+                </div>
+                
+                {{#if digitableLine}}
+                <div style="margin-top: 20px;">
+                    <strong>🏦 Linha Digitável:</strong><br>
+                    <code style="background: #e2e8f0; padding: 12px; border-radius: 6px; font-size: 14px; word-break: break-all; display: block; margin-top: 8px;">{{digitableLine}}</code>
+                </div>
+                {{/if}}
+            </div>
+
+            <div class="risk-alert">
+                <h3 style="color: #ff7675; margin-top: 0; text-align: center;">⚠️ RISCO DE PERDA TOTAL</h3>
+                <div style="text-align: center; font-size: 16px; line-height: 1.6;">
+                    <p>Se você não pagar até às <strong>23:59 de hoje</strong>:</p>
+                    <ul style="text-align: left; margin: 20px 0;">
+                        <li>❌ O boleto ficará inválido</li>
+                        <li>❌ Você perderá seu desconto/promoção</li>
+                        <li>❌ Terá que fazer uma nova compra</li>
+                        <li>❌ Pode não conseguir o mesmo preço</li>
+                    </ul>
+                    <p style="color: #ff7675; font-weight: 700;">
+                        NÃO DEIXE ISSO ACONTECER!
+                    </p>
+                </div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #00b894 0%, #00a085 100%); color: white; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                <h3 style="margin-top: 0;">📱 FORMAS SUPER RÁPIDAS DE PAGAR</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div>
+                        <div style="font-size: 24px;">📱</div>
+                        <strong>App Banco</strong><br>
+                        <small>2 minutos</small>
+                    </div>
+                    <div>
+                        <div style="font-size: 24px;">🏪</div>
+                        <strong>Lotérica</strong><br>
+                        <small>5 minutos</small>
+                    </div>
+                    <div>
+                        <div style="font-size: 24px;">💻</div>
+                        <strong>Internet Banking</strong><br>
+                        <small>3 minutos</small>
+                    </div>
+                    <div>
+                        <div style="font-size: 24px;">📷</div>
+                        <strong>PIX Boleto</strong><br>
+                        <small>1 minuto</small>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #fff5f5; border: 2px solid #d63031; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                <h3 style="color: #d63031; margin-top: 0; font-size: 20px;">🚨 ÚLTIMA CHANCE - AÇÃO IMEDIATA NECESSÁRIA</h3>
+                <div style="font-size: 16px; color: #2d3748; line-height: 1.6;">
+                    <p><strong>Você investiu tempo pesquisando e escolhendo este produto.</strong></p>
+                    <p><strong>Não deixe todo esse esforço ir por água abaixo!</strong></p>
+                    <p style="color: #d63031; font-weight: 700;">
+                        PAGUE AGORA e garante seu acesso imediato!
+                    </p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="{{bankSlipUrl}}" class="cta-button" style="font-size: 22px; padding: 25px 50px;">
+                    🔥 PAGAR BOLETO AGORA
+                </a>
+                <div style="margin-top: 15px; color: #718096;">
+                    <small>💡 <strong>Dica:</strong> Pagamento no app do banco é mais rápido</small>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #e2e8f0; text-align: center; color: #718096;">
+                <p style="color: #d63031; font-weight: 600;">🆘 PRECISA DE AJUDA URGENTE?</p>
+                <p>Responda este email AGORA ou chame no WhatsApp</p>
+                <p>📧 Confirmação do pagamento em até 2 horas</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="color: #d63031; font-weight: 600;">⚠️ Este é o último email sobre este boleto!</p>
+            <p>© {{currentYear}} {{companyName}}. Todos os direitos reservados.</p>
+        </div>
+    </div>
+
+    <script>
+        // Countdown timer simples (opcional, funciona se JavaScript estiver habilitado)
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const dueDate = new Date('{{dueDate}}').getTime();
+            const timeLeft = dueDate - now;
+            
+            if (timeLeft > 0) {
+                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            } else {
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+            }
+        }
+        
+        if (typeof setInterval !== 'undefined') {
+            updateCountdown();
+            setInterval(updateCountdown, 60000); // Atualiza a cada minuto
+        }
+    </script>
+</body>
+</html>

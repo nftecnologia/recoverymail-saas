@@ -3,40 +3,18 @@ import { prisma } from '../config/database';
 import { z } from 'zod';
 import { logger } from '../utils/logger';
 import domainRoutes from './domain.routes';
+import { authenticateToken, authenticateOrganization } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// Middleware para validar organizationId
-const validateOrgId = async (req: any, res: any, next: any): Promise<void> => {
-  const orgId = req.headers['x-organization-id'] as string;
-  
-  if (!orgId) {
-    res.status(401).json({ error: 'Organization ID required' });
-    return;
-  }
-
-  try {
-    const org = await prisma.organization.findUnique({
-      where: { id: orgId }
-    });
-
-    if (!org) {
-      res.status(404).json({ error: 'Organization not found' });
-      return;
-    }
-
-    req.organizationId = orgId;
-    next();
-  } catch (error) {
-    logger.error('Error validating organization', { error });
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
+// Aplicar autenticação a todas as rotas da API
+router.use(authenticateToken);
+router.use(authenticateOrganization);
 
 // GET /api/dashboard/metrics
-router.get('/dashboard/metrics', validateOrgId, async (req, res) => {
+router.get('/dashboard/metrics', async (req, res) => {
   try {
-    const { organizationId } = req as any;
+    const organizationId = req.organization!.id;
     const now = new Date();
     const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
@@ -112,9 +90,9 @@ router.get('/dashboard/metrics', validateOrgId, async (req, res) => {
 });
 
 // GET /api/events
-router.get('/events', validateOrgId, async (req, res) => {
+router.get('/events', async (req, res) => {
   try {
-    const { organizationId } = req as any;
+    const organizationId = req.organization!.id;
     const { page = '1', limit = '20', type, status } = req.query;
 
     const where: any = { organizationId };
@@ -157,9 +135,9 @@ router.get('/events', validateOrgId, async (req, res) => {
 });
 
 // GET /api/emails
-router.get('/emails', validateOrgId, async (req, res) => {
+router.get('/emails', async (req, res) => {
   try {
-    const { organizationId } = req as any;
+    const organizationId = req.organization!.id;
     const { page = '1', limit = '20', status, template } = req.query;
 
     const where: any = { organizationId };
@@ -202,9 +180,9 @@ router.get('/emails', validateOrgId, async (req, res) => {
 });
 
 // GET /api/metrics/charts
-router.get('/metrics/charts', validateOrgId, async (req, res) => {
+router.get('/metrics/charts', async (req, res) => {
   try {
-    const { organizationId } = req as any;
+    const organizationId = req.organization!.id;
     const { period = '7d' } = req.query;
 
     const days = period === '30d' ? 30 : 7;
@@ -269,9 +247,9 @@ router.get('/metrics/charts', validateOrgId, async (req, res) => {
 });
 
 // GET /api/settings
-router.get('/settings', validateOrgId, async (req, res) => {
+router.get('/settings', async (req, res) => {
   try {
-    const { organizationId } = req as any;
+    const organizationId = req.organization!.id;
 
     const organization = await prisma.organization.findUnique({
       where: { id: organizationId },
@@ -316,9 +294,9 @@ router.get('/settings', validateOrgId, async (req, res) => {
 });
 
 // PUT /api/settings/email
-router.put('/settings/email', validateOrgId, async (req, res) => {
+router.put('/settings/email', async (req, res) => {
   try {
-    const { organizationId } = req as any;
+    const organizationId = req.organization!.id;
     
     const schema = z.object({
       fromName: z.string(),
@@ -346,7 +324,7 @@ router.put('/settings/email', validateOrgId, async (req, res) => {
 });
 
 // Rotas de domínio
-router.use('/domain', validateOrgId, domainRoutes);
+router.use('/domain', domainRoutes);
 
 // TEMPORÁRIO: Teste simples
 router.get('/test', (_req, res) => {

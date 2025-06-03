@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancelamento Confirmado</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; }
+        .content { padding: 40px 30px; }
+        .icon { font-size: 48px; margin-bottom: 20px; }
+        .title { font-size: 24px; font-weight: 700; color: #1a202c; margin-bottom: 16px; }
+        .subtitle { font-size: 16px; color: #4a5568; margin-bottom: 30px; line-height: 1.6; }
+        .cancel-summary { background-color: #f7fafc; border-radius: 12px; padding: 25px; margin: 30px 0; border-left: 4px solid #3182ce; }
+        .feedback-section { background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center; }
+        .benefits-lost { background-color: #fff5f5; border: 1px solid #fed7d7; border-radius: 12px; padding: 25px; margin: 30px 0; }
+        .cta-button { display: inline-block; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; margin: 25px 0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: transform 0.2s; }
+        .cta-button:hover { transform: translateY(-2px); }
+        .footer { background-color: #f7fafc; padding: 30px; text-align: center; color: #718096; font-size: 14px; }
+        @media (max-width: 600px) {
+            .container { margin: 0 10px; }
+            .content { padding: 20px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">✅</div>
+            <h1>Cancelamento Confirmado</h1>
+        </div>
+        
+        <div class="content">
+            <div class="title">Olá, {{customerName}} 👋</div>
+            <div class="subtitle">
+                Confirmamos o cancelamento da sua assinatura conforme solicitado. 
+                Respeitamos sua decisão e gostaríamos de entender como podemos melhorar.
+            </div>
+
+            <div class="cancel-summary">
+                <h3 style="color: #2b6cb0; margin-top: 0;">📋 Resumo do Cancelamento</h3>
+                <div style="color: #2d3748; line-height: 1.6;">
+                    <strong>Plano:</strong> {{subscriptionPlan.name}}<br>
+                    <strong>Valor:</strong> {{subscriptionPlan.price}}<br>
+                    <strong>Data do Cancelamento:</strong> {{formatDate cancellation.canceled_at}}<br>
+                    {{#if cancellation.effective_until}}
+                    <strong>Acesso até:</strong> {{formatDate cancellation.effective_until}}<br>
+                    {{/if}}
+                    {{#if cancellation.reason}}
+                    <strong>Motivo:</strong> {{cancellation.reason}}<br>
+                    {{/if}}
+                </div>
+            </div>
+
+            {{#if cancellation.effective_until}}
+            <div style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                <h3 style="margin-top: 0; color: white;">⏰ Você ainda tem acesso!</h3>
+                <p style="margin-bottom: 0; font-size: 16px;">
+                    Sua assinatura permanece ativa até <strong>{{formatDate cancellation.effective_until}}</strong><br>
+                    Continue aproveitando todos os benefícios até lá!
+                </p>
+            </div>
+            {{/if}}
+
+            {{#if benefitsLost}}
+            <div class="benefits-lost">
+                <h3 style="color: #e53e3e; margin-top: 0;">💔 O que você perderá:</h3>
+                <ul style="color: #2d3748; margin: 0; padding-left: 20px;">
+                    {{#each benefitsLost}}
+                    <li style="margin: 10px 0;">
+                        <strong>{{name}}</strong>
+                        {{#if description}}<br><small>{{description}}</small>{{/if}}
+                        {{#if value_estimate}}<br><em style="color: #e53e3e;">Valor estimado: {{value_estimate}}</em>{{/if}}
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+            {{/if}}
+
+            <div class="feedback-section">
+                <h3 style="margin-top: 0; color: #2d3748;">💭 Ajude-nos a Melhorar</h3>
+                <p style="color: #2d3748; margin-bottom: 20px;">
+                    Sua opinião é muito importante para nós! Que tal nos contar o motivo do cancelamento?
+                    Isso nos ajuda a criar uma experiência ainda melhor.
+                </p>
+                <a href="mailto:suporte@example.com?subject=Feedback sobre cancelamento&body=Olá, gostaria de compartilhar meu feedback sobre o cancelamento..." 
+                   style="display: inline-block; background: #2d3748; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600;">
+                    📝 Enviar Feedback
+                </a>
+            </div>
+
+            <div style="background-color: #ebf8ff; border: 1px solid #bee3f8; border-radius: 12px; padding: 25px; margin: 30px 0;">
+                <h3 style="color: #2b6cb0; margin-top: 0; text-align: center;">🤝 Mudou de Ideia?</h3>
+                <p style="color: #2d3748; text-align: center; margin-bottom: 20px;">
+                    Se você quiser reativar sua assinatura, é só entrar em contato conosco.<br>
+                    Estamos sempre aqui para ajudar!
+                </p>
+                <div style="text-align: center;">
+                    <a href="mailto:suporte@example.com?subject=Reativar assinatura" 
+                       style="display: inline-block; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: 600; margin: 0 10px 10px 0;">
+                        💬 Falar com Suporte
+                    </a>
+                    {{#if checkoutUrl}}
+                    <a href="{{checkoutUrl}}" 
+                       style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: 600; margin: 0 10px 10px 0;">
+                        🔄 Reativar Agora
+                    </a>
+                    {{/if}}
+                </div>
+            </div>
+
+            <div style="background-color: #f0fff4; border: 1px solid #9ae6b4; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                <h3 style="color: #2f855a; margin-top: 0;">🎁 Oferta Especial para Você</h3>
+                <p style="color: #2d3748; margin-bottom: 0;">
+                    Como agradecimento pelo tempo que esteve conosco, preparamos uma oferta especial 
+                    caso mude de ideia. <strong>Fique de olho no seu email!</strong>
+                </p>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #e2e8f0; text-align: center; color: #718096;">
+                <p><strong>Obrigado por ter feito parte da nossa comunidade!</strong></p>
+                <p>Se precisar de alguma coisa, estamos sempre aqui para ajudar.</p>
+                <p>📧 suporte@example.com | 📞 (11) 9999-9999</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Este email foi enviado automaticamente pelo sistema de gerenciamento de assinaturas.</p>
+            <p>© {{currentYear}} {{companyName}}. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

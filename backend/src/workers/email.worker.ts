@@ -6,6 +6,11 @@ import { getRedisConfig } from '../config/env';
 import { processAbandonedCart } from '../handlers/abandonedCart.handler';
 import { processBankSlipExpired } from '../handlers/bankSlipExpired.handler';
 import { processPixExpired } from '../handlers/pixExpired.handler';
+import { processSaleRefused } from '../handlers/saleRefused.handler';
+import { processBankSlipGenerated } from '../handlers/bankSlipGenerated.handler';
+import { processPixGenerated } from '../handlers/pixGenerated.handler';
+import { processSubscriptionCanceled } from '../handlers/subscriptionCanceled.handler';
+import { processSubscriptionExpired } from '../handlers/subscriptionExpired.handler';
 import { prisma } from '../config/database';
 
 // Mapeamento de tipos de evento para handlers
@@ -13,6 +18,11 @@ const eventHandlers: Record<string, (job: Job<EmailJobData>) => Promise<void>> =
   'ABANDONED_CART': processAbandonedCart,
   'BANK_SLIP_EXPIRED': processBankSlipExpired,
   'PIX_EXPIRED': processPixExpired,
+  'SALE_REFUSED': processSaleRefused,
+  'BANK_SLIP_GENERATED': processBankSlipGenerated,
+  'PIX_GENERATED': processPixGenerated,
+  'SUBSCRIPTION_CANCELED': processSubscriptionCanceled,
+  'SUBSCRIPTION_EXPIRED': processSubscriptionExpired,
 };
 
 // Configuração do Redis

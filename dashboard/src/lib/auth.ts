@@ -1,15 +1,5 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
-
-// Por enquanto, vamos usar um usuário hardcoded para testes
-// Em produção, isso viria do banco de dados
-const DEMO_USER = {
-  id: "1",
-  email: "admin@inboxrecovery.com",
-  name: "Admin",
-  password: "$2b$10$VfmXiCRdvKxbNUURFAbfKuAnhEuTixAoVQe2JWhPGyDpPVC4EuKk2", // senha: admin123
-};
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -24,25 +14,40 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Em produção, buscar usuário do banco
-        if (credentials.email !== DEMO_USER.email) {
+        try {
+          // Fazer login na API do backend
+          const response = await fetch(`${process.env.NEXTAUTH_URL?.replace('/api/auth', '') || 'http://localhost:4000'}/auth/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+          });
+
+          if (!response.ok) {
+            return null;
+          }
+
+          const data = await response.json();
+          
+          if (!data.success) {
+            return null;
+          }
+
+          return {
+            id: data.data.user.id,
+            email: data.data.user.email,
+            name: data.data.user.name,
+            organizations: data.data.organizations,
+            accessToken: data.data.token,
+          };
+        } catch (error) {
+          console.error('Auth error:', error);
           return null;
         }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          DEMO_USER.password
-        );
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: DEMO_USER.id,
-          email: DEMO_USER.email,
-          name: DEMO_USER.name,
-        };
       },
     }),
   ],
@@ -56,12 +61,16 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.organizations = (user as any).organizations;
+        token.accessToken = (user as any).accessToken;
       }
       return token;
     },
     async session({ session, token }) {
       if (session?.user) {
         session.user.id = token.id as string;
+        (session as any).organizations = token.organizations;
+        (session as any).accessToken = token.accessToken;
       }
       return session;
     },

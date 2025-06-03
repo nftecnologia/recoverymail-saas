@@ -3,28 +3,34 @@ import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
 import type { EmailJobData } from '../services/queue.service';
 
-// Schema específico para SALE_REFUSED
-const saleRefusedSchema = z.object({
-  event: z.literal('SALE_REFUSED'),
+// Schema específico para PIX_GENERATED
+const pixGeneratedSchema = z.object({
+  event: z.literal('PIX_GENERATED'),
   transaction_id: z.string(),
-  order_number: z.string(),
-  payment_method: z.string(),
-  refusal_reason: z.string().optional(),
-  refusal_code: z.string().optional(),
-  amount: z.string(),
+  order_number: z.string().optional(),
+  pix_qr_code: z.string(), // Base64 da imagem QR Code
+  pix_copy_paste: z.string(), // Código PIX para copiar e colar
+  total_price: z.string(),
+  expires_at: z.string(), // Data de expiração do PIX
   customer: z.object({
     name: z.string(),
     email: z.string().email(),
     phone_number: z.string().optional(),
     document: z.string().optional()
   }),
-  product: z.object({
-    id: z.string(),
+  products: z.array(z.object({
+    id: z.string().optional(),
     name: z.string(),
-    offer_id: z.string().optional(),
-    offer_name: z.string().optional()
-  }),
-  checkout_url: z.string().url(),
+    price: z.string(),
+    quantity: z.number().optional(),
+    offer_name: z.string().optional(),
+    description: z.string().optional()
+  })).optional(),
+  payment_details: z.object({
+    method: z.literal('PIX'),
+    expires_in_minutes: z.number().optional().default(30)
+  }).optional(),
+  checkout_url: z.string().url().optional(),
   utm: z.object({
     utm_source: z.string().optional(),
     utm_medium: z.string().optional(),
@@ -33,28 +39,30 @@ const saleRefusedSchema = z.object({
   }).optional()
 });
 
-export type SaleRefusedPayload = z.infer<typeof saleRefusedSchema>;
+export type PixGeneratedPayload = z.infer<typeof pixGeneratedSchema>;
 
-export async function handleSaleRefused(
+export async function handlePixGenerated(
   payload: unknown,
   eventId: string,
   organizationId: string,
   forceImmediate: boolean = false
 ) {
   // Valida o payload
-  const validatedPayload = saleRefusedSchema.parse(payload);
+  const validatedPayload = pixGeneratedSchema.parse(payload);
   
-  logger.info('Processing SALE_REFUSED event', {
+  logger.info('Processing PIX_GENERATED event', {
     eventId,
     organizationId,
     customerEmail: validatedPayload.customer.email,
-    refusalReason: validatedPayload.refusal_reason
+    transactionId: validatedPayload.transaction_id,
+    expiresAt: validatedPayload.expires_at
   });
 
   // Configuração dos delays para cada tentativa
   const delays = [
-    30 * 60 * 1000,        // 30 minutos - Primeira tentativa rápida
-    6 * 60 * 60 * 1000,    // 6 horas - Segunda tentativa com suporte
+    1 * 60 * 1000,         // 1 minuto - QR Code imediato
+    10 * 60 * 1000,        // 10 minutos - Lembrete urgente
+    25 * 60 * 1000,        // 25 minutos - Últimos minutos
   ];
 
   // Agenda emails para cada tentativa
@@ -65,7 +73,7 @@ export async function handleSaleRefused(
     const jobData: EmailJobData = {
       eventId,
       organizationId,
-      eventType: 'SALE_REFUSED',
+      eventType: 'PIX_GENERATED',
       attemptNumber,
       payload: validatedPayload as any
     };
@@ -91,10 +99,10 @@ export async function handleSaleRefused(
       }
     );
 
-    logger.info('Sale refused email job enqueued', {
+    logger.info('PIX generated email job enqueued', {
       jobId,
       eventId,
-      eventType: 'SALE_REFUSED',
+      eventType: 'PIX_GENERATED',
       attemptNumber,
       delay,
       forceImmediate
@@ -103,25 +111,27 @@ export async function handleSaleRefused(
 }
 
 // Mapeamento de templates para cada tentativa
-export const saleRefusedTemplates = {
-  1: 'sale-refused-retry',          // Primeira tentativa - Soluções rápidas
-  2: 'sale-refused-support'         // Segunda tentativa - Suporte personalizado
+export const pixGeneratedTemplates = {
+  1: 'pix-generated-qrcode',      // QR Code e instruções
+  2: 'pix-generated-urgency',     // Lembrete urgente 10min
+  3: 'pix-generated-lastchance'   // Últimos 5 minutos
 };
 
 // Mapeamento de assuntos para cada tentativa
-export const saleRefusedSubjects = {
-  1: '❌ {customerName}, houve um problema com seu pagamento',
-  2: '💳 {customerName}, ainda está com problemas no pagamento?'
+export const pixGeneratedSubjects = {
+  1: '⚡ {customerName}, seu PIX foi gerado - Pagamento em 30 segundos!',
+  2: '🚨 {customerName}, seu PIX expira em 20 minutos!',
+  3: '⏰ {customerName}, ÚLTIMOS 5 MINUTOS para pagar via PIX!'
 };
 
 // Função de processamento para o worker
-export async function processSaleRefused(job: any): Promise<void> {
+export async function processPixGenerated(job: any): Promise<void> {
   const { eventId, attemptNumber, payload } = job.data;
   
   try {
-    const validatedPayload = saleRefusedSchema.parse(payload);
+    const validatedPayload = pixGeneratedSchema.parse(payload);
     
-    logger.info('Processing SALE_REFUSED email', {
+    logger.info('Processing PIX_GENERATED email', {
       eventId,
       attemptNumber,
       customerEmail: validatedPayload.customer.email
@@ -131,8 +141,8 @@ export async function processSaleRefused(job: any): Promise<void> {
     const { sendEmail } = await import('../services/email.service');
     
     // Preparar dados do email
-    const template = saleRefusedTemplates[attemptNumber as keyof typeof saleRefusedTemplates];
-    const subjectTemplate = saleRefusedSubjects[attemptNumber as keyof typeof saleRefusedSubjects];
+    const template = pixGeneratedTemplates[attemptNumber as keyof typeof pixGeneratedTemplates];
+    const subjectTemplate = pixGeneratedSubjects[attemptNumber as keyof typeof pixGeneratedSubjects];
     
     const emailData = {
       to: validatedPayload.customer.email,
@@ -142,12 +152,13 @@ export async function processSaleRefused(job: any): Promise<void> {
         customerName: validatedPayload.customer.name,
         transactionId: validatedPayload.transaction_id,
         orderNumber: validatedPayload.order_number,
-        amount: validatedPayload.amount,
-        paymentMethod: validatedPayload.payment_method,
-        refusalReason: validatedPayload.refusal_reason,
-        refusalCode: validatedPayload.refusal_code,
+        pixQrCode: validatedPayload.pix_qr_code,
+        pixCopyPaste: validatedPayload.pix_copy_paste,
+        totalPrice: validatedPayload.total_price,
+        expiresAt: validatedPayload.expires_at,
+        products: validatedPayload.products,
+        paymentDetails: validatedPayload.payment_details,
         checkoutUrl: validatedPayload.checkout_url,
-        product: validatedPayload.product,
         utm: validatedPayload.utm
       },
       organizationId: job.data.organizationId,
@@ -157,18 +168,18 @@ export async function processSaleRefused(job: any): Promise<void> {
 
     await sendEmail(emailData);
     
-    logger.info('SALE_REFUSED email sent successfully', {
+    logger.info('PIX_GENERATED email sent successfully', {
       eventId,
       attemptNumber,
       template
     });
     
   } catch (error) {
-    logger.error('Error processing SALE_REFUSED email', {
+    logger.error('Error processing PIX_GENERATED email', {
       eventId,
       attemptNumber,
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     throw error;
   }
-} 
+}
