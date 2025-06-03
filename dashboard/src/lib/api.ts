@@ -18,8 +18,27 @@ export class ApiClient {
       'Content-Type': 'application/json',
     };
 
-    // Por enquanto usando org fixa, depois integrar com sessão
-    headers['x-organization-id'] = organizationId || 'test-org-123';
+    try {
+      const session = await getSession();
+      
+      if (session?.accessToken) {
+        headers['Authorization'] = `Bearer ${session.accessToken}`;
+      }
+
+      // Use organizationId from parameter or default to first org from session
+      if (organizationId) {
+        headers['x-organization-id'] = organizationId;
+      } else if (session?.organizations?.[0]?.organizationId) {
+        headers['x-organization-id'] = session.organizations[0].organizationId;
+      } else {
+        // Fallback to test org for backward compatibility
+        headers['x-organization-id'] = 'test-org-123';
+      }
+    } catch (error) {
+      console.warn('Failed to get session for API headers:', error);
+      // Fallback to test org if session is not available
+      headers['x-organization-id'] = organizationId || 'test-org-123';
+    }
 
     return headers;
   }
@@ -238,19 +257,19 @@ export interface DashboardMetrics {
 // Funções da API
 export const apiService = {
   // Eventos
-  async getEvents(organizationId: string = "test-org-123") {
+  async getEvents(organizationId?: string) {
     const response = await api.getEvents();
     return response.events;
   },
 
   // Emails
-  async getEmails(organizationId: string = "test-org-123") {
+  async getEmails(organizationId?: string) {
     const response = await api.getEmails();
     return response.emails;
   },
 
   // Métricas
-  async getMetrics(organizationId: string = "test-org-123") {
+  async getMetrics(organizationId?: string) {
     const response = await api.getMetrics();
     return {
       totalEvents: response.totalEvents,

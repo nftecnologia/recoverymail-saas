@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           // Fazer login na API do backend
-          const response = await fetch(`${process.env.NEXTAUTH_URL?.replace('/api/auth', '') || 'http://localhost:4000'}/auth/login`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.inboxrecovery.com'}/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

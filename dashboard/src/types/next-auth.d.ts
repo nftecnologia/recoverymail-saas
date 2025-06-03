@@ -5,5 +5,11 @@ declare module "next-auth" {
     user: {
       id: string;
     } & DefaultSession["user"];
+    accessToken?: string;
+    organizations?: Array<{
+      organizationId: string;
+      role: string;
+      permissions: string[];
+    }>;
   }
 } 
