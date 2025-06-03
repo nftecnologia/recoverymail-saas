@@ -168,8 +168,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               </div>
               <div className="h-8 w-px bg-gray-200" />
               <div className="text-sm">
-                <span className="text-gray-600">Próximo envio em: </span>
-                <span className="font-medium text-gray-900">5 min</span>
+                <span className="text-gray-600">Modo: </span>
+                <span className="font-medium text-blue-600">Demonstração</span>
               </div>
             </div>
           </div>
