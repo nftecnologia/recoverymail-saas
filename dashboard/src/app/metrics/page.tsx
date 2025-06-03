@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,7 +21,8 @@ import {
   Legend, 
   ResponsiveContainer,
   Area,
-  AreaChart
+  AreaChart,
+  ComposedChart
 } from "recharts";
 import { 
   TrendingUp, 
@@ -31,375 +33,506 @@ import {
   Zap,
   Calendar,
   Download,
-  RefreshCw
+  RefreshCw,
+  Mail,
+  MousePointerClick,
+  Eye,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Users,
+  DollarSign,
+  Percent
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+import { format, subDays, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
-// Dados mockados para os gráficos
-const conversionData = [
-  { name: "Seg", taxa: 42 },
-  { name: "Ter", taxa: 38 },
-  { name: "Qua", taxa: 45 },
-  { name: "Qui", taxa: 51 },
-  { name: "Sex", taxa: 48 },
-  { name: "Sáb", taxa: 55 },
-  { name: "Dom", taxa: 52 },
-];
+interface MetricCard {
+  title: string;
+  value: string;
+  change: number;
+  changeLabel: string;
+  icon: any;
+  color: string;
+}
 
-const emailPerformance = [
-  { name: "00h", enviados: 120, abertos: 89, clicados: 34 },
-  { name: "06h", enviados: 280, abertos: 210, clicados: 98 },
-  { name: "12h", enviados: 450, abertos: 380, clicados: 156 },
-  { name: "18h", enviados: 380, abertos: 290, clicados: 134 },
-];
+interface ChartData {
+  emailsOverTime: Array<{
+    date: string;
+    sent: number;
+    opened: number;
+    clicked: number;
+  }>;
+  eventsByType: Array<{
+    name: string;
+    value: number;
+  }>;
+  conversionByTemplate: Array<{
+    template: string;
+    total: number;
+    clicked: number;
+    conversion_rate: number;
+  }>;
+}
 
-const eventDistribution = [
-  { name: "Carrinho Abandonado", value: 45, color: "#f97316" },
-  { name: "PIX Expirado", value: 20, color: "#a855f7" },
-  { name: "Boleto Expirado", value: 15, color: "#eab308" },
-  { name: "Venda Recusada", value: 10, color: "#ef4444" },
-  { name: "Outros", value: 10, color: "#6b7280" },
-];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
-const monthlyTrend = [
-  { month: "Jan", recuperado: 45000, potencial: 120000 },
-  { month: "Fev", recuperado: 52000, potencial: 130000 },
-  { month: "Mar", recuperado: 48000, potencial: 125000 },
-  { month: "Abr", recuperado: 61000, potencial: 140000 },
-  { month: "Mai", recuperado: 58000, potencial: 135000 },
-  { month: "Jun", recuperado: 67000, potencial: 150000 },
-];
+const eventTypeLabels: Record<string, string> = {
+  'ABANDONED_CART': 'Carrinho Abandonado',
+  'BANK_SLIP_EXPIRED': 'Boleto Expirado',
+  'BANK_SLIP_GENERATED': 'Boleto Gerado',
+  'PIX_EXPIRED': 'PIX Expirado',
+  'PIX_GENERATED': 'PIX Gerado',
+  'SALE_APPROVED': 'Venda Aprovada',
+  'SALE_REFUSED': 'Venda Recusada',
+  'SALE_REFUNDED': 'Venda Reembolsada',
+  'SALE_CHARGEBACK': 'Chargeback',
+  'SUBSCRIPTION_CANCELED': 'Assinatura Cancelada',
+  'SUBSCRIPTION_EXPIRED': 'Assinatura Expirada',
+  'SUBSCRIPTION_RENEWED': 'Assinatura Renovada',
+};
 
 export default function MetricsPage() {
+  const [chartData, setChartData] = useState<ChartData | null>(null);
+  const [metrics, setMetrics] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState<'7d' | '30d'>('7d');
+
+  useEffect(() => {
+    loadData();
+  }, [period]);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [chartResponse, metricsResponse] = await Promise.all([
+        api.getChartData(period),
+        api.getMetrics()
+      ]);
+      
+      setChartData(chartResponse);
+      setMetrics(metricsResponse);
+    } catch (error) {
+      toast.error('Erro ao carregar dados de analytics');
+      console.error('Error loading analytics data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    try {
+      return format(parseISO(dateStr), 'dd/MM', { locale: ptBR });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const formatPercent = (value: number) => {
+    return `${value.toFixed(1)}%`;
+  };
+
+  const metricCards: MetricCard[] = metrics ? [
+    {
+      title: "Total de Emails",
+      value: metrics.totalEmails?.toLocaleString() || "0",
+      change: 12.5,
+      changeLabel: "vs período anterior",
+      icon: Mail,
+      color: "blue"
+    },
+    {
+      title: "Taxa de Entrega",
+      value: formatPercent((metrics.deliveryRate || 0) * 100),
+      change: 2.3,
+      changeLabel: "vs período anterior",
+      icon: CheckCircle,
+      color: "green"
+    },
+    {
+      title: "Taxa de Abertura",
+      value: formatPercent((metrics.openRate || 0) * 100),
+      change: -1.2,
+      changeLabel: "vs período anterior",
+      icon: Eye,
+      color: "yellow"
+    },
+    {
+      title: "Taxa de Clique",
+      value: formatPercent((metrics.clickRate || 0) * 100),
+      change: 5.8,
+      changeLabel: "vs período anterior",
+      icon: MousePointerClick,
+      color: "purple"
+    }
+  ] : [];
+
   return (
     <DashboardLayout>
-      <div className="space-y-8">
-        {/* Header com gradiente */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 p-8 text-white">
-          <div className="absolute inset-0 bg-black/10" />
-          <div className="relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-white/20 p-3 backdrop-blur-sm">
-                <BarChart3 className="h-6 w-6" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold">Central de Métricas</h1>
-                <p className="mt-1 text-lg text-white/80">
-                  Análise detalhada do desempenho das suas campanhas
-                </p>
-              </div>
-            </div>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Analytics Avançado</h1>
+            <p className="text-muted-foreground">
+              Análise detalhada do desempenho dos emails e conversões
+            </p>
           </div>
-          <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-          <div className="absolute -top-10 -left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-          <Activity className="absolute right-8 top-8 h-8 w-8 text-white/20" />
-        </div>
-
-        {/* Cards de KPIs */}
-        <div className="grid gap-6 md:grid-cols-4">
-          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-green-50 to-emerald-50 shadow-lg transition-all hover:shadow-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5" />
-            <CardHeader className="relative">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">Valor Recuperado</CardTitle>
-                <div className="rounded-lg bg-green-500/10 p-2">
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                </div>
-              </div>
-              <div className="mt-2">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-gray-900">R$ 67.5k</span>
-                  <Badge className="bg-green-100 text-green-700">
-                    +23%
-                  </Badge>
-                </div>
-                <p className="mt-1 text-sm text-gray-500">Este mês</p>
-              </div>
-            </CardHeader>
-          </Card>
-
-          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg transition-all hover:shadow-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-indigo-500/5" />
-            <CardHeader className="relative">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">Taxa de Conversão</CardTitle>
-                <div className="rounded-lg bg-blue-500/10 p-2">
-                  <Target className="h-4 w-4 text-blue-600" />
-                </div>
-              </div>
-              <div className="mt-2">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-gray-900">48.3%</span>
-                  <Badge className="bg-blue-100 text-blue-700">
-                    +5.2%
-                  </Badge>
-                </div>
-                <p className="mt-1 text-sm text-gray-500">Média semanal</p>
-              </div>
-            </CardHeader>
-          </Card>
-
-          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg transition-all hover:shadow-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5" />
-            <CardHeader className="relative">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">Tempo Médio</CardTitle>
-                <div className="rounded-lg bg-purple-500/10 p-2">
-                  <Zap className="h-4 w-4 text-purple-600" />
-                </div>
-              </div>
-              <div className="mt-2">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-gray-900">2.4h</span>
-                  <Badge className="bg-purple-100 text-purple-700">
-                    -18min
-                  </Badge>
-                </div>
-                <p className="mt-1 text-sm text-gray-500">Para conversão</p>
-              </div>
-            </CardHeader>
-          </Card>
-
-          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-orange-50 to-red-50 shadow-lg transition-all hover:shadow-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-red-500/5" />
-            <CardHeader className="relative">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">ROI</CardTitle>
-                <div className="rounded-lg bg-orange-500/10 p-2">
-                  <TrendingUp className="h-4 w-4 text-orange-600" />
-                </div>
-              </div>
-              <div className="mt-2">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-gray-900">12.5x</span>
-                  <Badge className="bg-orange-100 text-orange-700">
-                    +2.3x
-                  </Badge>
-                </div>
-                <p className="mt-1 text-sm text-gray-500">Retorno sobre investimento</p>
-              </div>
-            </CardHeader>
-          </Card>
-        </div>
-
-        {/* Gráficos em Tabs */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader className="border-b bg-gray-50/50">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">Análise Detalhada</CardTitle>
-                <CardDescription>Visualize o desempenho em diferentes perspectivas</CardDescription>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Últimos 7 dias
-                </Button>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Download className="h-4 w-4" />
-                  Exportar
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <Tabs defaultValue="conversion" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-4 bg-gray-100/50">
-                <TabsTrigger value="conversion">Taxa de Conversão</TabsTrigger>
-                <TabsTrigger value="performance">Performance de Email</TabsTrigger>
-                <TabsTrigger value="distribution">Distribuição</TabsTrigger>
-                <TabsTrigger value="trend">Tendência Mensal</TabsTrigger>
+          <div className="flex items-center gap-2">
+            <Tabs value={period} onValueChange={(v) => setPeriod(v as '7d' | '30d')}>
+              <TabsList>
+                <TabsTrigger value="7d">7 dias</TabsTrigger>
+                <TabsTrigger value="30d">30 dias</TabsTrigger>
               </TabsList>
+            </Tabs>
+            <Button onClick={loadData} disabled={loading} variant="outline">
+              <RefreshCw className={cn("h-4 w-4 mr-2", loading && "animate-spin")} />
+              Atualizar
+            </Button>
+            <Button variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Exportar
+            </Button>
+          </div>
+        </div>
 
-              <TabsContent value="conversion" className="space-y-4">
+        {/* Metric Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {metricCards.map((metric, index) => {
+            const Icon = metric.icon;
+            const isPositive = metric.change > 0;
+            
+            return (
+              <Card key={index}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {metric.title}
+                  </CardTitle>
+                  <Icon className={cn("h-4 w-4", `text-${metric.color}-600`)} />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{metric.value}</div>
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    {isPositive ? (
+                      <TrendingUp className="h-3 w-3 mr-1 text-green-600" />
+                    ) : (
+                      <TrendingDown className="h-3 w-3 mr-1 text-red-600" />
+                    )}
+                    <span className={isPositive ? "text-green-600" : "text-red-600"}>
+                      {isPositive ? "+" : ""}{metric.change}%
+                    </span>
+                    <span className="ml-1">{metric.changeLabel}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Charts */}
+        <Tabs defaultValue="timeline" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="timeline">Linha do Tempo</TabsTrigger>
+            <TabsTrigger value="events">Eventos por Tipo</TabsTrigger>
+            <TabsTrigger value="templates">Performance de Templates</TabsTrigger>
+            <TabsTrigger value="funnel">Funil de Conversão</TabsTrigger>
+          </TabsList>
+
+          {/* Timeline Chart */}
+          <TabsContent value="timeline" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Desempenho de Emails ao Longo do Tempo
+                </CardTitle>
+                <CardDescription>
+                  Emails enviados, abertos e clicados nos últimos {period === '7d' ? '7 dias' : '30 dias'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <div className="h-[400px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={conversionData}>
-                      <defs>
-                        <linearGradient id="colorConversion" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                      <XAxis dataKey="name" stroke="#6b7280" />
-                      <YAxis stroke="#6b7280" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'white', 
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                        }} 
+                    <ComposedChart data={chartData?.emailsOverTime || []}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="date" 
+                        tickFormatter={formatDate}
                       />
-                      <Area 
-                        type="monotone" 
-                        dataKey="taxa" 
-                        stroke="#10b981" 
-                        strokeWidth={3}
-                        fillOpacity={1} 
-                        fill="url(#colorConversion)" 
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="rounded-lg bg-gray-50 p-4">
-                    <p className="text-sm text-gray-600">Média</p>
-                    <p className="text-2xl font-bold text-gray-900">47.3%</p>
-                  </div>
-                  <div className="rounded-lg bg-gray-50 p-4">
-                    <p className="text-sm text-gray-600">Melhor dia</p>
-                    <p className="text-2xl font-bold text-gray-900">Sábado (55%)</p>
-                  </div>
-                  <div className="rounded-lg bg-gray-50 p-4">
-                    <p className="text-sm text-gray-600">Tendência</p>
-                    <p className="text-2xl font-bold text-green-600">↑ 8.5%</p>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="performance" className="space-y-4">
-                <div className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={emailPerformance}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                      <XAxis dataKey="name" stroke="#6b7280" />
-                      <YAxis stroke="#6b7280" />
+                      <YAxis />
                       <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'white', 
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                        }} 
+                        labelFormatter={(value) => `Data: ${formatDate(value)}`}
+                        formatter={(value, name) => [
+                          value,
+                          name === 'sent' ? 'Enviados' : 
+                          name === 'opened' ? 'Abertos' : 'Clicados'
+                        ]}
                       />
                       <Legend />
-                      <Bar dataKey="enviados" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-                      <Bar dataKey="abertos" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
-                      <Bar dataKey="clicados" fill="#ec4899" radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="sent" fill="#8884d8" name="Enviados" />
+                      <Line 
+                        type="monotone" 
+                        dataKey="opened" 
+                        stroke="#82ca9d" 
+                        name="Abertos"
+                        strokeWidth={2}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="clicked" 
+                        stroke="#ffc658" 
+                        name="Clicados"
+                        strokeWidth={2}
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Events by Type */}
+          <TabsContent value="events" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Eventos por Tipo
+                  </CardTitle>
+                  <CardDescription>
+                    Distribuição dos tipos de eventos processados
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={chartData?.eventsByType?.map(item => ({
+                            ...item,
+                            name: eventTypeLabels[item.name] || item.name
+                          })) || []}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {chartData?.eventsByType?.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5" />
+                    Volume de Eventos
+                  </CardTitle>
+                  <CardDescription>
+                    Quantidade de eventos por tipo
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart 
+                        data={chartData?.eventsByType?.map(item => ({
+                          ...item,
+                          name: eventTypeLabels[item.name] || item.name
+                        })) || []}
+                        layout="horizontal"
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis 
+                          dataKey="name" 
+                          type="category" 
+                          width={100}
+                          tick={{ fontSize: 12 }}
+                        />
+                        <Tooltip />
+                        <Bar dataKey="value" fill="#8884d8" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Template Performance */}
+          <TabsContent value="templates" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  Performance de Templates
+                </CardTitle>
+                <CardDescription>
+                  Taxa de conversão por template de email
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData?.conversionByTemplate || []}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="template" 
+                        angle={-45}
+                        textAnchor="end"
+                        height={100}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <YAxis />
+                      <Tooltip 
+                        formatter={(value, name) => [
+                          name === 'conversion_rate' ? `${value}%` : value,
+                          name === 'total' ? 'Total Enviados' : 
+                          name === 'clicked' ? 'Cliques' : 'Taxa de Conversão'
+                        ]}
+                      />
+                      <Legend />
+                      <Bar dataKey="total" fill="#8884d8" name="Total Enviados" />
+                      <Bar dataKey="clicked" fill="#82ca9d" name="Cliques" />
+                      <Bar dataKey="conversion_rate" fill="#ffc658" name="Taxa de Conversão (%)" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="rounded-lg bg-blue-50 p-4">
-                    <p className="text-sm text-gray-600">Taxa de Abertura</p>
-                    <p className="text-2xl font-bold text-blue-600">78.4%</p>
-                  </div>
-                  <div className="rounded-lg bg-purple-50 p-4">
-                    <p className="text-sm text-gray-600">Taxa de Clique</p>
-                    <p className="text-2xl font-bold text-purple-600">36.2%</p>
-                  </div>
-                  <div className="rounded-lg bg-pink-50 p-4">
-                    <p className="text-sm text-gray-600">Melhor Horário</p>
-                    <p className="text-2xl font-bold text-pink-600">12h</p>
-                  </div>
-                </div>
-              </TabsContent>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-              <TabsContent value="distribution" className="space-y-4">
-                <div className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={eventDistribution}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        outerRadius={120}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {eventDistribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'white', 
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                        }} 
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  {eventDistribution.map((item) => (
-                    <div key={item.name} className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
-                      <div 
-                        className="h-4 w-4 rounded"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">{item.name}</p>
-                        <p className="text-xs text-gray-500">{item.value}% dos eventos</p>
+          {/* Conversion Funnel */}
+          <TabsContent value="funnel" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Funil de Conversão
+                </CardTitle>
+                <CardDescription>
+                  Acompanhamento do funil de emails
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Funnel Steps */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="bg-blue-100 text-blue-800 rounded-lg p-4">
+                        <Mail className="h-8 w-8 mx-auto mb-2" />
+                        <div className="text-2xl font-bold">{metrics?.totalEmails || 0}</div>
+                        <div className="text-sm">Emails Enviados</div>
+                        <div className="text-xs text-muted-foreground">100%</div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </TabsContent>
+                    
+                    <div className="text-center">
+                      <div className="bg-green-100 text-green-800 rounded-lg p-4">
+                        <CheckCircle className="h-8 w-8 mx-auto mb-2" />
+                        <div className="text-2xl font-bold">
+                          {Math.round((metrics?.deliveryRate || 0) * (metrics?.totalEmails || 0))}
+                        </div>
+                        <div className="text-sm">Entregues</div>
+                        <div className="text-xs text-muted-foreground">
+                          {formatPercent((metrics?.deliveryRate || 0) * 100)}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="bg-yellow-100 text-yellow-800 rounded-lg p-4">
+                        <Eye className="h-8 w-8 mx-auto mb-2" />
+                        <div className="text-2xl font-bold">
+                          {Math.round((metrics?.openRate || 0) * (metrics?.totalEmails || 0))}
+                        </div>
+                        <div className="text-sm">Abertos</div>
+                        <div className="text-xs text-muted-foreground">
+                          {formatPercent((metrics?.openRate || 0) * 100)}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="bg-purple-100 text-purple-800 rounded-lg p-4">
+                        <MousePointerClick className="h-8 w-8 mx-auto mb-2" />
+                        <div className="text-2xl font-bold">
+                          {Math.round((metrics?.clickRate || 0) * (metrics?.totalEmails || 0))}
+                        </div>
+                        <div className="text-sm">Clicados</div>
+                        <div className="text-xs text-muted-foreground">
+                          {formatPercent((metrics?.clickRate || 0) * 100)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-              <TabsContent value="trend" className="space-y-4">
-                <div className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={monthlyTrend}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                      <XAxis dataKey="month" stroke="#6b7280" />
-                      <YAxis stroke="#6b7280" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'white', 
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                        }}
-                        formatter={(value: number) => `R$ ${(value / 1000).toFixed(1)}k`}
-                      />
-                      <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="recuperado" 
-                        stroke="#10b981" 
-                        strokeWidth={3}
-                        dot={{ fill: '#10b981', r: 6 }}
-                        activeDot={{ r: 8 }}
-                        name="Valor Recuperado"
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="potencial" 
-                        stroke="#6366f1" 
-                        strokeWidth={3}
-                        strokeDasharray="5 5"
-                        dot={{ fill: '#6366f1', r: 6 }}
-                        activeDot={{ r: 8 }}
-                        name="Potencial Total"
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="rounded-lg bg-green-50 p-4">
-                    <p className="text-sm text-gray-600">Total Recuperado</p>
-                    <p className="text-2xl font-bold text-green-600">R$ 336k</p>
-                  </div>
-                  <div className="rounded-lg bg-indigo-50 p-4">
-                    <p className="text-sm text-gray-600">Potencial Total</p>
-                    <p className="text-2xl font-bold text-indigo-600">R$ 800k</p>
-                  </div>
-                  <div className="rounded-lg bg-purple-50 p-4">
-                    <p className="text-sm text-gray-600">Taxa de Captura</p>
-                    <p className="text-2xl font-bold text-purple-600">42%</p>
+                  {/* Insights */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">Melhor Dia</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">Sexta</div>
+                        <div className="text-xs text-muted-foreground">
+                          +15% aberturas vs média
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">Melhor Horário</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">14:00</div>
+                        <div className="text-xs text-muted-foreground">
+                          +23% cliques vs média
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">Template Top</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">Urgência</div>
+                        <div className="text-xs text-muted-foreground">
+                          8.5% taxa de clique
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-8">
+            <RefreshCw className="h-8 w-8 animate-spin" />
+            <span className="ml-2">Carregando dados...</span>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
-} 
+}

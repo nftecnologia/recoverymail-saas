@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { logger } from '../utils/logger';
 import domainRoutes from './domain.routes';
 import { authenticateToken, authenticateOrganization } from '../middleware/auth.middleware';
+import fs from 'fs/promises';
+import path from 'path';
 
 const router = Router();
 
@@ -741,6 +743,522 @@ router.get('/worker-status', async (_req, res) => {
     res.status(500).json({
       status: 'error',
       error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// ===== ROTAS DE TEMPLATES =====
+
+// GET /api/templates - Listar todos os templates
+router.get('/templates', async (_req, res) => {
+  try {
+    const templatesDir = path.join(__dirname, '../templates/emails');
+    const files = await fs.readdir(templatesDir);
+    const hbsFiles = files.filter(file => file.endsWith('.hbs'));
+    
+    const templates = await Promise.all(
+      hbsFiles.map(async (file) => {
+        const filePath = path.join(templatesDir, file);
+        const content = await fs.readFile(filePath, 'utf-8');
+        const stats = await fs.stat(filePath);
+        
+        // Extrair informações do nome do arquivo
+        const name = file.replace('.hbs', '');
+        const parts = name.split('-');
+        const eventType = parts.slice(0, -1).join('_').toUpperCase();
+        const templateType = parts[parts.length - 1];
+        
+        return {
+          id: name,
+          name: name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          filename: file,
+          eventType,
+          templateType,
+          content,
+          size: stats.size,
+          lastModified: stats.mtime,
+          path: filePath
+        };
+      })
+    );
+    
+    // Agrupar por evento
+    const groupedTemplates = templates.reduce((acc, template) => {
+      if (!acc[template.eventType]) {
+        acc[template.eventType] = [];
+      }
+      acc[template.eventType]!.push(template);
+      return acc;
+    }, {} as Record<string, typeof templates>);
+    
+    res.json({
+      templates,
+      groupedTemplates,
+      totalTemplates: templates.length,
+      eventTypes: Object.keys(groupedTemplates)
+    });
+  } catch (error: any) {
+    logger.error('Error listing templates:', error);
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// GET /api/templates/:templateId - Obter template específico
+router.get('/templates/:templateId', async (req, res) => {
+  try {
+    const { templateId } = req.params;
+    const templatesDir = path.join(__dirname, '../templates/emails');
+    const filePath = path.join(templatesDir, `${templateId}.hbs`);
+    
+    const content = await fs.readFile(filePath, 'utf-8');
+    const stats = await fs.stat(filePath);
+    
+    const parts = templateId.split('-');
+    const eventType = parts.slice(0, -1).join('_').toUpperCase();
+    const templateType = parts[parts.length - 1] || 'default';
+    
+    res.json({
+      id: templateId,
+      name: templateId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      filename: `${templateId}.hbs`,
+      eventType,
+      templateType,
+      content,
+      size: stats.size,
+      lastModified: stats.mtime
+    });
+  } catch (error: any) {
+    logger.error('Error getting template:', error);
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// PUT /api/templates/:templateId - Atualizar template
+router.put('/templates/:templateId', async (req, res) => {
+  try {
+    const { templateId } = req.params;
+    const { content } = req.body;
+    
+    if (!content || typeof content !== 'string') {
+      res.status(400).json({
+        error: 'Content is required and must be a string'
+      });
+      return;
+    }
+    
+    const templatesDir = path.join(__dirname, '../templates/emails');
+    const filePath = path.join(templatesDir, `${templateId}.hbs`);
+    
+    // Verificar se o arquivo existe
+    try {
+      await fs.access(filePath);
+    } catch {
+      res.status(404).json({
+        error: 'Template not found'
+      });
+      return;
+    }
+    
+    // Fazer backup do arquivo original
+    const backupPath = path.join(templatesDir, `${templateId}.hbs.backup.${Date.now()}`);
+    const originalContent = await fs.readFile(filePath, 'utf-8');
+    await fs.writeFile(backupPath, originalContent, 'utf-8');
+    
+    // Salvar novo conteúdo
+    await fs.writeFile(filePath, content, 'utf-8');
+    
+    const stats = await fs.stat(filePath);
+    
+    logger.info(`Template ${templateId} updated successfully`, {
+      organizationId: req.organization!.id,
+      userId: req.user!.id,
+      templateId,
+      backupPath
+    });
+    
+    res.json({
+      success: true,
+      message: 'Template updated successfully',
+      template: {
+        id: templateId,
+        size: stats.size,
+        lastModified: stats.mtime,
+        backupPath
+      }
+    });
+  } catch (error: any) {
+    logger.error('Error updating template:', error);
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// POST /api/templates/:templateId/preview - Preview template com dados de teste
+router.post('/templates/:templateId/preview', async (req, res) => {
+  try {
+    const { templateId } = req.params;
+    const { testData } = req.body;
+    
+    const templatesDir = path.join(__dirname, '../templates/emails');
+    const filePath = path.join(templatesDir, `${templateId}.hbs`);
+    
+    const content = await fs.readFile(filePath, 'utf-8');
+    
+    // Usar dados de teste padrão se não fornecidos
+    const defaultTestData = {
+      customerName: 'João Silva',
+      customerEmail: 'joao@exemplo.com',
+      productName: 'Curso de Marketing Digital',
+      productPrice: 'R$ 297,00',
+      discountPercent: '50',
+      discountAmount: 'R$ 148,50',
+      expiryDate: '15/01/2025',
+      supportEmail: 'suporte@empresa.com',
+      companyName: 'Sua Empresa',
+      purchaseDate: '10/01/2025',
+      orderNumber: '#12345',
+      ...testData
+    };
+    
+    // Simular compilação do Handlebars (básico)
+    let previewContent = content;
+    Object.entries(defaultTestData).forEach(([key, value]) => {
+      const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+      previewContent = previewContent.replace(regex, String(value));
+    });
+    
+    res.json({
+      success: true,
+      preview: previewContent,
+      testData: defaultTestData,
+      originalContent: content
+    });
+  } catch (error: any) {
+    logger.error('Error previewing template:', error);
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// ===== ROTAS DE ORGANIZAÇÕES =====
+
+// GET /api/organizations - Listar organizações do usuário
+router.get('/organizations', async (req, res) => {
+  try {
+    const userId = req.user!.id;
+    
+    const userOrganizations = await prisma.userOrganization.findMany({
+      where: { userId },
+      include: {
+        organization: {
+          include: {
+            _count: {
+              select: {
+                webhookEvents: true,
+                emailLogs: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        joinedAt: 'desc'
+      }
+    });
+    
+    res.json({
+      organizations: userOrganizations.map(uo => ({
+        ...uo.organization,
+        role: uo.role,
+        permissions: uo.permissions,
+        joinedAt: uo.joinedAt,
+        stats: {
+          totalEvents: uo.organization._count.webhookEvents,
+          totalEmails: uo.organization._count.emailLogs
+        }
+      }))
+    });
+  } catch (error: any) {
+    logger.error('Error listing organizations:', error);
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// GET /api/organizations/:orgId - Obter detalhes da organização
+router.get('/organizations/:orgId', async (req, res) => {
+  try {
+    const { orgId } = req.params;
+    const userId = req.user!.id;
+    
+    // Verificar se usuário tem acesso à organização
+    const userOrg = await prisma.userOrganization.findFirst({
+      where: {
+        userId,
+        organizationId: orgId
+      }
+    });
+    
+    if (!userOrg) {
+      res.status(403).json({
+        error: 'Access denied to this organization'
+      });
+      return;
+    }
+    
+    const organization = await prisma.organization.findUnique({
+      where: { id: orgId },
+      include: {
+        users: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                isActive: true
+              }
+            }
+          }
+        },
+        _count: {
+          select: {
+            webhookEvents: true,
+            emailLogs: true
+          }
+        }
+      }
+    });
+    
+    if (!organization) {
+      res.status(404).json({
+        error: 'Organization not found'
+      });
+      return;
+    }
+    
+    res.json({
+      organization: {
+        ...organization,
+        stats: {
+          totalEvents: organization._count.webhookEvents,
+          totalEmails: organization._count.emailLogs,
+          totalUsers: organization.users.length
+        }
+      },
+      userRole: userOrg.role,
+      userPermissions: userOrg.permissions
+    });
+  } catch (error: any) {
+    logger.error('Error getting organization:', error);
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// PUT /api/organizations/:orgId - Atualizar organização
+router.put('/organizations/:orgId', async (req, res) => {
+  try {
+    const { orgId } = req.params;
+    const userId = req.user!.id;
+    const { name, webhookUrl, emailSettings } = req.body;
+    
+    // Verificar se usuário tem permissão para editar
+    const userOrg = await prisma.userOrganization.findFirst({
+      where: {
+        userId,
+        organizationId: orgId,
+        role: { in: ['OWNER', 'ADMIN'] }
+      }
+    });
+    
+    if (!userOrg) {
+      res.status(403).json({
+        error: 'Insufficient permissions to update organization'
+      });
+      return;
+    }
+    
+    const updatedOrganization = await prisma.organization.update({
+      where: { id: orgId },
+      data: {
+        ...(name && { name }),
+        ...(webhookUrl && { webhookUrl }),
+        ...(emailSettings && { emailSettings })
+      }
+    });
+    
+    logger.info(`Organization ${orgId} updated by user ${userId}`, {
+      organizationId: orgId,
+      userId,
+      changes: { name, webhookUrl, emailSettings }
+    });
+    
+    res.json({
+      success: true,
+      organization: updatedOrganization
+    });
+  } catch (error: any) {
+    logger.error('Error updating organization:', error);
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// POST /api/organizations/:orgId/regenerate-keys - Regenerar chaves da organização
+router.post('/organizations/:orgId/regenerate-keys', async (req, res) => {
+  try {
+    const { orgId } = req.params;
+    const userId = req.user!.id;
+    const { keyType } = req.body; // 'apiKey' ou 'webhookSecret'
+    
+    // Verificar se usuário tem permissão
+    const userOrg = await prisma.userOrganization.findFirst({
+      where: {
+        userId,
+        organizationId: orgId,
+        role: { in: ['OWNER', 'ADMIN'] }
+      }
+    });
+    
+    if (!userOrg) {
+      res.status(403).json({
+        error: 'Insufficient permissions'
+      });
+      return;
+    }
+    
+    const updateData: any = {};
+    
+    if (keyType === 'apiKey') {
+      updateData.apiKey = `sk_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    } else if (keyType === 'webhookSecret') {
+      updateData.webhookSecret = `whsec_${Math.random().toString(36).substr(2, 32)}`;
+    } else {
+      res.status(400).json({
+        error: 'Invalid key type. Must be "apiKey" or "webhookSecret"'
+      });
+      return;
+    }
+    
+    await prisma.organization.update({
+      where: { id: orgId },
+      data: updateData
+    });
+    
+    logger.warn(`${keyType} regenerated for organization ${orgId} by user ${userId}`, {
+      organizationId: orgId,
+      userId,
+      keyType
+    });
+    
+    res.json({
+      success: true,
+      message: `${keyType} regenerated successfully`,
+      [keyType]: updateData[keyType]
+    });
+  } catch (error: any) {
+    logger.error('Error regenerating keys:', error);
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+// POST /api/organizations/:orgId/invite - Convidar usuário para organização
+router.post('/organizations/:orgId/invite', async (req, res) => {
+  try {
+    const { orgId } = req.params;
+    const userId = req.user!.id;
+    const { email, role = 'MEMBER', permissions = [] } = req.body;
+    
+    // Verificar se usuário pode convidar
+    const userOrg = await prisma.userOrganization.findFirst({
+      where: {
+        userId,
+        organizationId: orgId,
+        role: { in: ['OWNER', 'ADMIN'] }
+      }
+    });
+    
+    if (!userOrg) {
+      res.status(403).json({
+        error: 'Insufficient permissions to invite users'
+      });
+      return;
+    }
+    
+    // Verificar se usuário existe
+    const targetUser = await prisma.user.findUnique({
+      where: { email }
+    });
+    
+    if (!targetUser) {
+      res.status(404).json({
+        error: 'User not found'
+      });
+      return;
+    }
+    
+    // Verificar se já é membro
+    const existingMembership = await prisma.userOrganization.findFirst({
+      where: {
+        userId: targetUser.id,
+        organizationId: orgId
+      }
+    });
+    
+    if (existingMembership) {
+      res.status(400).json({
+        error: 'User is already a member of this organization'
+      });
+      return;
+    }
+    
+    // Criar convite/adicionar usuário
+    const newMembership = await prisma.userOrganization.create({
+      data: {
+        userId: targetUser.id,
+        organizationId: orgId,
+        role,
+        permissions
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
+    });
+    
+    logger.info(`User ${targetUser.email} invited to organization ${orgId} by ${userId}`, {
+      organizationId: orgId,
+      invitedUserId: targetUser.id,
+      invitedByUserId: userId,
+      role
+    });
+    
+    res.json({
+      success: true,
+      message: 'User invited successfully',
+      membership: newMembership
+    });
+  } catch (error: any) {
+    logger.error('Error inviting user:', error);
+    res.status(500).json({
+      error: error.message
     });
   }
 });

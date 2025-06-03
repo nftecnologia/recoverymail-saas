@@ -209,6 +209,155 @@ export class ApiClient {
       body: JSON.stringify(settings),
     });
   }
+
+  // Templates
+  async getTemplates() {
+    return this.request<{
+      templates: Array<{
+        id: string;
+        name: string;
+        filename: string;
+        eventType: string;
+        templateType: string;
+        content: string;
+        size: number;
+        lastModified: string;
+      }>;
+      groupedTemplates: Record<string, any[]>;
+      totalTemplates: number;
+      eventTypes: string[];
+    }>('/api/templates');
+  }
+
+  async getTemplate(templateId: string) {
+    return this.request<{
+      id: string;
+      name: string;
+      filename: string;
+      eventType: string;
+      templateType: string;
+      content: string;
+      size: number;
+      lastModified: string;
+    }>(`/api/templates/${templateId}`);
+  }
+
+  async updateTemplate(templateId: string, content: string) {
+    return this.request<{
+      success: boolean;
+      message: string;
+      template: {
+        id: string;
+        size: number;
+        lastModified: string;
+        backupPath: string;
+      };
+    }>(`/api/templates/${templateId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ content }),
+    });
+  }
+
+  async previewTemplate(templateId: string, testData?: Record<string, any>) {
+    return this.request<{
+      success: boolean;
+      preview: string;
+      testData: Record<string, any>;
+      originalContent: string;
+    }>(`/api/templates/${templateId}/preview`, {
+      method: 'POST',
+      body: JSON.stringify({ testData }),
+    });
+  }
+
+  // Organizations
+  async getOrganizations() {
+    return this.request<{
+      organizations: Array<{
+        id: string;
+        name: string;
+        apiKey: string;
+        webhookSecret: string;
+        webhookUrl: string;
+        plan: string;
+        role: string;
+        permissions: string[];
+        joinedAt: string;
+        stats: {
+          totalEvents: number;
+          totalEmails: number;
+        };
+      }>;
+    }>('/api/organizations');
+  }
+
+  async getOrganization(orgId: string) {
+    return this.request<{
+      organization: {
+        id: string;
+        name: string;
+        apiKey: string;
+        webhookSecret: string;
+        webhookUrl: string;
+        plan: string;
+        emailSettings: any;
+        users: Array<{
+          user: {
+            id: string;
+            name: string;
+            email: string;
+            isActive: boolean;
+          };
+          role: string;
+          permissions: string[];
+        }>;
+        stats: {
+          totalEvents: number;
+          totalEmails: number;
+          totalUsers: number;
+        };
+      };
+      userRole: string;
+      userPermissions: string[];
+    }>(`/api/organizations/${orgId}`);
+  }
+
+  async updateOrganization(orgId: string, data: {
+    name?: string;
+    webhookUrl?: string;
+    emailSettings?: any;
+  }) {
+    return this.request<{
+      success: boolean;
+      organization: any;
+    }>(`/api/organizations/${orgId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async regenerateKeys(orgId: string, keyType: 'apiKey' | 'webhookSecret') {
+    return this.request<{
+      success: boolean;
+      message: string;
+      apiKey?: string;
+      webhookSecret?: string;
+    }>(`/api/organizations/${orgId}/regenerate-keys`, {
+      method: 'POST',
+      body: JSON.stringify({ keyType }),
+    });
+  }
+
+  async inviteUser(orgId: string, email: string, role: string = 'MEMBER') {
+    return this.request<{
+      success: boolean;
+      message: string;
+      membership: any;
+    }>(`/api/organizations/${orgId}/invite`, {
+      method: 'POST',
+      body: JSON.stringify({ email, role }),
+    });
+  }
 }
 
 export const api = new ApiClient(API_URL);
