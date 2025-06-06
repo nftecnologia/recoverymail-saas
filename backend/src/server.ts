@@ -12,7 +12,7 @@ import webhookRoutes from '@/routes/webhook.routes';
 import resendWebhookRoutes from '@/routes/resend-webhook.routes';
 import apiRoutes from '@/routes/api.routes';
 import authRoutes from '@/routes/auth.routes';
-import { cleanOldJobs } from '@/services/queue.service';
+import { cleanOldJobs } from '@/services/trigger.service';
 import setupRoutes from '@/routes/setup.routes';
 
 // LOG PARA VERIFICAR DEPLOY
@@ -147,23 +147,9 @@ async function startServer() {
       }
     }, 60 * 60 * 1000);
 
-    // Iniciar workers
-    logger.info('Starting to load workers...');
-    try {
-      // Usar a nova função de inicialização
-      const { startWorkers } = await import('./workers/startWorkers');
-      await startWorkers();
-      
-      // Verificar se o worker está rodando
-      const { getQueue } = await import('./services/queue.service');
-      const queue = getQueue();
-      const workers = await queue.getWorkers();
-      logger.info(`Workers status: ${workers.length} workers running`);
-    } catch (workerError) {
-      logger.error('Failed to load workers', workerError);
-      // Não vamos falhar o servidor se os workers falharem
-      logger.error('Server will continue without workers - emails will not be processed!');
-    }
+    // Trigger.dev está sendo usado para processamento de jobs
+    logger.info('Using Trigger.dev for email processing - no local workers needed');
+    logger.info('Email jobs will be processed by Trigger.dev cloud infrastructure');
 
     // Iniciar servidor
     const server = app.listen(env.PORT, () => {

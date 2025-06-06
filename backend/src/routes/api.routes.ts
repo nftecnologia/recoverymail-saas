@@ -337,86 +337,39 @@ router.get('/test', (_req, res) => {
   });
 });
 
-// TEMPORÁRIO: Testar Redis
-router.get('/test-redis', async (_req, res) => {
+// TEMPORÁRIO: Testar Trigger.dev
+router.get('/test-trigger', async (_req, res) => {
   try {
-    // Verificar se REDIS_URL está configurado
-    const redisUrl = process.env['REDIS_URL'];
+    const { getQueueStats } = await import('../services/trigger.service');
+    const stats = await getQueueStats();
     
-    if (!redisUrl) {
-      res.json({
-        redis: 'not configured',
-        error: 'REDIS_URL environment variable is not set',
-        redisUrl: 'NOT CONFIGURED'
-      });
-      return;
-    }
-    
-    // Tentar importar e conectar
-    try {
-      const { getQueue } = await import('../services/queue.service');
-      const queue = getQueue();
-      const jobCounts = await queue.getJobCounts();
-      
-      res.json({
-        redis: 'connected',
-        queue: queue.name,
-        jobs: jobCounts,
-        redisUrl: 'configured',
-        redisHost: redisUrl.split('@')[1]?.split(':')[0] || 'unknown'
-      });
-    } catch (queueError: any) {
-      res.json({
-        redis: 'connection failed',
-        error: queueError.message,
-        redisUrl: 'configured',
-        details: 'Failed to connect to Redis or get queue'
-      });
-    }
+    res.json({
+      trigger: 'connected',
+      stats,
+      note: 'Using Trigger.dev for job processing'
+    });
   } catch (error: any) {
     res.status(500).json({
-      redis: 'error',
+      trigger: 'error',
       error: error.message,
       stack: process.env['NODE_ENV'] === 'development' ? error.stack : undefined
     });
   }
 });
 
-// TEMPORÁRIO: Ver jobs failed
+// TEMPORÁRIO: Ver tarefas com problema (redirect para dashboard Trigger.dev)
 router.get('/test-failed-jobs', async (_req, res) => {
-  try {
-    const { getQueue } = await import('../services/queue.service');
-    const queue = getQueue();
-    
-    // Pegar jobs failed
-    const failedJobs = await queue.getFailed(0, 10);
-    
-    const failedDetails = failedJobs.map(job => ({
-      id: job.id,
-      name: job.name,
-      data: job.data,
-      failedReason: job.failedReason,
-      attemptsMade: job.attemptsMade,
-      timestamp: job.timestamp,
-      processedOn: job.processedOn,
-      finishedOn: job.finishedOn
-    }));
-    
-    res.json({
-      totalFailed: failedJobs.length,
-      failedJobs: failedDetails
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      error: error.message
-    });
-  }
+  res.json({
+    note: 'Failed jobs monitoring is available in Trigger.dev dashboard',
+    dashboardUrl: 'https://cloud.trigger.dev',
+    projectId: 'proj_mdohvtloydfywjxorkwu'
+  });
 });
 
 // TEMPORÁRIO: Processar job imediatamente
 router.post('/test-process-now', async (_req, res) => {
   try {
-    const { enqueueEmailJob } = await import('../services/queue.service');
+    const { enqueueEmailJob } = await import('../services/trigger.service');
     const { prisma } = await import('../config/database');
     
     // Pegar o último evento
@@ -437,7 +390,7 @@ router.post('/test-process-now', async (_req, res) => {
     await enqueueEmailJob(lastEvent, true);
     
     res.json({
-      message: 'Job enqueued for immediate processing',
+      message: 'Task triggered for immediate processing via Trigger.dev',
       eventId: lastEvent.id,
       eventType: lastEvent.eventType
     });
@@ -448,66 +401,22 @@ router.post('/test-process-now', async (_req, res) => {
   }
 });
 
-// TEMPORÁRIO: Verificar se worker está rodando
+// TEMPORÁRIO: Status do processamento (Trigger.dev)
 router.get('/test-worker-status', async (_req, res) => {
-  try {
-    const { getQueue } = await import('../services/queue.service');
-    const queue = getQueue();
-    
-    // Verificar workers
-    const workers = await queue.getWorkers();
-    
-    // Pegar informações da queue
-    const jobCounts = await queue.getJobCounts();
-    const isPaused = await queue.isPaused();
-    
-    res.json({
-      queue: {
-        name: queue.name,
-        isPaused,
-        jobCounts
-      },
-      workers: {
-        count: workers.length,
-        details: workers.map(w => ({
-          id: (w as any)['id'],
-          name: (w as any)['name']
-        }))
-      },
-      workerStatus: workers.length > 0 ? 'running' : 'not running'
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      error: error.message,
-      workerStatus: 'error'
-    });
-  }
+  res.json({
+    status: 'Using Trigger.dev cloud infrastructure',
+    workers: 'Managed by Trigger.dev',
+    monitoring: 'Available at https://cloud.trigger.dev',
+    projectId: 'proj_mdohvtloydfywjxorkwu'
+  });
 });
 
-// TEMPORÁRIO: Limpar filas para teste
+// TEMPORÁRIO: Limpar filas (não aplicável no Trigger.dev)
 router.post('/test-clear-queues', async (_req, res) => {
-  try {
-    const { getQueue } = await import('../services/queue.service');
-    const queue = getQueue();
-    
-    // Limpar failed jobs
-    await queue.clean(0, 0, 'failed');
-    
-    // Limpar delayed jobs
-    await queue.clean(0, 0, 'delayed');
-    
-    // Pegar novo status
-    const jobCounts = await queue.getJobCounts();
-    
-    res.json({
-      message: 'Queues cleared',
-      jobCounts
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      error: error.message
-    });
-  }
+  res.json({
+    message: 'Queue clearing not available with Trigger.dev',
+    note: 'Tasks are managed automatically by Trigger.dev cloud infrastructure'
+  });
 });
 
 // TEMPORÁRIO: Testar Resend diretamente
@@ -609,27 +518,12 @@ router.get('/test-templates', async (_req, res) => {
   }
 });
 
-// TEMPORÁRIO: Limpar TODOS os jobs
+// TEMPORÁRIO: Limpar TODOS os jobs (não aplicável no Trigger.dev)
 router.post('/test-clear-all-jobs', async (_req, res) => {
-  try {
-    const { getQueue } = await import('../services/queue.service');
-    const queue = getQueue();
-    
-    // Limpar TODOS os jobs
-    await queue.obliterate({ force: true });
-    
-    // Pegar novo status
-    const jobCounts = await queue.getJobCounts();
-    
-    res.json({
-      message: 'All jobs cleared',
-      jobCounts
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      error: error.message
-    });
-  }
+  res.json({
+    message: 'Job clearing not available with Trigger.dev',
+    note: 'All tasks are managed by Trigger.dev cloud infrastructure'
+  });
 });
 
 // TESTE IMEDIATO: Enviar email de carrinho abandonado sem delay
@@ -716,35 +610,15 @@ router.post('/test-immediate-email', async (_req, res) => {
   }
 });
 
-// Worker status endpoint
+// Worker status endpoint (Trigger.dev)
 router.get('/worker-status', async (_req, res) => {
-  try {
-    const { getQueue } = await import('../services/queue.service');
-    const queue = getQueue();
-    const workers = await queue.getWorkers();
-    const workerCount = await queue.getWorkersCount();
-    const activeCount = await queue.getActiveCount();
-    const waitingCount = await queue.getWaitingCount();
-    
-    res.json({
-      status: 'ok',
-      workers: {
-        count: workerCount,
-        active: activeCount,
-        waiting: waitingCount,
-        details: workers.map(w => ({
-          id: (w as any)['id'],
-          state: (w as any)['state']
-        }))
-      },
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
-  }
+  res.json({
+    status: 'ok',
+    processor: 'Trigger.dev',
+    workers: 'Managed by cloud infrastructure',
+    monitoring: 'https://cloud.trigger.dev',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // ===== ROTAS DE TEMPLATES =====

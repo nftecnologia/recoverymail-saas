@@ -1,7 +1,5 @@
 import { z } from 'zod';
-import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../services/queue.service';
 
 // Schema específico para SUBSCRIPTION_RENEWED
 const subscriptionRenewedSchema = z.object({
@@ -75,35 +73,9 @@ export async function handleSubscriptionRenewed(
   // Para renovação, enviamos confirmação com pequeno delay
   const delay = forceImmediate ? 0 : 2000; // 2 segundos
   
-  const jobData: EmailJobData = {
-    eventId,
-    organizationId,
-    eventType: 'SUBSCRIPTION_RENEWED',
-    attemptNumber: 1,
-    payload: validatedPayload as any
-  };
 
   const jobId = `${eventId}-renewal-confirmation`;
   
-  await emailQueue.add(
-    'send-email',
-    jobData,
-    {
-      delay,
-      jobId,
-      attempts: 5,
-      backoff: {
-        type: 'exponential',
-        delay: 2000
-      },
-      priority: 1, // Alta prioridade
-      removeOnComplete: {
-        age: 30 * 24 * 60 * 60, // 30 dias
-        count: 1000
-      },
-      removeOnFail: false
-    }
-  );
 
   logger.info('Renewal confirmation job enqueued', {
     jobId,

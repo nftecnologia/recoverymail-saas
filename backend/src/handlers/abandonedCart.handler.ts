@@ -1,8 +1,8 @@
 import { Job } from 'bullmq';
-import { EmailJobData } from '../services/queue.service';
 import { logger } from '../utils/logger';
 import { sendEmail } from '../services/email.service';
 import { prisma } from '../config/database';
+import { EmailJobData } from '../services/trigger.service';
 
 export async function processAbandonedCart(job: Job<EmailJobData>): Promise<void> {
   const { eventId, organizationId, payload, attemptNumber } = job.data;

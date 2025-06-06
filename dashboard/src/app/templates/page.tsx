@@ -36,9 +36,7 @@ import {
   UserCheck,
   Download,
   RefreshCcw,
-  Copy,
-  Edit,
-  Save
+  Copy
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -394,9 +392,32 @@ const templateExamples = {
 export default function TemplatesPage() {
   const [selectedEventType, setSelectedEventType] = useState("ABANDONED_CART");
   const [selectedTemplate, setSelectedTemplate] = useState(0);
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   const currentEventType = eventTypes.find(et => et.value === selectedEventType);
   const currentTemplates = templateExamples[selectedEventType as keyof typeof templateExamples]?.templates || [];
+
+
+  const handleCopyTemplate = () => {
+    const currentTemplate = currentTemplates[selectedTemplate];
+    if (currentTemplate) {
+      navigator.clipboard.writeText(currentTemplate.preview);
+      toast.success("Template copiado para área de transferência!");
+    }
+  };
+
+  const handlePreviewTemplate = () => {
+    const currentTemplate = currentTemplates[selectedTemplate];
+    if (currentTemplate) {
+      toast.info("Abrindo preview em nova aba...");
+      // Em um app real, abriria uma nova janela com o preview
+      const newWindow = window.open();
+      if (newWindow) {
+        newWindow.document.write(currentTemplate.preview);
+        newWindow.document.close();
+      }
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -508,10 +529,9 @@ export default function TemplatesPage() {
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
                               <h4 className="font-medium">Configurações</h4>
-                              <Button size="sm" variant="outline">
-                                <Edit className="h-4 w-4 mr-1" />
-                                Editar
-                              </Button>
+                              <Badge variant="secondary">
+                                Template Otimizado
+                              </Badge>
                             </div>
                             
                             <div className="space-y-2 text-sm">
@@ -541,14 +561,11 @@ export default function TemplatesPage() {
                           </div>
 
                           <div className="flex gap-2">
-                            <Button className="flex-1">
-                              <Save className="h-4 w-4 mr-2" />
-                              Salvar Alterações
+                            <Button variant="outline" className="flex-1" onClick={handlePreviewTemplate}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Visualizar Email
                             </Button>
-                            <Button variant="outline" size="icon">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="icon">
+                            <Button variant="outline" size="icon" onClick={handleCopyTemplate}>
                               <Copy className="h-4 w-4" />
                             </Button>
                           </div>
@@ -559,18 +576,26 @@ export default function TemplatesPage() {
                           <div className="flex items-center justify-between">
                             <h4 className="font-medium">Preview do Email</h4>
                             <div className="flex gap-2">
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant={viewMode === 'mobile' ? 'default' : 'outline'} 
+                                size="sm"
+                                onClick={() => setViewMode('mobile')}
+                              >
                                 <Smartphone className="h-4 w-4 mr-1" />
                                 Mobile
                               </Button>
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant={viewMode === 'desktop' ? 'default' : 'outline'} 
+                                size="sm"
+                                onClick={() => setViewMode('desktop')}
+                              >
                                 <Monitor className="h-4 w-4 mr-1" />
                                 Desktop
                               </Button>
                             </div>
                           </div>
                           
-                          <div className="border rounded-lg bg-gray-50 p-4">
+                          <div className={cn("border rounded-lg bg-gray-50 p-4", viewMode === 'mobile' && "max-w-sm mx-auto")}>
                             <div className="bg-white rounded border shadow-sm">
                               <div className="border-b p-3 bg-gray-50 text-sm">
                                 <div className="font-medium">Para: cliente@exemplo.com</div>
@@ -601,6 +626,7 @@ export default function TemplatesPage() {
           </Card>
         )}
       </div>
+      
     </DashboardLayout>
   );
 }

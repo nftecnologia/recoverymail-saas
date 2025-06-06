@@ -15,28 +15,20 @@ const envSchema = z.object({
   FRONTEND_URL: z.string().url().default('http://localhost:3000'),
   
   // Database
-  DATABASE_URL: z.string().url(),
+  DATABASE_URL: z.string().url().optional(),
   
-  // Redis - Suporta tanto Redis local quanto Upstash
+  // Redis - Opcional (para cache, não mais necessário para filas)
   REDIS_URL: z.string().optional(),
-  REDIS_HOST: z.string().default('localhost'),
-  REDIS_PORT: z.string().default('6379').transform(Number),
-  REDIS_PASSWORD: z.string().optional(),
-  
-  // Upstash Redis (opcional)
-  KV_URL: z.string().optional(),
-  KV_REST_API_URL: z.string().optional(),
-  KV_REST_API_TOKEN: z.string().optional(),
   
   // Email (Resend)
-  RESEND_API_KEY: z.string(),
+  RESEND_API_KEY: z.string().default('re_placeholder_for_build'),
   RESEND_DOMAIN: z.string().default('inboxrecovery.com'),
   RESEND_FROM_EMAIL: z.string().email().default('recovery@inboxrecovery.com'),
   RESEND_FROM_NAME: z.string().default('InboxRecovery'),
   RESEND_WEBHOOK_SECRET: z.string().optional(),
   
   // Security
-  JWT_SECRET: z.string().min(32),
+  JWT_SECRET: z.string().min(8).default('dev-secret-key'),
   
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: z.string().default('900000').transform(Number),
@@ -48,6 +40,10 @@ const envSchema = z.object({
   // n8n
   N8N_URL: z.string().url().optional(),
   N8N_API_KEY: z.string().optional(),
+
+  // Trigger.dev
+  TRIGGER_API_KEY: z.string().optional(),
+  TRIGGER_API_URL: z.string().url().default('https://api.trigger.dev'),
 
   // Optional services
   SENTRY_DSN: z.string().url().optional(),
@@ -64,18 +60,6 @@ if (!envResult.success) {
 }
 
 export const env = envResult.data;
-
-// Helper para obter a configuração do Redis
-export function getRedisConfig() {
-  // Se tiver REDIS_URL (Upstash ou Redis completo), usar ela
-  if (env.REDIS_URL) {
-    return env.REDIS_URL;
-  }
-  
-  // Caso contrário, montar a URL do Redis local
-  const auth = env.REDIS_PASSWORD ? `:${env.REDIS_PASSWORD}@` : '';
-  return `redis://${auth}${env.REDIS_HOST}:${env.REDIS_PORT}`;
-}
 
 // Type helper
 export type Env = typeof env; 

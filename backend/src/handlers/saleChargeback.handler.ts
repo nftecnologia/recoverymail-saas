@@ -1,7 +1,5 @@
 import { z } from 'zod';
-import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../services/queue.service';
 
 // Schema específico para SALE_CHARGEBACK
 const saleChargebackSchema = z.object({
@@ -56,35 +54,9 @@ export async function handleSaleChargeback(
   // Chargeback é urgente - enviamos imediatamente
   const delay = 0; // Sem delay, é urgente!
   
-  const jobData: EmailJobData = {
-    eventId,
-    organizationId,
-    eventType: 'SALE_CHARGEBACK',
-    attemptNumber: 1,
-    payload: validatedPayload as any
-  };
 
   const jobId = `${eventId}-urgent-notice`;
   
-  await emailQueue.add(
-    'send-email',
-    jobData,
-    {
-      delay,
-      jobId,
-      attempts: 10, // Muitas tentativas pois é crítico
-      backoff: {
-        type: 'exponential',
-        delay: 1000 // Retry rápido
-      },
-      priority: 0, // Máxima prioridade
-      removeOnComplete: {
-        age: 30 * 24 * 60 * 60, // 30 dias
-        count: 1000
-      },
-      removeOnFail: false
-    }
-  );
 
   logger.info('Chargeback notification job enqueued', {
     jobId,

@@ -1,7 +1,5 @@
 import { z } from 'zod';
-import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../services/queue.service';
 
 // Schema específico para BANK_SLIP_GENERATED
 const bankSlipGeneratedSchema = z.object({
@@ -71,34 +69,9 @@ export async function handleBankSlipGenerated(
     const attemptNumber = i + 1;
     const delay = forceImmediate ? 0 : delays[i];
     
-    const jobData: EmailJobData = {
-      eventId,
-      organizationId,
-      eventType: 'BANK_SLIP_GENERATED',
-      attemptNumber,
-      payload: validatedPayload as any
-    };
 
     const jobId = `${eventId}-attempt-${attemptNumber}`;
     
-    await emailQueue.add(
-      'send-email',
-      jobData,
-      {
-        delay: delay || 0,
-        jobId,
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 5000
-        },
-        removeOnComplete: {
-          age: 24 * 60 * 60, // 24 horas
-          count: 100
-        },
-        removeOnFail: false
-      }
-    );
 
     logger.info('Bank slip generated email job enqueued', {
       jobId,

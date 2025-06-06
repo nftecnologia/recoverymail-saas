@@ -4,7 +4,7 @@ import { logger } from '../utils/logger';
 import { AppError } from '../utils/errors';
 import { prisma } from '../config/database';
 import { validateWebhookPayload } from '../utils/webhook.validator';
-import { enqueueEmailJob } from '../services/queue.service';
+import { enqueueEmailJob } from '../services/trigger.service';
 
 const router = Router();
 

@@ -2,9 +2,7 @@ import { getSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.inboxrecovery.com';
 
-interface ApiOptions extends RequestInit {
-  organizationId?: string;
-}
+interface ApiOptions extends RequestInit {}
 
 export class ApiClient {
   private baseUrl: string;
@@ -13,7 +11,7 @@ export class ApiClient {
     this.baseUrl = baseUrl;
   }
 
-  private async getHeaders(organizationId?: string): Promise<HeadersInit> {
+  private async getHeaders(): Promise<HeadersInit> {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
@@ -24,34 +22,21 @@ export class ApiClient {
       if (session?.accessToken) {
         headers['Authorization'] = `Bearer ${session.accessToken}`;
       }
-
-      // Use organizationId from parameter or default to first org from session
-      if (organizationId) {
-        headers['x-organization-id'] = organizationId;
-      } else if (session?.organizations?.[0]?.organizationId) {
-        headers['x-organization-id'] = session.organizations[0].organizationId;
-      } else {
-        // Fallback to test org for backward compatibility
-        headers['x-organization-id'] = 'test-org-123';
-      }
     } catch (error) {
       console.warn('Failed to get session for API headers:', error);
-      // Fallback to test org if session is not available
-      headers['x-organization-id'] = organizationId || 'test-org-123';
     }
 
     return headers;
   }
 
   async request<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
-    const { organizationId, ...fetchOptions } = options;
-    const headers = await this.getHeaders(organizationId);
+    const headers = await this.getHeaders();
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...fetchOptions,
+      ...options,
       headers: {
         ...headers,
-        ...fetchOptions.headers,
+        ...options.headers,
       },
     });
 
@@ -117,7 +102,6 @@ export class ApiClient {
     return this.request<{
       events: Array<{
         id: string;
-        organizationId: string;
         eventType: string;
         payload: any;
         status: string;
@@ -150,7 +134,6 @@ export class ApiClient {
     return this.request<{
       emails: Array<{
         id: string;
-        organizationId: string;
         eventId: string;
         emailId?: string;
         to: string;
@@ -356,94 +339,6 @@ export class ApiClient {
     });
   }
 
-  // Organizations
-  async getOrganizations() {
-    return this.request<{
-      organizations: Array<{
-        id: string;
-        name: string;
-        apiKey: string;
-        webhookSecret: string;
-        webhookUrl: string;
-        plan: string;
-        role: string;
-        permissions: string[];
-        joinedAt: string;
-        stats: {
-          totalEvents: number;
-          totalEmails: number;
-        };
-      }>;
-    }>('/api/organizations');
-  }
-
-  async getOrganization(orgId: string) {
-    return this.request<{
-      organization: {
-        id: string;
-        name: string;
-        apiKey: string;
-        webhookSecret: string;
-        webhookUrl: string;
-        plan: string;
-        emailSettings: any;
-        users: Array<{
-          user: {
-            id: string;
-            name: string;
-            email: string;
-            isActive: boolean;
-          };
-          role: string;
-          permissions: string[];
-        }>;
-        stats: {
-          totalEvents: number;
-          totalEmails: number;
-          totalUsers: number;
-        };
-      };
-      userRole: string;
-      userPermissions: string[];
-    }>(`/api/organizations/${orgId}`);
-  }
-
-  async updateOrganization(orgId: string, data: {
-    name?: string;
-    webhookUrl?: string;
-    emailSettings?: any;
-  }) {
-    return this.request<{
-      success: boolean;
-      organization: any;
-    }>(`/api/organizations/${orgId}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async regenerateKeys(orgId: string, keyType: 'apiKey' | 'webhookSecret') {
-    return this.request<{
-      success: boolean;
-      message: string;
-      apiKey?: string;
-      webhookSecret?: string;
-    }>(`/api/organizations/${orgId}/regenerate-keys`, {
-      method: 'POST',
-      body: JSON.stringify({ keyType }),
-    });
-  }
-
-  async inviteUser(orgId: string, email: string, role: string = 'MEMBER') {
-    return this.request<{
-      success: boolean;
-      message: string;
-      membership: any;
-    }>(`/api/organizations/${orgId}/invite`, {
-      method: 'POST',
-      body: JSON.stringify({ email, role }),
-    });
-  }
 }
 
 export const api = new ApiClient(API_URL);
@@ -451,7 +346,6 @@ export const api = new ApiClient(API_URL);
 // Tipos para as respostas da API
 export interface WebhookEvent {
   id: string;
-  organizationId: string;
   eventType: string;
   payload: any;
   status: "PENDING" | "PROCESSED" | "FAILED";
@@ -463,7 +357,6 @@ export interface WebhookEvent {
 
 export interface EmailLog {
   id: string;
-  organizationId: string;
   eventId: string;
   emailId?: string;
   to: string;

@@ -20,7 +20,6 @@ import {
   Webhook,
   ChevronRight,
   Sparkles,
-  Building,
 } from "lucide-react";
 
 const navigation = [
@@ -29,7 +28,6 @@ const navigation = [
   { name: "Emails", href: "/emails", icon: Mail },
   { name: "Templates", href: "/templates", icon: FileText },
   { name: "Métricas", href: "/metrics", icon: BarChart3 },
-  { name: "Organizações", href: "/organizations", icon: Building },
   { name: "Configurações", href: "/settings", icon: Settings },
 ];
 

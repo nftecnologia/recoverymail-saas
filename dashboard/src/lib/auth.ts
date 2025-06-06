@@ -41,7 +41,6 @@ export const authOptions: NextAuthOptions = {
             id: data.data.user.id,
             email: data.data.user.email,
             name: data.data.user.name,
-            organizations: data.data.organizations,
             accessToken: data.data.token,
           };
         } catch (error) {
@@ -53,11 +52,6 @@ export const authOptions: NextAuthOptions = {
               id: 'mock-user-id',
               email: credentials.email,
               name: 'Admin Recovery',
-              organizations: [{
-                organizationId: 'test-org-123',
-                role: 'OWNER',
-                permissions: ['ALL']
-              }],
               accessToken: 'mock-jwt-token',
             };
           }
@@ -77,7 +71,6 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.organizations = (user as any).organizations;
         token.accessToken = (user as any).accessToken;
       }
       return token;
@@ -85,7 +78,6 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session?.user) {
         session.user.id = token.id as string;
-        (session as any).organizations = token.organizations;
         (session as any).accessToken = token.accessToken;
       }
       return session;

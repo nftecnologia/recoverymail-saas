@@ -1,7 +1,5 @@
 import { z } from 'zod';
-import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../services/queue.service';
 
 // Schema específico para SALE_REFUSED
 const saleRefusedSchema = z.object({
@@ -62,34 +60,9 @@ export async function handleSaleRefused(
     const attemptNumber = i + 1;
     const delay = forceImmediate ? 0 : delays[i];
     
-    const jobData: EmailJobData = {
-      eventId,
-      organizationId,
-      eventType: 'SALE_REFUSED',
-      attemptNumber,
-      payload: validatedPayload as any
-    };
 
     const jobId = `${eventId}-attempt-${attemptNumber}`;
     
-    await emailQueue.add(
-      'send-email',
-      jobData,
-      {
-        delay: delay || 0,
-        jobId,
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 5000
-        },
-        removeOnComplete: {
-          age: 24 * 60 * 60, // 24 horas
-          count: 100
-        },
-        removeOnFail: false
-      }
-    );
 
     logger.info('Sale refused email job enqueued', {
       jobId,

@@ -10,6 +10,13 @@ import path from 'path';
 // Inicializar Resend
 const resend = new Resend(env.RESEND_API_KEY);
 
+// Validar se a API key é real (não é placeholder)
+function validateResendKey() {
+  if (env.RESEND_API_KEY === 're_placeholder_for_build') {
+    throw new AppError('RESEND_API_KEY not configured properly', 500);
+  }
+}
+
 // Interface para dados de email
 export interface EmailData {
   to: string;
@@ -92,6 +99,9 @@ async function loadTemplate(templateName: string): Promise<handlebars.TemplateDe
  * Enviar email via Resend
  */
 export async function sendEmail(emailData: EmailData): Promise<string> {
+  // Validar se a API key do Resend está configurada
+  validateResendKey();
+  
   const {
     to,
     subject,

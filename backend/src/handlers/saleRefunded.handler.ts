@@ -1,7 +1,5 @@
 import { z } from 'zod';
-import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../services/queue.service';
 
 // Schema específico para SALE_REFUNDED
 const saleRefundedSchema = z.object({
@@ -61,35 +59,9 @@ export async function handleSaleRefunded(
   // Para reembolso, enviamos confirmação com pequeno delay
   const delay = forceImmediate ? 0 : 5000; // 5 segundos
   
-  const jobData: EmailJobData = {
-    eventId,
-    organizationId,
-    eventType: 'SALE_REFUNDED',
-    attemptNumber: 1,
-    payload: validatedPayload as any
-  };
 
   const jobId = `${eventId}-refund-confirmation`;
   
-  await emailQueue.add(
-    'send-email',
-    jobData,
-    {
-      delay,
-      jobId,
-      attempts: 5,
-      backoff: {
-        type: 'exponential',
-        delay: 3000
-      },
-      priority: 2, // Prioridade média
-      removeOnComplete: {
-        age: 30 * 24 * 60 * 60, // 30 dias
-        count: 1000
-      },
-      removeOnFail: false
-    }
-  );
 
   logger.info('Refund confirmation job enqueued', {
     jobId,

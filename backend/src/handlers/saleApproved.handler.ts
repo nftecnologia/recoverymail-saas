@@ -1,7 +1,6 @@
 import { z } from 'zod';
-import { emailQueue } from '../services/queue.service';
 import { logger } from '../utils/logger';
-import type { EmailJobData } from '../services/queue.service';
+import { EmailJobData } from '../services/trigger.service';
 
 // Schema específico para SALE_APPROVED
 const saleApprovedSchema = z.object({
@@ -44,13 +43,13 @@ const saleApprovedSchema = z.object({
 
 export type SaleApprovedPayload = z.infer<typeof saleApprovedSchema>;
 
+// Função compatível com processo antigo (para uso direto)
 export async function handleSaleApproved(
   payload: unknown,
   eventId: string,
-  organizationId: string,
-  forceImmediate: boolean = false
+  organizationId: string
 ) {
-  // Valida o payload
+  // Validar payload
   const validatedPayload = saleApprovedSchema.parse(payload);
   
   logger.info('Processing SALE_APPROVED event', {
@@ -60,45 +59,48 @@ export async function handleSaleApproved(
     orderNumber: validatedPayload.order_number
   });
 
-  // Para venda aprovada, enviamos apenas 1 email de confirmação imediatamente
-  const delay = forceImmediate ? 0 : 1000; // 1 segundo de delay apenas para evitar sobrecarga
+  // Não precisa mais gerenciar filas - isso será feito pelo Trigger.dev
+}
+
+// Função compatível com Job interface (para uso pelo Trigger.dev)
+export async function processSaleApproved(job: { data: EmailJobData }) {
+  const { sendEmail } = await import('../services/email.service');
+  const { eventId, organizationId, payload, attemptNumber } = job.data;
   
-  const jobData: EmailJobData = {
+  // Validar payload
+  const validatedPayload = saleApprovedSchema.parse(payload);
+  
+  logger.info('Sending SALE_APPROVED email', {
     eventId,
     organizationId,
-    eventType: 'SALE_APPROVED',
-    attemptNumber: 1,
-    payload: validatedPayload as any
-  };
+    customerEmail: validatedPayload.customer.email,
+    attemptNumber
+  });
 
-  const jobId = `${eventId}-confirmation`;
-  
-  await emailQueue.add(
-    'send-email',
-    jobData,
-    {
-      delay,
-      jobId,
-      attempts: 5, // Mais tentativas pois é crítico
-      backoff: {
-        type: 'exponential',
-        delay: 2000
-      },
-      priority: 1, // Alta prioridade
-      removeOnComplete: {
-        age: 7 * 24 * 60 * 60, // 7 dias
-        count: 1000
-      },
-      removeOnFail: false
-    }
-  );
-
-  logger.info('Confirmation email job enqueued', {
-    jobId,
+  // Enviar email de confirmação de venda
+  await sendEmail({
+    to: validatedPayload.customer.email,
+    subject: `🎉 Compra Confirmada - ${validatedPayload.product.name}`,
+    template: 'sale-approved-confirmation',
+    data: {
+      customerName: validatedPayload.customer.name,
+      orderNumber: validatedPayload.order_number,
+      productName: validatedPayload.product.name,
+      amount: validatedPayload.amount,
+      paymentMethod: validatedPayload.payment_method,
+      accessInfo: validatedPayload.access,
+      bonuses: validatedPayload.bonuses,
+      community: validatedPayload.community
+    },
+    organizationId,
     eventId,
-    eventType: 'SALE_APPROVED',
-    delay,
-    forceImmediate
+    attemptNumber
+  });
+
+  logger.info('SALE_APPROVED email sent successfully', {
+    eventId,
+    organizationId,
+    customerEmail: validatedPayload.customer.email
   });
 }
 
