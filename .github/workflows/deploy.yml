@@ -1,4 +1,4 @@
-name: Deploy to Railway
+name: Deploy to Vercel
 
 on:
   push:
@@ -18,27 +18,27 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
+        cache-dependency-path: |
+          backend/package-lock.json
+          dashboard/package-lock.json
     
-    - name: Install dependencies
-      run: |
-        cd backend
-        npm ci
+    - name: Install Backend Dependencies
+      run: cd backend && npm ci
     
-    - name: Run linter
-      run: |
-        cd backend
-        npm run lint
+    - name: Install Dashboard Dependencies  
+      run: cd dashboard && npm ci
     
-    - name: Build project
-      run: |
-        cd backend
-        npm run build
+    - name: Lint Backend
+      run: cd backend && npm run lint
     
-    - name: Run tests
-      run: |
-        cd backend
-        npm test || echo "No tests configured yet"
+    - name: Build Backend
+      run: cd backend && npm run build
+      
+    - name: Build Dashboard
+      run: cd dashboard && npm run build
+    
+    - name: Test Backend
+      run: cd backend && npm test || echo "No tests configured yet"
 
   deploy:
     needs: test
@@ -48,11 +48,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install Railway CLI
-      run: npm install -g @railway/cli
-    
-    - name: Deploy to Railway
-      env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-      run: |
-        railway up --service inbox-recovery-backend 
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.ORG_ID }}
+        vercel-project-id: ${{ secrets.PROJECT_ID }}
+        working-directory: ./ 
