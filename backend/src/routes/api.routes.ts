@@ -3,6 +3,7 @@ import { prisma } from '../config/database';
 import { z } from 'zod';
 import { logger } from '../utils/logger';
 import domainRoutes from './domain.routes';
+import dashboardRoutes from './dashboard.routes';
 import { authenticateToken, authenticateOrganization } from '../middleware/auth.middleware';
 import fs from 'fs/promises';
 import path from 'path';
@@ -1137,4 +1138,4 @@ router.post('/organizations/:orgId/invite', async (req, res) => {
   }
 });
 
-export default router; 
+export default router;
