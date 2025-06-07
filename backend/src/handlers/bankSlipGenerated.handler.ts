@@ -1,156 +1,136 @@
-import { z } from 'zod';
 import { logger } from '../utils/logger';
+import { sendEmail } from '../services/email.service';
+import { prisma } from '../config/database';
+import { getEmailTemplate } from '../utils/email.templates';
+import { EmailJobData } from '../services/trigger.service';
 
-// Schema específico para BANK_SLIP_GENERATED
-const bankSlipGeneratedSchema = z.object({
-  event: z.literal('BANK_SLIP_GENERATED'),
-  transaction_id: z.string(),
-  order_number: z.string().optional(),
-  bank_slip_url: z.string().url(),
-  digitable_line: z.string().optional(),
-  barcode: z.string().optional(),
-  total_price: z.string(),
-  due_date: z.string(), // Data de vencimento
-  customer: z.object({
-    name: z.string(),
-    email: z.string().email(),
-    phone_number: z.string().optional(),
-    document: z.string().optional()
-  }),
-  products: z.array(z.object({
-    id: z.string().optional(),
-    name: z.string(),
-    price: z.string(),
-    quantity: z.number().optional(),
-    offer_name: z.string().optional(),
-    description: z.string().optional()
-  })),
-  payment_details: z.object({
-    method: z.literal('BANK_SLIP'),
-    installments: z.number().optional()
-  }).optional(),
-  checkout_url: z.string().url().optional(),
-  utm: z.object({
-    utm_source: z.string().optional(),
-    utm_medium: z.string().optional(),
-    utm_campaign: z.string().optional(),
-    utm_content: z.string().optional()
-  }).optional()
-});
+export async function processBankSlipGenerated(data: EmailJobData): Promise<void> {
+  const { eventId, organizationId, payload, attemptNumber } = data;
+  const event = payload as any;
 
-export type BankSlipGeneratedPayload = z.infer<typeof bankSlipGeneratedSchema>;
-
-export async function handleBankSlipGenerated(
-  payload: unknown,
-  eventId: string,
-  organizationId: string,
-  forceImmediate: boolean = false
-) {
-  // Valida o payload
-  const validatedPayload = bankSlipGeneratedSchema.parse(payload);
-  
-  logger.info('Processing BANK_SLIP_GENERATED event', {
+  logger.info('Processing bank slip generated email', {
     eventId,
-    organizationId,
-    customerEmail: validatedPayload.customer.email,
-    transactionId: validatedPayload.transaction_id,
-    dueDate: validatedPayload.due_date
+    attemptNumber,
+    transactionId: event.transaction_id || event.order_id,
+    customerEmail: event.customer?.email,
   });
 
-  // Configuração dos delays para cada tentativa
-  const delays = [
-    2 * 60 * 1000,         // 2 minutos - Confirmação imediata
-    24 * 60 * 60 * 1000,   // 24 horas - Lembrete do vencimento
-    48 * 60 * 60 * 1000,   // 48 horas - Lembrete final antes do vencimento
-  ];
+  // Buscar informações da organização
+  const organization = await prisma.organization.findUnique({
+    where: { id: organizationId },
+    select: { name: true, domain: true, emailSettings: true },
+  });
 
-  // Agenda emails para cada tentativa
-  for (let i = 0; i < delays.length; i++) {
-    const attemptNumber = i + 1;
-    const delay = forceImmediate ? 0 : delays[i];
-    
-
-    const jobId = `${eventId}-attempt-${attemptNumber}`;
-    
-
-    logger.info('Bank slip generated email job enqueued', {
-      jobId,
-      eventId,
-      eventType: 'BANK_SLIP_GENERATED',
-      attemptNumber,
-      delay,
-      forceImmediate
-    });
+  if (!organization) {
+    throw new Error(`Organization not found: ${organizationId}`);
   }
-}
 
-// Mapeamento de templates para cada tentativa
-export const bankSlipGeneratedTemplates = {
-  1: 'bank-slip-generated-confirmation',  // Confirmação com instruções
-  2: 'bank-slip-generated-reminder',      // Lembrete 24h
-  3: 'bank-slip-generated-urgency'        // Urgência antes do vencimento
-};
-
-// Mapeamento de assuntos para cada tentativa
-export const bankSlipGeneratedSubjects = {
-  1: '📄 {customerName}, seu boleto foi gerado com sucesso',
-  2: '⏰ {customerName}, lembrete: seu boleto vence amanhã',
-  3: '🚨 {customerName}, últimas horas para pagar seu boleto'
-};
-
-// Função de processamento para o worker
-export async function processBankSlipGenerated(job: any): Promise<void> {
-  const { eventId, attemptNumber, payload } = job.data;
+  // Extrair dados do payload
+  const customerEmail = event.customer?.email;
+  const customerName = event.customer?.name || 'Cliente';
   
+  if (!customerEmail) {
+    throw new Error('Customer email not found in payload');
+  }
+
+  // Buscar template para esta tentativa
+  const template = getEmailTemplate('BANK_SLIP_GENERATED', attemptNumber);
+  if (!template) {
+    throw new Error(`No template found for BANK_SLIP_GENERATED attempt ${attemptNumber}`);
+  }
+
+  // Processar data de vencimento
+  const dueDate = event.due_date || event.expiration_date;
+  let formattedDueDate = 'não informado';
+  let daysUntilDue = 0;
+  
+  if (dueDate) {
+    try {
+      const dueDateObj = new Date(dueDate);
+      formattedDueDate = dueDateObj.toLocaleDateString('pt-BR');
+      daysUntilDue = Math.ceil((dueDateObj.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    } catch (e) {
+      formattedDueDate = dueDate;
+    }
+  }
+
+  // Preparar dados do template
+  const templateData = {
+    customerName: customerName.split(' ')[0], // Primeiro nome
+    customerEmail,
+    
+    // Dados da transação
+    transactionId: event.transaction_id || event.order_id || 'N/A',
+    orderNumber: event.order_number || event.transaction_id || 'N/A',
+    totalPrice: event.total_price || event.amount || 'N/A',
+    
+    // Dados do boleto
+    bankSlipUrl: event.bank_slip_url || event.boleto_url || '#',
+    digitableLine: event.digitable_line || event.linha_digitavel || '',
+    barcode: event.barcode || event.codigo_barras || '',
+    dueDate: formattedDueDate,
+    daysUntilDue,
+    
+    // Estado do vencimento
+    isNearExpiry: daysUntilDue <= 2 && daysUntilDue > 0,
+    isExpiringSoon: daysUntilDue <= 1 && daysUntilDue > 0,
+    hasExpired: daysUntilDue <= 0,
+    
+    // Produtos
+    products: event.products || [],
+    productName: event.products?.[0]?.name || event.product_name || 'seu produto',
+    
+    // URLs importantes
+    checkoutUrl: event.checkout_url || '#',
+    supportUrl: event.support_url || 'https://suporte.empresa.com',
+    paymentUrl: event.payment_url || event.checkout_url || '#',
+    
+    // Organização
+    organizationName: organization.name,
+    organizationEmail: (organization.emailSettings as any)?.fromEmail || 'noreply@empresa.com',
+    
+    // Controle de tentativas
+    isFirstAttempt: attemptNumber === 1, // Confirmação
+    isReminderEmail: attemptNumber === 2, // Lembrete
+    isUrgentEmail: attemptNumber >= 3,   // Urgência
+    attemptNumber,
+    
+    // Instruções específicas por tentativa
+    instructionType: attemptNumber === 1 ? 'confirmation' : 
+                    attemptNumber === 2 ? 'reminder' : 'urgent',
+    
+    // Dados de pagamento
+    paymentMethod: 'Boleto Bancário',
+    paymentDetails: event.payment_details || {},
+    
+    // Dados adicionais
+    utm: event.utm || {},
+    
+    // Urgência baseada no vencimento
+    urgencyLevel: daysUntilDue <= 1 ? 'high' : daysUntilDue <= 3 ? 'medium' : 'low'
+  };
+
   try {
-    const validatedPayload = bankSlipGeneratedSchema.parse(payload);
-    
-    logger.info('Processing BANK_SLIP_GENERATED email', {
+    // Enviar email
+    const emailId = await sendEmail({
+      to: customerEmail,
+      subject: template.subject,
+      template: template.templateName,
+      data: templateData,
+      organizationId,
       eventId,
       attemptNumber,
-      customerEmail: validatedPayload.customer.email
     });
 
-    // Importar serviço de email dinamicamente para evitar circular imports
-    const { sendEmail } = await import('../services/email.service');
-    
-    // Preparar dados do email
-    const template = bankSlipGeneratedTemplates[attemptNumber as keyof typeof bankSlipGeneratedTemplates];
-    const subjectTemplate = bankSlipGeneratedSubjects[attemptNumber as keyof typeof bankSlipGeneratedSubjects];
-    
-    const emailData = {
-      to: validatedPayload.customer.email,
-      subject: subjectTemplate.replace('{customerName}', validatedPayload.customer.name),
-      template,
-      data: {
-        customerName: validatedPayload.customer.name,
-        transactionId: validatedPayload.transaction_id,
-        orderNumber: validatedPayload.order_number,
-        bankSlipUrl: validatedPayload.bank_slip_url,
-        digitableLine: validatedPayload.digitable_line,
-        barcode: validatedPayload.barcode,
-        totalPrice: validatedPayload.total_price,
-        dueDate: validatedPayload.due_date,
-        products: validatedPayload.products,
-        paymentDetails: validatedPayload.payment_details,
-        checkoutUrl: validatedPayload.checkout_url,
-        utm: validatedPayload.utm
-      },
-      organizationId: job.data.organizationId,
-      eventId,
-      attemptNumber
-    };
-
-    await sendEmail(emailData);
-    
-    logger.info('BANK_SLIP_GENERATED email sent successfully', {
+    logger.info('Bank slip generated email sent successfully', {
       eventId,
       attemptNumber,
-      template
+      emailId,
+      dueDate: formattedDueDate,
+      daysUntilDue
     });
-    
   } catch (error) {
-    logger.error('Error processing BANK_SLIP_GENERATED email', {
+    logger.error('Failed to send bank slip generated email', {
       eventId,
       attemptNumber,
       error: error instanceof Error ? error.message : 'Unknown error',

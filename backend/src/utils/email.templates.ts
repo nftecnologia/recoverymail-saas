@@ -78,11 +78,15 @@ const EMAIL_TEMPLATES: Record<string, Record<number, EmailTemplate>> = {
   BANK_SLIP_GENERATED: {
     1: {
       subject: '📄 Seu boleto está pronto para pagamento',
-      templateName: 'bank-slip-generated-reminder',
+      templateName: 'bank-slip-generated-confirmation',
     },
     2: {
-      subject: '⏰ Último dia para pagar seu boleto!',
-      templateName: 'bank-slip-generated-lastday',
+      subject: '⏰ Lembrete: seu boleto vence em breve',
+      templateName: 'bank-slip-generated-reminder',
+    },
+    3: {
+      subject: '🚨 Últimas horas para pagar seu boleto!',
+      templateName: 'bank-slip-generated-urgency',
     },
   },
   PIX_GENERATED: {

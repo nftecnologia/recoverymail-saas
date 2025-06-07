@@ -43,8 +43,9 @@ const EVENT_DELAYS: Record<string, number[]> = {
     0,                     // Imediato
   ],
   BANK_SLIP_GENERATED: [
+    0,                     // Imediato (confirmação)
     24 * 60 * 60 * 1000,   // 24 horas (lembrete)
-    48 * 60 * 60 * 1000,   // 48 horas (último dia)
+    48 * 60 * 60 * 1000,   // 48 horas (urgência)
   ],
   PIX_GENERATED: [
     30 * 60 * 1000,        // 30 minutos
