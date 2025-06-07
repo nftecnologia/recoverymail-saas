@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oferta Especial - Resolva seu Pagamento</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background-color: #f8f9fa; }
+        .container { max-width: 600px; margin: 0 auto; background: white; }
+        .header { background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 30px 20px; text-align: center; }
+        .header h1 { font-size: 26px; margin-bottom: 10px; }
+        .header p { font-size: 16px; opacity: 0.9; }
+        .content { padding: 30px 20px; }
+        .offer-box { background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 25px; border-radius: 10px; text-align: center; margin: 25px 0; }
+        .offer-box h2 { font-size: 28px; margin-bottom: 10px; }
+        .offer-box .discount { font-size: 36px; font-weight: bold; }
+        .offer-box .savings { font-size: 18px; margin-top: 10px; }
+        .btn { display: inline-block; background: #28a745; color: white; padding: 15px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 10px 5px; text-align: center; font-size: 16px; }
+        .btn-primary { background: #007bff; }
+        .btn-success { background: #28a745; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-large { padding: 18px 40px; font-size: 18px; }
+        .payment-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+        .payment-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; border: 2px solid #e9ecef; transition: all 0.3s; }
+        .payment-card:hover { border-color: #007bff; background: #e3f2fd; }
+        .payment-card .icon { font-size: 24px; margin-bottom: 10px; }
+        .payment-card h4 { color: #007bff; margin-bottom: 8px; }
+        .urgency-banner { background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; margin: 25px 0; border-radius: 6px; }
+        .urgency-banner .icon { font-size: 24px; margin-right: 10px; }
+        .testimonial { background: #e8f5e8; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 14px; }
+        @media (max-width: 600px) {
+            .container { margin: 0; }
+            .content { padding: 20px 15px; }
+            .payment-methods { grid-template-columns: 1fr; }
+            .btn { display: block; margin: 10px 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💳 Oferta Especial para Você!</h1>
+            <p>Resolva seu pagamento com 5% de desconto</p>
+        </div>
+
+        <div class="content">
+            <p>Olá <strong>{{customerName}}</strong>,</p>
+            
+            <p style="margin: 20px 0;">
+                Notamos que você ainda está com dificuldades para finalizar o pagamento de <strong>{{productName}}</strong>. 
+                Para ajudar, preparamos uma <strong>oferta especial exclusiva</strong> para você!
+            </p>
+
+            {{#if hasDiscount}}
+            <div class="offer-box">
+                <h2>🎁 OFERTA ESPECIAL</h2>
+                <div class="discount">{{discountPercent}}% OFF</div>
+                <div class="savings">Economia de {{savingsAmount}}</div>
+                <p style="margin-top: 15px; opacity: 0.9;">
+                    De <s>{{totalPrice}}</s> por apenas <strong>{{discountedPrice}}</strong>
+                </p>
+            </div>
+            {{/if}}
+
+            <div class="urgency-banner">
+                <div style="display: flex; align-items: center;">
+                    <span class="icon">⏰</span>
+                    <div>
+                        <strong>Oferta válida até {{deadlineDate}} às {{deadlineTime}}</strong><br>
+                        <small>Após esse prazo, o desconto não estará mais disponível</small>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="text-align: center; margin: 30px 0 20px; color: #007bff;">
+                💳 Escolha a Forma de Pagamento
+            </h3>
+
+            <div class="payment-methods">
+                <div class="payment-card">
+                    <div class="icon">💳</div>
+                    <h4>Outro Cartão</h4>
+                    <p>Tente com um cartão diferente ou de outra bandeira</p>
+                    <a href="{{newPaymentUrl}}" class="btn btn-primary" style="margin-top: 15px;">
+                        Tentar Novamente
+                    </a>
+                </div>
+
+                <div class="payment-card">
+                    <div class="icon">📱</div>
+                    <h4>PIX Instantâneo</h4>
+                    <p>Aprovação na hora, sem complicações</p>
+                    <a href="{{pixUrl}}" class="btn btn-success" style="margin-top: 15px;">
+                        Pagar com PIX
+                    </a>
+                </div>
+
+                {{#if isInsufficientFunds}}
+                <div class="payment-card">
+                    <div class="icon">📄</div>
+                    <h4>Boleto Bancário</h4>
+                    <p>Pague no seu tempo, sem pressa</p>
+                    <a href="{{bankSlipUrl}}" class="btn btn-warning" style="margin-top: 15px;">
+                        Gerar Boleto
+                    </a>
+                </div>
+
+                <div class="payment-card">
+                    <div class="icon">💰</div>
+                    <h4>Mais Parcelas</h4>
+                    <p>Reduza o valor mensal</p>
+                    <a href="{{newPaymentUrl}}" class="btn btn-primary" style="margin-top: 15px;">
+                        Parcelar Mais
+                    </a>
+                </div>
+                {{/if}}
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="{{newPaymentUrl}}" class="btn btn-success btn-large">
+                    🔥 APROVEITAR DESCONTO DE {{discountPercent}}%
+                </a>
+            </div>
+
+            <div class="testimonial">
+                <p><strong>💬 "Resolvi o problema do meu pagamento em 2 minutos com o PIX! Super recomendo."</strong></p>
+                <p style="margin-top: 10px; font-size: 14px; color: #666;">
+                    - Cliente verificado
+                </p>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h4 style="color: #dc3545; margin-bottom: 15px;">🛡️ Por que houve problema?</h4>
+                <p><strong>Motivo:</strong> {{refusedReason}}</p>
+                
+                {{#if isCardProblem}}
+                <p style="margin-top: 10px;">
+                    <strong>💡 Dica:</strong> Problemas com cartão são comuns. Tente verificar os dados ou use outro cartão.
+                </p>
+                {{/if}}
+                
+                {{#if isInsufficientFunds}}
+                <p style="margin-top: 10px;">
+                    <strong>💡 Dica:</strong> O PIX ou boleto podem ser melhores opções quando há limitação no cartão.
+                </p>
+                {{/if}}
+            </div>
+
+            <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                <h4 style="color: #1976d2; margin-bottom: 10px;">🔒 Pagamento 100% Seguro</h4>
+                <ul style="margin-left: 20px;">
+                    <li>Dados protegidos com criptografia SSL</li>
+                    <li>Certificação PCI DSS</li>
+                    <li>Sem armazenamento de dados do cartão</li>
+                </ul>
+            </div>
+
+            <p style="margin-top: 30px;">
+                Qualquer dúvida, nossa equipe está pronta para ajudar! Responda este email ou acesse nossa central de ajuda.
+            </p>
+
+            <p style="margin-top: 15px;">
+                Atenciosamente,<br>
+                <strong>Equipe {{organizationName}}</strong>
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>📧 Este é um email automático do sistema de recuperação.</p>
+            <p>{{organizationName}} | Email: {{organizationEmail}}</p>
+            {{#if supportUrl}}
+            <p><a href="{{supportUrl}}" style="color: #007bff;">Central de Ajuda</a></p>
+            {{/if}}
+        </div>
+    </div>
+</body>
+</html>

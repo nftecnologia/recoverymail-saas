@@ -1,147 +1,188 @@
-import { z } from 'zod';
 import { logger } from '../utils/logger';
+import { sendEmail } from '../services/email.service';
+import { prisma } from '../config/database';
+import { EmailJobData } from '../services/trigger.service';
 
-// Schema específico para SALE_REFUSED
-const saleRefusedSchema = z.object({
-  event: z.literal('SALE_REFUSED'),
-  transaction_id: z.string(),
-  order_number: z.string(),
-  payment_method: z.string(),
-  refusal_reason: z.string().optional(),
-  refusal_code: z.string().optional(),
-  amount: z.string(),
-  customer: z.object({
-    name: z.string(),
-    email: z.string().email(),
-    phone_number: z.string().optional(),
-    document: z.string().optional()
-  }),
-  product: z.object({
-    id: z.string(),
-    name: z.string(),
-    offer_id: z.string().optional(),
-    offer_name: z.string().optional()
-  }),
-  checkout_url: z.string().url(),
-  utm: z.object({
-    utm_source: z.string().optional(),
-    utm_medium: z.string().optional(),
-    utm_campaign: z.string().optional(),
-    utm_content: z.string().optional()
-  }).optional()
-});
+export async function processSaleRefused(data: EmailJobData): Promise<void> {
+  const { eventId, organizationId, payload, attemptNumber } = data;
+  const event = payload as any;
 
-export type SaleRefusedPayload = z.infer<typeof saleRefusedSchema>;
-
-export async function handleSaleRefused(
-  payload: unknown,
-  eventId: string,
-  organizationId: string,
-  forceImmediate: boolean = false
-) {
-  // Valida o payload
-  const validatedPayload = saleRefusedSchema.parse(payload);
-  
-  logger.info('Processing SALE_REFUSED event', {
+  logger.info('Processing sale refused email', {
     eventId,
-    organizationId,
-    customerEmail: validatedPayload.customer.email,
-    refusalReason: validatedPayload.refusal_reason
+    attemptNumber,
+    transactionId: event.transaction_id || event.sale_id,
+    customerEmail: event.customer?.email,
   });
 
-  // Configuração dos delays para cada tentativa
-  const delays = [
-    30 * 60 * 1000,        // 30 minutos - Primeira tentativa rápida
-    6 * 60 * 60 * 1000,    // 6 horas - Segunda tentativa com suporte
-  ];
+  // Buscar informações da organização
+  const organization = await prisma.organization.findUnique({
+    where: { id: organizationId },
+    select: { name: true, domain: true, emailSettings: true },
+  });
 
-  // Agenda emails para cada tentativa
-  for (let i = 0; i < delays.length; i++) {
-    const attemptNumber = i + 1;
-    const delay = forceImmediate ? 0 : delays[i];
-    
-
-    const jobId = `${eventId}-attempt-${attemptNumber}`;
-    
-
-    logger.info('Sale refused email job enqueued', {
-      jobId,
-      eventId,
-      eventType: 'SALE_REFUSED',
-      attemptNumber,
-      delay,
-      forceImmediate
-    });
+  if (!organization) {
+    throw new Error(`Organization not found: ${organizationId}`);
   }
-}
 
-// Mapeamento de templates para cada tentativa
-export const saleRefusedTemplates = {
-  1: 'sale-refused-retry',          // Primeira tentativa - Soluções rápidas
-  2: 'sale-refused-support'         // Segunda tentativa - Suporte personalizado
-};
-
-// Mapeamento de assuntos para cada tentativa
-export const saleRefusedSubjects = {
-  1: '❌ {customerName}, houve um problema com seu pagamento',
-  2: '💳 {customerName}, ainda está com problemas no pagamento?'
-};
-
-// Função de processamento para o worker
-export async function processSaleRefused(job: any): Promise<void> {
-  const { eventId, attemptNumber, payload } = job.data;
+  // Extrair dados do payload
+  const customerEmail = event.customer?.email;
+  const customerName = event.customer?.name || 'Cliente';
   
+  if (!customerEmail) {
+    throw new Error('Customer email not found in payload');
+  }
+
+  // Determinar razão da recusa (se disponível)
+  const refusedReason = event.refused_reason || event.payment?.refused_reason || 'problema com o cartão';
+  const refusedCode = event.refused_code || event.payment?.refused_code || 'insufficient_funds';
+  
+  // Mapear códigos de recusa para mensagens amigáveis
+  const refusedReasonMap: Record<string, string> = {
+    'insufficient_funds': 'saldo insuficiente',
+    'card_declined': 'cartão recusado',
+    'expired_card': 'cartão vencido',
+    'invalid_card': 'dados do cartão inválidos',
+    'card_not_supported': 'cartão não aceito',
+    'processing_error': 'erro no processamento',
+    'fraud_suspected': 'transação suspeita',
+  };
+
+  const friendlyReason = refusedReasonMap[refusedCode] || refusedReason;
+
+  // Determinar qual email enviar baseado no attemptNumber
+  let subject: string;
+  let templateName: string;
+  
+  switch (attemptNumber) {
+    case 1:
+      subject = '⚠️ Problema com seu pagamento - Vamos resolver juntos!';
+      templateName = 'sale-refused-immediate';
+      break;
+    case 2:
+      subject = '💳 Tente novamente com outro cartão - Oferta especial!';
+      templateName = 'sale-refused-alternative';
+      break;
+    case 3:
+      subject = '🎁 Última chance com desconto especial!';
+      templateName = 'sale-refused-lastchance';
+      break;
+    default:
+      throw new Error(`Invalid attempt number: ${attemptNumber}`);
+  }
+
+  // Calcular desconto crescente por tentativa
+  const discountPercent = attemptNumber === 1 ? 0 : attemptNumber === 2 ? 5 : 10;
+  let discountedPrice = event.total_price || event.amount;
+  let savingsAmount = 'R$ 0,00';
+  
+  if (discountPercent > 0 && (event.total_price || event.amount)) {
+    const priceValue = parseFloat(
+      (event.total_price || event.amount).replace('R$', '').replace('.', '').replace(',', '.')
+    );
+    if (!isNaN(priceValue)) {
+      const discountValue = priceValue * (1 - discountPercent / 100);
+      const savings = priceValue - discountValue;
+      
+      discountedPrice = `R$ ${discountValue.toFixed(2).replace('.', ',')}`;
+      savingsAmount = `R$ ${savings.toFixed(2).replace('.', ',')}`;
+    }
+  }
+
+  // Sugerir métodos alternativos de pagamento
+  const alternativePayments = [];
+  if (refusedCode !== 'insufficient_funds') {
+    alternativePayments.push('PIX (aprovação instantânea)');
+  }
+  if (!event.payment_method || event.payment_method !== 'bank_slip') {
+    alternativePayments.push('Boleto bancário');
+  }
+  if (attemptNumber >= 2) {
+    alternativePayments.push('Parcelamento em mais vezes');
+  }
+
+  // Preparar dados do template
+  const templateData = {
+    customerName: customerName.split(' ')[0], // Primeiro nome
+    customerEmail,
+    
+    // Dados da transação
+    transactionId: event.transaction_id || event.sale_id || 'N/A',
+    totalPrice: event.total_price || event.amount || 'N/A',
+    paymentMethod: event.payment_method || 'Cartão',
+    
+    // Problema
+    refusedReason: friendlyReason,
+    refusedCode,
+    isInsufficientFunds: refusedCode === 'insufficient_funds',
+    isCardProblem: ['card_declined', 'expired_card', 'invalid_card'].includes(refusedCode),
+    
+    // Produtos
+    products: event.products || [],
+    productName: event.products?.[0]?.name || event.product_name || 'seu produto',
+    
+    // URLs importantes
+    checkoutUrl: event.checkout_url || event.payment_url || '#',
+    newPaymentUrl: event.new_payment_url || event.checkout_url || '#',
+    pixUrl: event.pix_url || event.checkout_url || '#',
+    bankSlipUrl: event.bank_slip_url || event.checkout_url || '#',
+    supportUrl: event.support_url || 'https://suporte.empresa.com',
+    
+    // Organização
+    organizationName: organization.name,
+    organizationEmail: (organization.emailSettings as any)?.fromEmail || 'noreply@empresa.com',
+    
+    // Desconto e ofertas
+    hasDiscount: discountPercent > 0,
+    discountPercent,
+    discountedPrice,
+    savingsAmount,
+    
+    // Pagamentos alternativos
+    alternativePayments,
+    hasAlternatives: alternativePayments.length > 0,
+    
+    // Controle de tentativas
+    isFirstAttempt: attemptNumber === 1,
+    isSecondAttempt: attemptNumber === 2,
+    isLastAttempt: attemptNumber === 3,
+    attemptNumber,
+    
+    // Urgência
+    hasUrgency: attemptNumber >= 2,
+    
+    // Data limite (24h para resolver)
+    deadlineDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR'),
+    deadlineTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleTimeString('pt-BR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    })
+  };
+
   try {
-    const validatedPayload = saleRefusedSchema.parse(payload);
-    
-    logger.info('Processing SALE_REFUSED email', {
+    // Enviar email
+    const emailId = await sendEmail({
+      to: customerEmail,
+      subject,
+      template: templateName,
+      data: templateData,
+      organizationId,
       eventId,
       attemptNumber,
-      customerEmail: validatedPayload.customer.email
     });
 
-    // Importar serviço de email dinamicamente para evitar circular imports
-    const { sendEmail } = await import('../services/email.service');
-    
-    // Preparar dados do email
-    const template = saleRefusedTemplates[attemptNumber as keyof typeof saleRefusedTemplates];
-    const subjectTemplate = saleRefusedSubjects[attemptNumber as keyof typeof saleRefusedSubjects];
-    
-    const emailData = {
-      to: validatedPayload.customer.email,
-      subject: subjectTemplate.replace('{customerName}', validatedPayload.customer.name),
-      template,
-      data: {
-        customerName: validatedPayload.customer.name,
-        transactionId: validatedPayload.transaction_id,
-        orderNumber: validatedPayload.order_number,
-        amount: validatedPayload.amount,
-        paymentMethod: validatedPayload.payment_method,
-        refusalReason: validatedPayload.refusal_reason,
-        refusalCode: validatedPayload.refusal_code,
-        checkoutUrl: validatedPayload.checkout_url,
-        product: validatedPayload.product,
-        utm: validatedPayload.utm
-      },
-      organizationId: job.data.organizationId,
-      eventId,
-      attemptNumber
-    };
-
-    await sendEmail(emailData);
-    
-    logger.info('SALE_REFUSED email sent successfully', {
+    logger.info('Sale refused email sent successfully', {
       eventId,
       attemptNumber,
-      template
+      emailId,
+      refusedReason: friendlyReason,
+      discountPercent
     });
-    
   } catch (error) {
-    logger.error('Error processing SALE_REFUSED email', {
+    logger.error('Failed to send sale refused email', {
       eventId,
       attemptNumber,
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     throw error;
   }
-} 
+}
