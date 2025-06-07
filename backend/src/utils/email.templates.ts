@@ -45,12 +45,16 @@ const EMAIL_TEMPLATES: Record<string, Record<number, EmailTemplate>> = {
   },
   SALE_REFUSED: {
     1: {
-      subject: '❌ Pagamento não aprovado - Tente novamente',
-      templateName: 'sale-refused-retry',
+      subject: '⚠️ Problema com seu pagamento - Vamos resolver juntos!',
+      templateName: 'sale-refused-immediate',
     },
     2: {
-      subject: '💳 Problemas com o pagamento? Podemos ajudar',
-      templateName: 'sale-refused-support',
+      subject: '💳 Tente novamente com outro cartão - Oferta especial!',
+      templateName: 'sale-refused-alternative',
+    },
+    3: {
+      subject: '🎁 Última chance com desconto especial!',
+      templateName: 'sale-refused-lastchance',
     },
   },
   SALE_APPROVED: {
@@ -135,4 +139,4 @@ export function getMaxAttemptsForEvent(eventType: string): number {
   }
   
   return Object.keys(eventTemplates).length;
-} 
+}

@@ -29,8 +29,9 @@ const EVENT_DELAYS: Record<string, number[]> = {
     2 * 60 * 60 * 1000,    // 2 horas
   ],
   SALE_REFUSED: [
-    30 * 60 * 1000,        // 30 minutos
-    4 * 60 * 60 * 1000,    // 4 horas
+    15 * 60 * 1000,        // 15 minutos (urgente!)
+    2 * 60 * 60 * 1000,    // 2 horas
+    24 * 60 * 60 * 1000,   // 24 horas (última chance)
   ],
   SALE_APPROVED: [
     0,                     // Imediato
