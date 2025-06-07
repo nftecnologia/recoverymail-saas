@@ -3,19 +3,19 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/dist/server.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/webhook/(.*)",
-      "dest": "backend/dist/server.js" 
+      "dest": "/api/index.js" 
     },
     {
       "src": "/auth/(.*)",
-      "dest": "backend/dist/server.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/health",
-      "dest": "backend/dist/server.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/(.*)",
@@ -26,7 +26,7 @@
     "NODE_ENV": "production"
   },
   "functions": {
-    "backend/dist/server.js": {
+    "api/index.js": {
       "maxDuration": 300
     }
   }

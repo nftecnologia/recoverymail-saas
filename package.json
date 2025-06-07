@@ -4,13 +4,16 @@
   "description": "Inbox Recovery - Sistema de recuperação de vendas",
   "private": true,
   "scripts": {
-    "postinstall": "cd backend && npm install",
-    "build": "cd backend && npm run build",
+    "postinstall": "cd backend && npm install && cd ../dashboard && npm install",
+    "build": "cd backend && npm run build && cd ../dashboard && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build:dashboard": "cd dashboard && npm run build",
     "start": "cd backend && npm start",
-    "dev": "cd backend && npm run dev"
+    "dev": "cd backend && npm run dev",
+    "dev:dashboard": "cd dashboard && npm run dev"
   },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
   }
-} 
+}
