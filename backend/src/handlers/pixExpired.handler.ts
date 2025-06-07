@@ -1,12 +1,11 @@
-import { Job } from 'bullmq';
 import { logger } from '../utils/logger';
 import { prisma } from '../config/database';
 import { sendEmail } from '../services/email.service';
 import { getEmailTemplate } from '../utils/email.templates';
 import { EmailJobData } from '../services/trigger.service';
 
-export async function processPixExpired(job: Job<EmailJobData>): Promise<void> {
-  const { eventId, attemptNumber } = job.data;
+export async function processPixExpired(data: EmailJobData): Promise<void> {
+  const { eventId, attemptNumber } = data;
   
   logger.info('Processing PIX expired email', {
     eventId,
@@ -111,4 +110,4 @@ export async function processPixExpired(job: Job<EmailJobData>): Promise<void> {
     // Re-throw para o Bull tentar novamente
     throw error;
   }
-} 
+}

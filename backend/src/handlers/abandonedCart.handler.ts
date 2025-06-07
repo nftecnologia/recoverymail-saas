@@ -1,11 +1,10 @@
-import { Job } from 'bullmq';
 import { logger } from '../utils/logger';
 import { sendEmail } from '../services/email.service';
 import { prisma } from '../config/database';
 import { EmailJobData } from '../services/trigger.service';
 
-export async function processAbandonedCart(job: Job<EmailJobData>): Promise<void> {
-  const { eventId, organizationId, payload, attemptNumber } = job.data;
+export async function processAbandonedCart(data: EmailJobData): Promise<void> {
+  const { eventId, organizationId, payload, attemptNumber } = data;
   const event = payload as any;
 
   logger.info('Processing abandoned cart email', {
@@ -102,4 +101,4 @@ export async function processAbandonedCart(job: Job<EmailJobData>): Promise<void
     });
     throw error;
   }
-} 
+}

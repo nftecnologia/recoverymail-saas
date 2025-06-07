@@ -1,12 +1,11 @@
-import { Job } from 'bullmq';
 import { logger } from '../utils/logger';
 import { prisma } from '../config/database';
 import { sendEmail } from '../services/email.service';
 import { getEmailTemplate } from '../utils/email.templates';
 import { EmailJobData } from '../services/trigger.service';
 
-export async function processBankSlipExpired(job: Job<EmailJobData>): Promise<void> {
-  const { eventId, attemptNumber } = job.data;
+export async function processBankSlipExpired(data: EmailJobData): Promise<void> {
+  const { eventId, attemptNumber } = data;
   
   logger.info('Processing bank slip expired email', {
     eventId,
@@ -130,4 +129,4 @@ export async function processBankSlipExpired(job: Job<EmailJobData>): Promise<vo
     // Re-throw para o Bull tentar novamente
     throw error;
   }
-} 
+}
