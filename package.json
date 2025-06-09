@@ -1,18 +1,60 @@
 {
-  "name": "recovery-saas-tests",
+  "name": "recovery-saas",
   "version": "1.0.0",
-  "description": "Recovery SaaS - Test Suite",
-  "main": "test-system-complete.js",
+  "description": "Recovery SaaS - Sistema de recuperação automática de vendas perdidas",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "dashboard"
+  ],
   "scripts": {
-    "test": "node test-system-complete.js",
-    "test:abandoned-cart": "node test-abandoned-cart-complete.js",
-    "test:sale-refused": "node test-sale-refused-complete.js",
-    "setup": "node setup-database.js"
+    "dev": "concurrently \"npm run backend:dev\" \"npm run dashboard:dev\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:dashboard": "cd dashboard && npm run dev",
+    "backend:dev": "cd backend && npm run dev",
+    "dashboard:dev": "cd dashboard && npm run dev",
+    "setup": "npm install && cd backend && npm install && cd ../dashboard && npm install",
+    "setup:backend": "cd backend && npm install",
+    "setup:dashboard": "cd dashboard && npm install",
+    "build": "npm run build:backend && npm run build:dashboard",
+    "build:backend": "cd backend && npm run build",
+    "build:dashboard": "cd dashboard && npm run build",
+    "test": "cd backend && npm test",
+    "test:webhook": "node test-system-complete.js",
+    "test:complete": "npm run test:webhook",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:dashboard\"",
+    "start:backend": "cd backend && npm start",
+    "start:dashboard": "cd dashboard && npm start",
+    "clean": "rm -rf node_modules backend/node_modules dashboard/node_modules",
+    "clean:build": "rm -rf backend/dist dashboard/.next",
+    "db:setup": "cd backend && npx prisma generate && npx prisma db push",
+    "db:migrate": "cd backend && npx prisma migrate dev",
+    "db:seed": "cd backend && node seed-organization.js",
+    "postinstall": "npm run setup"
   },
-  "dependencies": {
-    "axios": "^1.6.0"
+  "devDependencies": {
+    "concurrently": "^8.2.0"
   },
-  "keywords": ["recovery", "saas", "webhooks", "email", "tests"],
-  "author": "Recovery SaaS",
-  "license": "MIT"
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nftecnologia/recoverymail-saas.git"
+  },
+  "keywords": [
+    "saas",
+    "email-marketing",
+    "recovery",
+    "e-commerce",
+    "webhook",
+    "automation",
+    "nodejs",
+    "nextjs",
+    "typescript"
+  ],
+  "author": "Recovery SaaS Team",
+  "license": "MIT",
+  "readme": "README.md"
 }

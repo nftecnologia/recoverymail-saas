@@ -1,6 +1,6 @@
 import { getSession } from "next-auth/react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.inboxrecovery.com';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 interface ApiOptions extends RequestInit {}
 
@@ -49,7 +49,7 @@ export class ApiClient {
   }
 
   // Métodos específicos
-  async getMetrics() {
+  async getMetrics(organizationId = 'test-org-123') {
     try {
       return await this.request<{
         totalEvents: number;
@@ -65,7 +65,7 @@ export class ApiClient {
         clickRate: string;
         recentEvents: number;
         processingRate: string;
-      }>('/api/dashboard/metrics');
+      }>(`/api/dashboard/metrics?organizationId=${organizationId}`);
     } catch (error) {
       // Fallback com dados mock
       console.warn('Using mock data for metrics');
@@ -92,8 +92,10 @@ export class ApiClient {
     limit?: number;
     type?: string;
     status?: string;
+    organizationId?: string;
   }) {
     const queryParams = new URLSearchParams();
+    queryParams.append('organizationId', params?.organizationId || 'test-org-123');
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.type) queryParams.append('type', params.type);
@@ -116,7 +118,7 @@ export class ApiClient {
         total: number;
         pages: number;
       };
-    }>(`/api/events?${queryParams}`);
+    }>(`/api/dashboard/events?${queryParams}`);
   }
 
   async getEmails(params?: {
@@ -124,8 +126,10 @@ export class ApiClient {
     limit?: number;
     status?: string;
     template?: string;
+    organizationId?: string;
   }) {
     const queryParams = new URLSearchParams();
+    queryParams.append('organizationId', params?.organizationId || 'test-org-123');
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.status) queryParams.append('status', params.status);
@@ -158,7 +162,7 @@ export class ApiClient {
         total: number;
         pages: number;
       };
-    }>(`/api/emails?${queryParams}`);
+    }>(`/api/dashboard/emails?${queryParams}`);
   }
 
   async getChartData(period: '7d' | '30d' = '7d') {
@@ -409,4 +413,4 @@ export const apiService = {
       emailsByStatus: {},
     };
   },
-}; 
+};
