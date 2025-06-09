@@ -29,8 +29,7 @@
     "clean:build": "rm -rf backend/dist dashboard/.next",
     "db:setup": "cd backend && npx prisma generate && npx prisma db push",
     "db:migrate": "cd backend && npx prisma migrate dev",
-    "db:seed": "cd backend && node seed-organization.js",
-    "postinstall": "npm run setup"
+    "db:seed": "cd backend && node seed-organization.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
