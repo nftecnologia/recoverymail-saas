@@ -69,6 +69,17 @@ export async function enqueueEmailJob(event: PrismaWebhookEvent, forceImmediate 
   const delays = forceImmediate ? [0] : (EVENT_DELAYS[event.eventType] || [0]);
   const payload = event.payload as unknown as WebhookEvent;
 
+  // Modo de teste - simular processamento sem chamar Trigger.dev
+  if (process.env['TEST_MODE'] === 'true') {
+    logger.info('TEST MODE: Simulating email job processing', {
+      eventId: event.id,
+      eventType: event.eventType,
+      totalJobs: delays.length,
+      delays
+    });
+    return Promise.resolve();
+  }
+
   for (let i = 0; i < delays.length; i++) {
     const jobData: EmailJobData = {
       eventId: event.id,
