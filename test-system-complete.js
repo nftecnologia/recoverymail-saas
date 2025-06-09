@@ -111,10 +111,8 @@ async function testPixExpired() {
   const pixExpiredPayload = {
     event: 'PIX_EXPIRED',
     transaction_id: 'PIX_' + Date.now(),
-    pix_id: 'PIX_' + Date.now(),
     expired_at: new Date().toISOString(),
-    amount: 'R$ 89,90',
-    expiration_time: '30 minutos',
+    total_price: 'R$ 89,90',
     customer: {
       name: 'Ana Costa',
       email: config.testEmail,
@@ -122,12 +120,7 @@ async function testPixExpired() {
     },
     pix_qr_code: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
     pix_copy_paste: '00020101021126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-42665544000052040000530398654041.235802BR5925NOME DO RECEBEDOR6009SAO PAULO61080123456762190515RP12345678-20196304A9A0',
-    new_pix_url: 'https://loja.exemplo.com/checkout/new-pix/abc123',
-    utm: {
-      utm_source: 'whatsapp',
-      utm_medium: 'social',
-      utm_campaign: 'pix_promo'
-    }
+    checkout_url: 'https://loja.exemplo.com/checkout/new-pix/abc123'
   };
   
   try {

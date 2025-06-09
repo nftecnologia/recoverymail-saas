@@ -10,87 +10,167 @@ import path from 'path';
 
 const router = Router();
 
-// Aplicar autenticação a todas as rotas da API
+// Rotas de teste público (sem autenticação) - apenas para desenvolvimento
+if (process.env['NODE_ENV'] === 'development' || process.env['TEST_MODE'] === 'true') {
+  // GET /api/dashboard/metrics (modo teste)
+  router.get('/dashboard/metrics', async (req, res) => {
+    try {
+      const { organizationId } = req.query;
+      
+      if (!organizationId) {
+        return res.status(400).json({ error: 'organizationId query parameter required' });
+      }
+
+      const now = new Date();
+      const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+      // Total de eventos
+      const totalEvents = await prisma.webhookEvent.count({
+        where: { organizationId: organizationId as string }
+      });
+
+      // Total de emails
+      const totalEmails = await prisma.emailLog.count({
+        where: { organizationId: organizationId as string }
+      });
+
+      // Emails abertos
+      const openedEmails = await prisma.emailLog.count({
+        where: { 
+          organizationId: organizationId as string,
+          openedAt: { not: null }
+        }
+      });
+
+      // Emails clicados
+      const clickedEmails = await prisma.emailLog.count({
+        where: { 
+          organizationId: organizationId as string,
+          clickedAt: { not: null }
+        }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          overview: {
+            totalEvents,
+            totalEmails,
+            openedEmails,
+            clickedEmails,
+            openRate: totalEmails > 0 ? Number((openedEmails / totalEmails * 100).toFixed(1)) : 0,
+            clickRate: totalEmails > 0 ? Number((clickedEmails / totalEmails * 100).toFixed(1)) : 0
+          },
+          testMode: true
+        }
+      });
+    } catch (error) {
+      logger.error('Error fetching test metrics', { error });
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to fetch metrics' 
+      });
+    }
+  });
+
+  // GET /api/dashboard/events (modo teste)
+  router.get('/dashboard/events', async (req, res) => {
+    try {
+      const { organizationId, page = '1', limit = '20' } = req.query;
+      
+      if (!organizationId) {
+        return res.status(400).json({ error: 'organizationId query parameter required' });
+      }
+
+      const pageNum = parseInt(page as string);
+      const limitNum = parseInt(limit as string);
+      const skip = (pageNum - 1) * limitNum;
+
+      const [events, total] = await Promise.all([
+        prisma.webhookEvent.findMany({
+          where: { organizationId: organizationId as string },
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take: limitNum
+        }),
+        prisma.webhookEvent.count({
+          where: { organizationId: organizationId as string }
+        })
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          events,
+          pagination: {
+            page: pageNum,
+            limit: limitNum,
+            total,
+            pages: Math.ceil(total / limitNum)
+          },
+          testMode: true
+        }
+      });
+    } catch (error) {
+      logger.error('Error fetching test events', { error });
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to fetch events' 
+      });
+    }
+  });
+
+  // GET /api/dashboard/emails (modo teste)
+  router.get('/dashboard/emails', async (req, res) => {
+    try {
+      const { organizationId, page = '1', limit = '20' } = req.query;
+      
+      if (!organizationId) {
+        return res.status(400).json({ error: 'organizationId query parameter required' });
+      }
+
+      const pageNum = parseInt(page as string);
+      const limitNum = parseInt(limit as string);
+      const skip = (pageNum - 1) * limitNum;
+
+      const [emails, total] = await Promise.all([
+        prisma.emailLog.findMany({
+          where: { organizationId: organizationId as string },
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take: limitNum
+        }),
+        prisma.emailLog.count({
+          where: { organizationId: organizationId as string }
+        })
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          emails,
+          pagination: {
+            page: pageNum,
+            limit: limitNum,
+            total,
+            pages: Math.ceil(total / limitNum)
+          },
+          testMode: true
+        }
+      });
+    } catch (error) {
+      logger.error('Error fetching test emails', { error });
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to fetch emails' 
+      });
+    }
+  });
+}
+
+// Aplicar autenticação a todas as outras rotas da API
 router.use(authenticateToken);
 router.use(authenticateOrganization);
-
-// GET /api/dashboard/metrics
-router.get('/dashboard/metrics', async (req, res) => {
-  try {
-    const organizationId = req.organization!.id;
-    const now = new Date();
-    const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-    // Total de eventos
-    const totalEvents = await prisma.webhookEvent.count({
-      where: { organizationId }
-    });
-
-    // Eventos processados
-    const processedEvents = await prisma.webhookEvent.count({
-      where: { 
-        organizationId,
-        status: 'PROCESSED'
-      }
-    });
-
-    // Total de emails
-    const totalEmails = await prisma.emailLog.count({
-      where: { organizationId }
-    });
-
-    // Emails por status
-    const emailsByStatus = await prisma.emailLog.groupBy({
-      by: ['status'],
-      where: { organizationId },
-      _count: true
-    });
-
-    // Taxa de abertura e cliques
-    const openedEmails = await prisma.emailLog.count({
-      where: { 
-        organizationId,
-        openedAt: { not: null }
-      }
-    });
-
-    const clickedEmails = await prisma.emailLog.count({
-      where: { 
-        organizationId,
-        clickedAt: { not: null }
-      }
-    });
-
-    // Eventos dos últimos 7 dias
-    const recentEvents = await prisma.webhookEvent.count({
-      where: {
-        organizationId,
-        createdAt: { gte: last7Days }
-      }
-    });
-
-    const metrics = {
-      totalEvents,
-      processedEvents,
-      failedEvents: totalEvents - processedEvents,
-      totalEmails,
-      sentEmails: emailsByStatus.find(e => e.status === 'SENT')?._count || 0,
-      deliveredEmails: emailsByStatus.find(e => e.status === 'DELIVERED')?._count || 0,
-      openedEmails,
-      clickedEmails,
-      bouncedEmails: emailsByStatus.find(e => e.status === 'BOUNCED')?._count || 0,
-      openRate: totalEmails > 0 ? (openedEmails / totalEmails * 100).toFixed(1) : '0',
-      clickRate: totalEmails > 0 ? (clickedEmails / totalEmails * 100).toFixed(1) : '0',
-      recentEvents,
-      processingRate: totalEvents > 0 ? (processedEvents / totalEvents * 100).toFixed(1) : '0'
-    };
-
-    res.json(metrics);
-  } catch (error) {
-    logger.error('Error fetching metrics', { error });
-    res.status(500).json({ error: 'Failed to fetch metrics' });
-  }
-});
 
 // GET /api/events
 router.get('/events', async (req, res) => {
