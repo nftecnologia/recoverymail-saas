@@ -3,7 +3,7 @@ const crypto = require('crypto');
 
 // Configuração do teste
 const config = {
-  webhookUrl: process.env.WEBHOOK_URL || 'http://localhost:3000/webhook/test-org-123',
+  webhookUrl: process.env.WEBHOOK_URL || 'http://localhost:4000/webhook/test-org-123',
   secret: process.env.WEBHOOK_SECRET || 'test-secret-key',
   testEmail: process.env.TEST_EMAIL || 'teste@recoverymail.com'
 };

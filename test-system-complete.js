@@ -4,8 +4,8 @@ const { testSaleRefused } = require('./test-sale-refused-complete');
 
 // Configuração global dos testes
 const config = {
-  webhookUrl: process.env.WEBHOOK_URL || 'http://localhost:3000/webhook/test-org-123',
-  apiUrl: process.env.API_URL || 'http://localhost:3000/api',
+  webhookUrl: process.env.WEBHOOK_URL || 'http://localhost:4000/webhook/test-org-123',
+  apiUrl: process.env.API_URL || 'http://localhost:4000/api',
   secret: process.env.WEBHOOK_SECRET || 'test-secret-key',
   testEmail: process.env.TEST_EMAIL || 'teste@recoverymail.com',
   orgId: process.env.TEST_ORG_ID || 'test-org-123'
