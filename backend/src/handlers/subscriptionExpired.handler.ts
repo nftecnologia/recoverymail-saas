@@ -1,177 +1,205 @@
-import { z } from 'zod';
 import { logger } from '../utils/logger';
+import { sendEmail } from '../services/email.service';
+import { prisma } from '../config/database';
+import { getEmailTemplate } from '../utils/email.templates';
+import { EmailJobData } from '../services/trigger.service';
 
-// Schema específico para SUBSCRIPTION_EXPIRED
-const subscriptionExpiredSchema = z.object({
-  event: z.literal('SUBSCRIPTION_EXPIRED'),
-  subscription_id: z.string(),
-  customer_id: z.string().optional(),
-  subscription_plan: z.object({
-    id: z.string(),
-    name: z.string(),
-    price: z.string(),
-    billing_cycle: z.enum(['MONTHLY', 'QUARTERLY', 'YEARLY']).optional(),
-    description: z.string().optional()
-  }),
-  customer: z.object({
-    name: z.string(),
-    email: z.string().email(),
-    phone_number: z.string().optional(),
-    document: z.string().optional(),
-    subscription_start_date: z.string().optional(),
-    last_payment_date: z.string().optional(),
-    total_paid: z.string().optional(),
-    usage_stats: z.object({
-      total_logins: z.number().optional(),
-      content_accessed: z.number().optional(),
-      completion_rate: z.string().optional()
-    }).optional()
-  }),
-  expiration: z.object({
-    expired_at: z.string(),
-    reason: z.enum(['PAYMENT_FAILED', 'CARD_EXPIRED', 'INSUFFICIENT_FUNDS', 'CANCELED', 'OTHER']).optional(),
-    grace_period_until: z.string().optional(), // Período de graça
-    failed_attempts: z.number().optional()
-  }),
-  renewal_offer: z.object({
-    discount_percent: z.number().optional(),
-    discount_amount: z.string().optional(),
-    valid_until: z.string().optional(),
-    payment_link: z.string().url().optional(),
-    alternative_plans: z.array(z.object({
-      id: z.string(),
-      name: z.string(),
-      price: z.string(),
-      discount: z.string().optional()
-    })).optional()
-  }).optional(),
-  content_backup: z.object({
-    download_link: z.string().url().optional(),
-    available_until: z.string().optional(),
-    content_list: z.array(z.string()).optional()
-  }).optional(),
-  checkout_url: z.string().url().optional(),
-  utm: z.object({
-    utm_source: z.string().optional(),
-    utm_medium: z.string().optional(),
-    utm_campaign: z.string().optional(),
-    utm_content: z.string().optional()
-  }).optional()
-});
+export async function processSubscriptionExpired(data: EmailJobData): Promise<void> {
+  const { eventId, organizationId, payload, attemptNumber } = data;
+  const event = payload as any;
 
-export type SubscriptionExpiredPayload = z.infer<typeof subscriptionExpiredSchema>;
-
-export async function handleSubscriptionExpired(
-  payload: unknown,
-  eventId: string,
-  organizationId: string,
-  forceImmediate: boolean = false
-) {
-  // Valida o payload
-  const validatedPayload = subscriptionExpiredSchema.parse(payload);
-  
-  logger.info('Processing SUBSCRIPTION_EXPIRED event', {
+  logger.info('Processing subscription expired email', {
     eventId,
-    organizationId,
-    customerEmail: validatedPayload.customer.email,
-    subscriptionId: validatedPayload.subscription_id,
-    expirationReason: validatedPayload.expiration.reason
+    attemptNumber,
+    subscriptionId: event.subscription_id || event.id,
+    customerEmail: event.customer?.email,
   });
 
-  // Configuração dos delays para cada tentativa
-  const delays = [
-    0,                         // Imediato - Notificação de expiração
-    3 * 24 * 60 * 60 * 1000,   // 3 dias - Oferta de renovação
-    7 * 24 * 60 * 60 * 1000,   // 7 dias - Última chance antes da perda completa
-  ];
+  // Buscar informações da organização
+  const organization = await prisma.organization.findUnique({
+    where: { id: organizationId },
+    select: { name: true, domain: true, emailSettings: true },
+  });
 
-  // Agenda emails para cada tentativa
-  for (let i = 0; i < delays.length; i++) {
-    const attemptNumber = i + 1;
-    const delay = forceImmediate ? 0 : delays[i];
-    
-
-    const jobId = `${eventId}-attempt-${attemptNumber}`;
-    
-
-    logger.info('Subscription expired email job enqueued', {
-      jobId,
-      eventId,
-      eventType: 'SUBSCRIPTION_EXPIRED',
-      attemptNumber,
-      delay,
-      forceImmediate
-    });
+  if (!organization) {
+    throw new Error(`Organization not found: ${organizationId}`);
   }
-}
 
-// Mapeamento de templates para cada tentativa
-export const subscriptionExpiredTemplates = {
-  1: 'subscription-expired-notification',   // Notificação da expiração
-  2: 'subscription-expired-renewal',        // Oferta de renovação
-  3: 'subscription-expired-lastchance'      // Última chance antes da perda
-};
-
-// Mapeamento de assuntos para cada tentativa
-export const subscriptionExpiredSubjects = {
-  1: '⚠️ {customerName}, sua assinatura expirou - Renovar agora',
-  2: '💡 {customerName}, oferta especial para renovar sua assinatura',
-  3: '🚨 {customerName}, ÚLTIMA CHANCE: Seus dados serão excluídos em breve'
-};
-
-// Função de processamento para o worker
-export async function processSubscriptionExpired(job: any): Promise<void> {
-  const { eventId, attemptNumber, payload } = job.data;
+  // Extrair dados do payload
+  const customerEmail = event.customer?.email;
+  const customerName = event.customer?.name || 'Cliente';
   
+  if (!customerEmail) {
+    throw new Error('Customer email not found in payload');
+  }
+
+  // Buscar template para esta tentativa
+  const template = getEmailTemplate('SUBSCRIPTION_EXPIRED', attemptNumber);
+  if (!template) {
+    throw new Error(`No template found for SUBSCRIPTION_EXPIRED attempt ${attemptNumber}`);
+  }
+
+  // Processar datas importantes
+  const expiredAt = event.expiration?.expired_at || event.expired_at;
+  const gracePeriodUntil = event.expiration?.grace_period_until || event.grace_period_until;
+  const renewalValidUntil = event.renewal_offer?.valid_until || event.offer_valid_until;
+  
+  let formattedExpiredDate = 'não informado';
+  let daysExpired = 0;
+  let gracePeriodDays = 0;
+  let offerValidDays = 0;
+
+  if (expiredAt) {
+    try {
+      const expiredDate = new Date(expiredAt);
+      formattedExpiredDate = expiredDate.toLocaleDateString('pt-BR');
+      daysExpired = Math.ceil((Date.now() - expiredDate.getTime()) / (1000 * 60 * 60 * 24));
+    } catch (e) {
+      formattedExpiredDate = expiredAt;
+    }
+  }
+
+  if (gracePeriodUntil) {
+    try {
+      const graceDate = new Date(gracePeriodUntil);
+      gracePeriodDays = Math.ceil((graceDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    } catch (e) {
+      // Ignore parsing error
+    }
+  }
+
+  if (renewalValidUntil) {
+    try {
+      const offerDate = new Date(renewalValidUntil);
+      offerValidDays = Math.ceil((offerDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    } catch (e) {
+      // Ignore parsing error
+    }
+  }
+
+  // Calcular desconto baseado na tentativa
+  const discountPercent = attemptNumber === 1 ? 0 : 
+                         attemptNumber === 2 ? 25 : 50; // Desconto crescente: 0%, 25%, 50%
+
+  // Preparar dados do template
+  const templateData = {
+    customerName: customerName.split(' ')[0], // Primeiro nome
+    customerFullName: customerName,
+    customerEmail,
+    
+    // Dados da assinatura
+    subscriptionId: event.subscription_id || event.id || 'N/A',
+    subscriptionPlan: event.subscription_plan || event.plan || {},
+    planName: event.subscription_plan?.name || event.plan_name || 'Sua Assinatura',
+    planPrice: event.subscription_plan?.price || event.plan_price || 'N/A',
+    billingCycle: event.subscription_plan?.billing_cycle || event.billing_cycle || 'MONTHLY',
+    
+    // Datas e prazos
+    expiredAt: formattedExpiredDate,
+    daysExpired,
+    gracePeriodDays,
+    hasGracePeriod: gracePeriodDays > 0,
+    isInGracePeriod: gracePeriodDays > 0,
+    
+    // Motivo da expiração
+    expirationReason: event.expiration?.reason || event.expiration_reason || 'PAYMENT_FAILED',
+    failedAttempts: event.expiration?.failed_attempts || event.failed_attempts || 0,
+    
+    // Oferta de renovação
+    hasRenewalOffer: !!(event.renewal_offer || discountPercent > 0),
+    discountPercent,
+    discountAmount: event.renewal_offer?.discount_amount || '',
+    originalPrice: event.subscription_plan?.price || event.plan_price || '',
+    offerValidDays,
+    offerValidUntil: renewalValidUntil,
+    
+    // URLs de renovação
+    renewalUrl: event.renewal_offer?.payment_link || event.checkout_url || event.renewal_url || '#',
+    checkoutUrl: event.checkout_url || '#',
+    
+    // Planos alternativos
+    alternativePlans: event.renewal_offer?.alternative_plans || event.alternative_plans || [],
+    hasAlternativePlans: Array.isArray(event.renewal_offer?.alternative_plans || event.alternative_plans),
+    
+    // Backup de conteúdo
+    contentBackup: event.content_backup || {},
+    hasContentBackup: !!(event.content_backup?.download_link || event.backup_url),
+    backupUrl: event.content_backup?.download_link || event.backup_url || '',
+    backupValidUntil: event.content_backup?.available_until || '',
+    contentList: event.content_backup?.content_list || [],
+    
+    // Estatísticas de uso
+    usageStats: event.customer?.usage_stats || event.usage_stats || {},
+    totalLogins: event.customer?.usage_stats?.total_logins || event.total_logins || 0,
+    contentAccessed: event.customer?.usage_stats?.content_accessed || event.content_accessed || 0,
+    completionRate: event.customer?.usage_stats?.completion_rate || event.completion_rate || '0%',
+    hasUsageStats: !!(event.customer?.usage_stats || event.usage_stats),
+    
+    // Datas importantes do histórico
+    subscriptionStartDate: event.customer?.subscription_start_date || event.start_date || '',
+    lastPaymentDate: event.customer?.last_payment_date || event.last_payment || '',
+    totalPaid: event.customer?.total_paid || event.total_paid || '',
+    
+    // URLs importantes
+    supportUrl: event.support_url || 'https://suporte.empresa.com',
+    accountUrl: event.account_url || event.platform_url || '#',
+    
+    // Organização
+    organizationName: organization.name,
+    organizationEmail: (organization.emailSettings as any)?.fromEmail || 'noreply@empresa.com',
+    
+    // Controle de tentativas
+    isNotification: attemptNumber === 1,     // Primeira notificação
+    isRenewalOffer: attemptNumber === 2,     // Oferta de renovação
+    isLastChance: attemptNumber === 3,       // Última chance
+    attemptNumber,
+    
+    // Estados baseados no tempo
+    isRecentExpiry: daysExpired <= 7,
+    isLongExpired: daysExpired > 30,
+    urgencyLevel: attemptNumber === 1 ? 'medium' : 
+                 attemptNumber === 2 ? 'high' : 'critical',
+    
+    // Incentivos baseados na tentativa
+    showDiscount: attemptNumber >= 2,
+    showUrgency: attemptNumber >= 2,
+    showDataLossWarning: attemptNumber === 3,
+    
+    // Call-to-actions dinâmicos
+    ctaText: attemptNumber === 1 ? 'RENOVAR ASSINATURA' :
+             attemptNumber === 2 ? `RENOVAR COM ${discountPercent}% OFF` :
+             'ÚLTIMA CHANCE - RENOVAR AGORA',
+    
+    // Dados adicionais
+    utm: event.utm || {},
+    customerId: event.customer_id || event.customer?.id || '',
+    
+    // Status da conta
+    accountStatus: 'EXPIRED',
+    accessStatus: gracePeriodDays > 0 ? 'LIMITED' : 'SUSPENDED'
+  };
+
   try {
-    const validatedPayload = subscriptionExpiredSchema.parse(payload);
-    
-    logger.info('Processing SUBSCRIPTION_EXPIRED email', {
+    // Enviar email
+    const emailId = await sendEmail({
+      to: customerEmail,
+      subject: template.subject,
+      template: template.templateName,
+      data: templateData,
+      organizationId,
       eventId,
       attemptNumber,
-      customerEmail: validatedPayload.customer.email
     });
 
-    // Importar serviço de email dinamicamente para evitar circular imports
-    const { sendEmail } = await import('../services/email.service');
-    
-    // Preparar dados do email
-    const template = subscriptionExpiredTemplates[attemptNumber as keyof typeof subscriptionExpiredTemplates];
-    const subjectTemplate = subscriptionExpiredSubjects[attemptNumber as keyof typeof subscriptionExpiredSubjects];
-    
-    const emailData = {
-      to: validatedPayload.customer.email,
-      subject: subjectTemplate.replace('{customerName}', validatedPayload.customer.name),
-      template,
-      data: {
-        customerName: validatedPayload.customer.name,
-        subscriptionId: validatedPayload.subscription_id,
-        subscriptionPlan: validatedPayload.subscription_plan,
-        expiration: validatedPayload.expiration,
-        renewalOffer: validatedPayload.renewal_offer,
-        contentBackup: validatedPayload.content_backup,
-        checkoutUrl: validatedPayload.checkout_url,
-        utm: validatedPayload.utm,
-        // Dados específicos por tentativa
-        isNotification: attemptNumber === 1,
-        isRenewalOffer: attemptNumber === 2,
-        isLastChance: attemptNumber === 3
-      },
-      organizationId: job.data.organizationId,
-      eventId,
-      attemptNumber
-    };
-
-    await sendEmail(emailData);
-    
-    logger.info('SUBSCRIPTION_EXPIRED email sent successfully', {
+    logger.info('Subscription expired email sent successfully', {
       eventId,
       attemptNumber,
-      template
+      emailId,
+      planName: templateData.planName,
+      discountPercent
     });
-    
   } catch (error) {
-    logger.error('Error processing SUBSCRIPTION_EXPIRED email', {
+    logger.error('Failed to send subscription expired email', {
       eventId,
       attemptNumber,
       error: error instanceof Error ? error.message : 'Unknown error',
