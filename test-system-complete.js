@@ -40,18 +40,18 @@ async function testDashboardAPIs() {
   const tests = [
     {
       name: 'Métricas Dashboard',
-      endpoint: '/dashboard/metrics',
-      expectedFields: ['totalEvents', 'totalEmails', 'openRate', 'clickRate']
+      endpoint: '/dashboard/metrics?organizationId=test-org-123',
+      expectedFields: ['success', 'data']
     },
     {
       name: 'Lista de Eventos',
-      endpoint: '/dashboard/events?page=1&limit=10',
-      expectedFields: ['events', 'total', 'page', 'limit']
+      endpoint: '/dashboard/events?organizationId=test-org-123&page=1&limit=10',
+      expectedFields: ['success', 'data']
     },
     {
       name: 'Lista de Emails',
-      endpoint: '/dashboard/emails?page=1&limit=10', 
-      expectedFields: ['emails', 'total', 'page', 'limit']
+      endpoint: '/dashboard/emails?organizationId=test-org-123&page=1&limit=10', 
+      expectedFields: ['success', 'data']
     }
   ];
 

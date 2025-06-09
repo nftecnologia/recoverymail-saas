@@ -47,6 +47,8 @@ const saleRefusedPayload = {
     sku: 'COURSE_ECOMMERCE_ADV',
     digital: true
   },
+  payment_method: 'CREDIT_CARD',
+  checkout_url: 'https://loja.exemplo.com/checkout/retry/abc123',
   payment_details: {
     method: 'CREDIT_CARD',
     card_brand: 'visa',
