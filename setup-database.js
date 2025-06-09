@@ -83,10 +83,37 @@ async function setupDatabase() {
     execSync('npx prisma generate', { stdio: 'inherit' });
     log('green', '✅ Cliente Prisma gerado');
 
-    // 3. Executar migrations
-    log('blue', '📊 Executando migrations...');
-    execSync('npx prisma migrate deploy', { stdio: 'inherit' });
-    log('green', '✅ Migrations executadas');
+    // 3. Resolver conflito de provider e executar migrations
+    log('blue', '📊 Resolvendo conflito de migrations...');
+    
+    // Verificar se existe conflito de provider
+    const migrationLockPath = 'prisma/migrations/migration_lock.toml';
+    if (fs.existsSync(migrationLockPath)) {
+      const lockContent = fs.readFileSync(migrationLockPath, 'utf8');
+      if (lockContent.includes('postgresql')) {
+        log('yellow', '⚠️ Conflito detectado: migrations eram PostgreSQL, convertendo para SQLite...');
+        
+        // Backup e remover migrations antigas
+        if (fs.existsSync('prisma/migrations')) {
+          if (fs.existsSync('prisma/migrations.backup')) {
+            execSync('rm -rf prisma/migrations.backup', { stdio: 'inherit' });
+          }
+          execSync('mv prisma/migrations prisma/migrations.backup', { stdio: 'inherit' });
+          log('green', '✅ Migrations PostgreSQL movidas para backup');
+        }
+      }
+    }
+    
+    // Criar nova migration para SQLite ou usar dev se não existir
+    if (!fs.existsSync('prisma/migrations') || fs.readdirSync('prisma/migrations').length === 0) {
+      log('blue', '📊 Criando nova migration para SQLite...');
+      execSync('npx prisma migrate dev --name init --skip-generate', { stdio: 'inherit' });
+    } else {
+      log('blue', '📊 Executando migrations existentes...');
+      execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+    }
+    
+    log('green', '✅ Migrations configuradas para SQLite');
 
     // 4. Verificar se dev.db foi criado
     if (fs.existsSync('dev.db')) {
